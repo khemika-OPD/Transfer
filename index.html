@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Takhli OPD Smart Queue - นวัตกรรมระบบคิวเปลอัจฉริยะ</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-family-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #0288d1;
@@ -77,7 +77,8 @@
             font-weight: 600;
             color: #333;
         }
-        .select-input {
+        /* ดีไซน์ช่องกรอกสำหรับการพิมพ์ค้นหาอัตโนมัติ */
+        .select-input, .search-input {
             width: 100%;
             padding: 12px;
             border-radius: 8px;
@@ -85,6 +86,12 @@
             font-size: 16px;
             box-sizing: border-box;
             font-family: 'Sarabun', sans-serif;
+            background-color: #fff;
+        }
+        .search-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 5px rgba(2, 136, 209, 0.3);
         }
         .btn {
             width: 100%;
@@ -156,6 +163,7 @@
 
     <div class="container">
         
+        <!-- แถบสลับโหมดผู้ใช้งาน -->
         <div class="role-switcher">
             <button id="btnNurseMode" class="role-btn active" onclick="switchMode('nurse')">
                 <i class="fa-solid fa-user-nurse"></i> 1. ฝั่งพยาบาลสั่งงาน
@@ -165,6 +173,7 @@
             </button>
         </div>
 
+        <!-- ================= โหมด 1: ฝั่งพยาบาลสั่งงาน ================= -->
         <div id="nurseModeSection" class="app-mode active">
             <div class="card">
                 <h3 style="margin-top:0; color: var(--primary-color);"><i class="fa-solid fa-paper-plane"></i> คีย์ส่งงานคิวเปลด่วน</h3>
@@ -186,26 +195,64 @@
                     </select>
                 </div>
 
+                <!-- 🔍 อัปเกรดระบบพิมพ์ค้นหาจุดต้นทางอัตโนมัติ (Datalist Search) -->
                 <div class="form-group">
-                    <label>📍 จุดต้นทาง (รับผู้ป่วย):</label>
-                    <select id="jobFrom" class="select-input">
-                        <option value="จุดคัดกรองหน้า OPD">จุดคัดกรองหน้า OPD</option>
-                        <option value="โต๊ะแยกตรวจบัตรทอง">โต๊ะแยกตรวจบัตรทอง</option>
-                        <option value="ห้องตรวจอายุรกรรม">ห้องตรวจอายุรกรรม</option>
-                        <option value="ห้องฉุกเฉิน (ER)">ห้องฉุกเฉิน (ER)</option>
-                    </select>
+                    <label>📍 จุดต้นทาง (พิมพ์ค้นหาหรือคลิกเลือก):</label>
+                    <input list="fromLocations" id="jobFrom" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดต้นทาง..." autocomplete="off">
+                    <datalist id="fromLocations">
+                        <option value="จุดแยกตรวจ">
+                        <option value="จุดซักประวัติ">
+                        <option value="หน้าห้องบัตร">
+                        <option value="จุดรถนั่ง">
+                        <option value="จุด 10">
+                        <option value="หน้าห้องตรวจ 6">
+                        <option value="จุด 99">
+                        <option value="หน้าห้อง Lab">
+                        <option value="หน้าห้องยา">
+                        <option value="ประชาสัมพันธ์">
+                        <option value="หน้าห้องการเงิน">
+                        <option value="คลินิกพิเศษ">
+                        <option value="ห้องน้ำ">
+                        <option value="ห้องฉุกเฉิน (ER)">
+                    </datalist>
                 </div>
 
+                <!-- 🔍 อัปเกรดระบบพิมพ์ค้นหาจุดปลายทางอัตโนมัติ 32 จุดทั่วโรงพยาบาลตาคลี -->
                 <div class="form-group">
-                    <label>➡️ จุดปลายทาง (ส่งผู้ป่วย):</label>
-                    <select id="jobTo" class="select-input">
-                        <option value="กลับบ้าน OPD 🏠">กลับบ้าน OPD 🏠</option>
-                        <option value="กลับบ้าน ER 🏠">กลับบ้าน ER 🏠</option>
-                        <option value="แผนกเอ็กซเรย์ (X-Ray)">แผนกเอ็กซเรย์ (X-Ray)</option>
-                        <option value="ห้องปฏิบัติการ (Lab)">ห้องปฏิบัติการ (Lab)</option>
-                        <option value="ห้องจ่ายยา OPD">ห้องจ่ายยา OPD</option>
-                        <option value="หอผู้ป่วยใน (IPD)">หอผู้ป่วยใน (IPD)</option>
-                    </select>
+                    <label>➡️ จุดปลายทาง (พิมพ์ค้นหาหรือคลิกเลือก):</label>
+                    <input list="toLocations" id="jobTo" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดปลายทาง..." autocomplete="off">
+                    <datalist id="toLocations">
+                        <option value="กลับบ้าน OPD 🏠">
+                        <option value="กลับบ้าน ER 🏠">
+                        <option value="ห้องผ่าตัด">
+                        <option value="ห้องคลอด">
+                        <option value="ห้องฝากครรภ์">
+                        <option value="ห้อง ICU">
+                        <option value="ห้องฉุกเฉิน ER">
+                        <option value="ห้องเอกซเรย์">
+                        <option value="ห้องจิตเวช">
+                        <option value="ห้องกายภาพ">
+                        <option value="ห้อง CT">
+                        <option value="ทันตกรรมบน">
+                        <option value="ทันตกรรมล่าง">
+                        <option value="ตึกหญิง">
+                        <option value="ตึกเด็ก">
+                        <option value="ตึกชาย">
+                        <option value="ตึกพิเศษ">
+                        <option value="จุดแยกตรวจ">
+                        <option value="จุดซักประวัติ">
+                        <option value="หน้าห้องบัตร">
+                        <option value="จุดรถนั่ง">
+                        <option value="จุด 10">
+                        <option value="หน้าห้องตรวจ 6">
+                        <option value="จุด 99">
+                        <option value="หน้าห้อง Lab">
+                        <option value="หน้าห้องยา">
+                        <option value="ประชาสัมพันธ์">
+                        <option value="หน้าห้องการเงิน">
+                        <option value="คลินิกพิเศษ">
+                        <option value="ห้องน้ำ">
+                    </datalist>
                 </div>
 
                 <button class="btn btn-primary" onclick="sendJobFromNurse()">
@@ -215,6 +262,7 @@
         </div>
 
 
+        <!-- ================= โหมด 2: ฝั่งพนักงานเปลรับงาน ================= -->
         <div id="staffModeSection" class="app-mode">
             <div id="loginSection" class="card">
                 <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
@@ -247,7 +295,7 @@
                         </div>
                         <span id="demoDetails">
                             <strong>🚨 อุปกรณ์:</strong> รถเข็นนั่ง (Wheelchair) 🦽<br>
-                            <strong>📍 ต้นทาง:</strong> จุดคัดกรองหน้า OPD<br>
+                            <strong>📍 ต้นทาง:</strong> จุดแยกตรวจ<br>
                             <strong>➡️ ปลายทาง:</strong> กลับบ้าน OPD 🏠
                         </span>
                         <div style="margin-top: 12px;">
@@ -273,7 +321,7 @@
         let currentLiveJob = {
             priority: "ปกติ",
             type: "รถเข็นนั่ง (Wheelchair) 🦽",
-            from: "จุดคัดกรองหน้า OPD",
+            from: "จุดแยกตรวจ",
             to: "กลับบ้าน OPD 🏠"
         };
 
@@ -310,6 +358,12 @@
             const from = document.getElementById("jobFrom").value;
             const to = document.getElementById("jobTo").value;
 
+            // ตรวจเช็คกรณีพยาบาลลืมพิมพ์จุดรับส่งเพื่อความถูกต้องของฐานข้อมูล
+            if (!from || !to) {
+                alert("⚠️ ข้อผิดพลาด: กรุณาระบุจุดต้นทางและจุดปลายทางก่อนกดส่งงานด้วยค่ะ");
+                return;
+            }
+
             const now = new Date();
             const orderTimeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
             
@@ -325,7 +379,6 @@
             const item = document.getElementById("demoQueueItem");
             const tag = document.getElementById("priorityTag");
             
-            // รีเซ็ตสถานะเสียงเก่าก่อนเล่นใหม่
             const nSound = document.getElementById("normalSound");
             const uSound = document.getElementById("urgentSound");
             nSound.pause(); nSound.currentTime = 0;
@@ -335,12 +388,12 @@
                 item.className = "queue-item urgent-pending";
                 tag.className = "tag tag-urgent";
                 tag.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> ความเร่งด่วน: 🔴 เร่งด่วน";
-                uSound.play().catch(e => { console.log("Audio play blocked by browser setup"); });
+                uSound.play().catch(e => {});
             } else {
                 item.className = "queue-item normal-pending";
                 tag.className = "tag tag-normal";
                 tag.innerHTML = "🟡 ความเร่งด่วน: ปกติ";
-                nSound.play().catch(e => { console.log("Audio play blocked by browser setup"); });
+                nSound.play().catch(e => {});
             }
 
             item.querySelector("button").disabled = false;
@@ -400,7 +453,6 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                // ดับเสียงแจ้งเตือนทันทีเมื่อเปลกดยอมรับงานสำเร็จ
                 document.getElementById("urgentSound").pause();
                 document.getElementById("urgentSound").currentTime = 0;
                 document.getElementById("normalSound").pause();
