@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบริหารคิวงานเปล - โรงพยาบาล (เชื่อมต่อ Google Sheet อัตโนมัติ)</title>
+    <title>ระบบบริหารคิวงานเปล - โรงพยาบาล (ระบบเตือนภัยคิวค้าง)</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -39,10 +39,31 @@
         .tab-btn { flex: 1; padding: 12px; border: none; background: #dcdde1; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
         .tab-btn.active { background: var(--primary); color: white; }
 
-        /* Task List */
+        /* 🚨 สไตล์ไฟกระพริบเตือนภัยสลับสีสำหรับคิวงานที่ยังไม่สำเร็จ */
+        @keyframes pulse-border {
+            0% { border-left-color: #e74c3c; background-color: #fff; box-shadow: 0 0 4px rgba(231, 76, 60, 0.2); }
+            50% { border-left-color: #f39c12; background-color: #fff2f2; box-shadow: 0 0 15px rgba(231, 76, 60, 0.6); }
+            100% { border-left-color: #e74c3c; background-color: #fff; box-shadow: 0 0 4px rgba(231, 76, 60, 0.2); }
+        }
+        @keyframes text-flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
         .task-card { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 6px solid var(--warning); box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; }
-        .task-card.success { border-left-color: var(--success); }
         
+        /* ใส่เอฟเฟกต์ไฟกระพริบให้คิวที่ค้างอยู่ */
+        .task-card.pending-alert {
+            animation: pulse-border 1.5s infinite;
+        }
+        .flash-text {
+            color: #d35400;
+            font-weight: bold;
+            animation: text-flash 1s infinite;
+        }
+
+        .task-card.success { border-left-color: var(--success); }
         .task-info { flex: 1; }
         .task-meta { font-size: 11px; color: #7f8c8d; margin-bottom: 4px; display: flex; gap: 8px; }
         .task-type-tag { background: #eee; padding: 1px 6px; border-radius: 4px; font-weight: bold; color: #333; }
@@ -50,10 +71,10 @@
         .task-staff { font-size: 13px; color: #2ecc71; font-weight: bold; margin-top: 2px; }
         
         .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; }
-        .status-pending { background: #fef9e7; color: #f39c12; }
+        .status-pending { background: #e74c3c; color: white; font-size: 13px; box-shadow: 0 3px 6px rgba(231,76,60,0.3); }
         .status-done { background: #d4efdf; color: #27ae60; cursor: default; }
 
-        /* สไตล์ตารางทะเบียนรายงานแบบเอกสารเดิม */
+        /* สไตล์ตารางทะเบียนรายงาน */
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid #dcdde1; }
         .report-table { width: 100%; border-collapse: collapse; background: white; min-width: 550px; }
         .report-table th, .report-table td { border: 1px solid #dcdde1; padding: 8px 6px; text-align: center; font-size: 13px; }
@@ -177,13 +198,64 @@
     </div>
 
     <script>
-        // ==========================================
-        // 🔗 1. เอาลิงก์ Web App จาก Google Apps Script มาวางแทนในเครื่องหมายคำพูดด้านล่างนี้ได้เลยค่ะ
-        // ==========================================
         const GOOGLE_SHEET_URL = "วาง_URL_เว็บแอปของอาจารย์ตรงนี้ค่ะ";
 
         const staffList = ["สมใจ", "สมบัติ", "นิรันดร์"];
         let jobDatabase = JSON.parse(localStorage.getItem('stretcher_jobs')) || [];
+        let alertInterval = null; // ตัวแปรคุมจังหวะเสียงไซเรน
+
+        // 🔊 ฟังก์ชันสังเคราะห์เสียงบี๊ปเตือนภัยผ่านลำโพงระบบ
+        function playAlertSound() {
+            try {
+                let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // เสียงที่ 1
+                let osc1 = audioCtx.createOscillator();
+                let gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(880, audioCtx.currentTime); // ความถี่เสียงแหลมสูง
+                gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start();
+                osc1.stop(audioCtx.currentTime + 0.15); // ดัง 0.15 วินาที
+                
+                // เสียงที่ 2 (เว้นจังหวะนิดนึงให้เป็นเสียงปี๊ปๆ)
+                setTimeout(() => {
+                    let osc2 = audioCtx.createOscillator();
+                    let gain2 = audioCtx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 0.15);
+                }, 200);
+
+            } catch (e) {
+                console.log("เบราว์เซอร์บล็อกเสียง รอการคลิกจากผู้ใช้งานก่อน");
+            }
+        }
+
+        // ⏱️ ตรวจสอบคิวค้างเพื่อคุมการเปิด-ปิดระบบเสียงอัตโนมัติ
+        function checkPendingAlerts() {
+            let hasPending = jobDatabase.some(j => j.status === "Pending");
+            
+            if (hasPending) {
+                // ถ้ามีคิวค้างและยังไม่ได้เปิดเสียง ให้เริ่มรันเสียงเตือนทุกๆ 10 วินาที
+                if (!alertInterval) {
+                    playAlertSound(); // ดังทันทีรอบแรก
+                    alertInterval = setInterval(playAlertSound, 10000);
+                }
+            } else {
+                // ถ้าไม่มีคิวงานค้างเลย ให้สั่งปิดเสียงเตือนให้เงียบสนิท
+                if (alertInterval) {
+                    clearInterval(alertInterval);
+                    alertInterval = null;
+                }
+            }
+        }
 
         function checkAndDateReset() {
             let today = new Date();
@@ -205,7 +277,6 @@
             if(tabId === 'summary-tab') renderReportTable();
         }
 
-        // ฟังก์ชันแจ้งงานใหม่ (ยิงข้อมูลส่งเข้าสู่ Google Sheet แบบอัตโนมัติทันทีกดปุ่ม)
         function addNewJob() {
             let reqType = document.getElementById('request-type').value;
             let fromLoc = document.getElementById('from-location').value;
@@ -214,6 +285,7 @@
             let timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
             let newJob = {
+                id: Date.now(),
                 time: timeStr,
                 type: reqType,
                 from: fromLoc,
@@ -222,7 +294,6 @@
                 status: "Pending"
             };
 
-            // 🚀 ฟังก์ชันคลิกเดียวยิงตรงเข้า Google Sheet อัตโนมัติหลังบ้าน
             if (GOOGLE_SHEET_URL !== "วาง_URL_เว็บแอปของอาจารย์ตรงนี้ค่ะ") {
                 fetch(GOOGLE_SHEET_URL, {
                     method: "POST",
@@ -234,20 +305,12 @@
 
             jobDatabase.push(newJob);
             saveAndRender();
-            alert("📌 บันทึกคิวงานเรียบร้อย และข้อมูลส่งเข้า Google Sheet ส่วนกลางแล้วค่ะ!");
+            playAlertSound(); // ส่งเสียงเตือนทันทีที่มีการคีย์งานชิ้นใหม่เข้าตาราง
         }
 
-        // ฟังก์ชันรับคิวงาน (เมื่อลูกน้องเคลียร์งาน จะทำอัปเดตข้อมูลแถวใหม่ในแอป)
         function claimJob(jobId) {
-            let pendingJobs = jobDatabase.filter(j => j.status === "Pending");
-            let doneJobs = jobDatabase.filter(j => j.status === "Done");
-            let displayList = [...pendingJobs, ...doneJobs];
-            
-            let job = displayList.find(j => j.id === jobId || (j.time === jobDatabase.find(x => x.id === jobId)?.time && j.from === jobDatabase.find(x => x.id === jobId)?.from));
-            
-            // หา object จริงในฐานข้อมูลหลัก
-            let realJob = jobDatabase.find(j => j.time === job.time && j.from === job.from && j.to === job.to && j.status === "Pending");
-            if (!realJob) return;
+            let job = jobDatabase.find(j => j.id === jobId);
+            if (!job || job.status === "Done") return;
 
             let selectText = "📱 กรุณาเลือกหมายเลขชื่อของคุณเพื่อรับงานนี้:\n";
             staffList.forEach((name, index) => { selectText += `${index + 1}. ${name}\n`; });
@@ -258,15 +321,14 @@
             let selectedStaff = staffList[parseInt(staffIndex) - 1];
 
             if (selectedStaff) {
-                realJob.staff = selectedStaff;
-                realJob.status = "Done";
+                job.staff = selectedStaff;
+                job.status = "Done";
 
-                // ยิงอัปเดตข้อมูลแถวการเคลียร์งานขึ้น Google Sheet เพิ่มด้วยอัตโนมัติ
                 let updateData = {
-                    time: realJob.time,
-                    type: realJob.type,
-                    from: realJob.from,
-                    to: realJob.to,
+                    time: job.time,
+                    type: job.type,
+                    from: job.from,
+                    to: job.to,
                     staff: selectedStaff,
                     status: "✔️ สำเร็จ"
                 };
@@ -281,7 +343,7 @@
                 }
 
                 saveAndRender();
-                alert(`✔️ บันทึกงานสำเร็จ! ระบบลงยอดงานของ คุณ${selectedStaff} เข้าสู่ระบบ Sheet เรียบร้อยแล้วค่ะ`);
+                alert(`✔️ บันทึกงานสำเร็จ! ระบบลดยอดคิวค้างและบันทึกข้อมูลเรียบร้อยแล้วค่ะ`);
             } else {
                 alert("❌ หมายเลขไม่ถูกต้อง การบันทึกไม่สำเร็จ");
             }
@@ -297,18 +359,17 @@
 
             if (displayList.length === 0) {
                 container.innerHTML = "<p style='text-align:center; color:#95a5a6; font-size:14px; padding: 20px 0;'>🎉 ยังไม่มีคิวงานในระบบขณะนี้</p>";
+                checkPendingAlerts();
                 return;
             }
 
             displayList.forEach(job => {
                 let isDone = job.status === "Done";
-                let cardClass = isDone ? "task-card success" : "task-card";
+                // ถ้ายังไม่เสร็จ ให้ใส่ Class พิเศษ "pending-alert" เพื่อเปิดเอฟเฟกต์ไฟกระพริบ
+                let cardClass = isDone ? "task-card success" : "task-card pending-alert";
                 let badgeClass = isDone ? "status-badge status-done" : "status-badge status-pending";
-                let badgeText = isDone ? "✔️ สำเร็จ" : "🏃‍♂️ รับคิวนี้";
-                let staffText = isDone ? `<div class="task-staff">ผู้ปฏิบัติงาน: ${job.staff}</div>` : `<div class="task-staff" style="color:#e67e22;">⏳ รอเจ้าหน้าที่เปล</div>`;
-
-                // การระบุ ID ชั่วคราวสำหรับการรับคลิก
-                let clickId = job.id ? job.id : Date.now();
+                let badgeText = isDone ? "✔️ สำเร็จ" : "🏃‍♂️ รับคิวงานนี้";
+                let staffText = isDone ? `<div class="task-staff">ผู้ปฏิบัติงาน: ${job.staff}</div>` : `<div class="task-staff flash-text">🚨 [ด่วน] รอพนักงานเปลมาเคลียร์คิว</div>`;
 
                 container.innerHTML += `
                     <div class="${cardClass}">
@@ -320,10 +381,12 @@
                             <div class="task-route">${job.from} ➡️ ${job.to}</div>
                             ${staffText}
                         </div>
-                        <button class="${badgeClass}" onclick="claimJob(${clickId})">${badgeText}</button>
+                        <button class="${badgeClass}" onclick="claimJob(${job.id})">${badgeText}</button>
                     </div>
                 `;
             });
+
+            checkPendingAlerts(); // ทุกครั้งที่วาดตารางใหม่ ให้คอยเช็กสถานะเสียงเตือนเสมอ
         }
 
         function renderReportTable() {
