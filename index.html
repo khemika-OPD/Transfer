@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Takhli OPD Smart Queue - นวัตกรรมระบบคิวเปลอัจฉริยะ</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-family-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #0288d1;
@@ -179,8 +179,8 @@
                 <div class="form-group">
                     <label style="color: var(--urgent-queue-color); font-weight: bold;">🚨 ระดับความเร่งด่วน:</label>
                     <select id="jobPriority" class="select-input" style="border: 2px solid var(--normal-queue-color);">
-                        <option value="ปกติ">🟡 ระดับปกติ (ทั่วไปตามลำดับคิว)</option>
-                        <option value="เร่งด่วน">🔴 ระดับเร่งด่วน (เคสวิกฤต/ส่งต่อด่วน)</option>
+                        <option value="ปกติ">🟡 ระดับปกติ</option>
+                        <option value="เร่งด่วน">🔴 ระดับเร่งด่วน</option>
                     </select>
                 </div>
 
@@ -341,11 +341,8 @@
             jobCounter++;
             const now = new Date();
             
-            // 🛠️ คลีนฟอร์แมตวันเวลาบนหน้าจอให้อ่านง่าย
             const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const displayTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
-            
-            // 🌟 คลีนข้อมูลส่งหลังบ้าน: ส่งแค่ "วัน/เดือน/ปี ชั่วโมง:นาที" ล้วน ๆ เพื่อให้สูตรสเปรดชีตลบกันได้ทันที
             const cleanStartDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
 
             const emptyMsg = document.getElementById("emptyMessage");
@@ -355,7 +352,7 @@
             const newCard = document.createElement("div");
             
             let cardClass = "queue-item normal-pending";
-            let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ปกติ</span>`;
+            let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${priority}</span>`;
             
             const nSound = document.getElementById("normalSound");
             const uSound = document.getElementById("urgentSound");
@@ -364,7 +361,7 @@
 
             if (priority === "เร่งด่วน") {
                 cardClass = "queue-item urgent-pending";
-                tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 เร่งด่วน</span>`;
+                tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${priority}</span>`;
                 uSound.play().catch(e => {});
             } else {
                 nSound.play().catch(e => {});
@@ -427,17 +424,18 @@
             const now = new Date();
             const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
             
-            // 🌟 คลีนข้อมูลส่งหลังบ้านฝั่งเวลารับงานให้เป็นแบบตัวเลขล้วนสอดคล้องกันค่ะ
             const cleanEndDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
             const displayTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
 
+            // 🌟 ปรับปรุงการส่ง Payload: แยกข้อมูลเป็น 2 ส่วนอิสระออกจากกันชัดเจนตามสัญญาล่าสุดค่ะ
             const payload = {
-                time: cleanStartDateTime, 
-                type: `[ความเร็ว: ${priority}] ${type}`, 
-                from: from,      
-                to: to,          
-                staff: currentStaff,            
-                status: cleanEndDateTime // 🌟 ส่งเฉพาะตัวเลขวันเวลาคลีน ๆ เข้าช่องสถานะเรียบร้อยค่ะ
+                time: cleanStartDateTime,   // คอลัมน์ A
+                type: type,                 // คอลัมน์ B (เหลือแค่อุปกรณ์ล้วน ๆ เช่น รถเข็นนั่ง)
+                priority: priority,         // คอลัมน์ C (ช่องความเร่งด่วนใหม่แยกออกมาต่างหาก)
+                from: from,                 // คอลัมน์ D
+                to: to,                     // คอลัมน์ E
+                staff: currentStaff,        // คอลัมน์ F
+                status: cleanEndDateTime    // คอลัมน์ G
             };
 
             fetch(GOOGLE_SHEET_URL, {
@@ -461,10 +459,10 @@
                         <span class="tag tag-success">✔️ บันทึกตัวชี้วัดสำเร็จ</span>
                         <small style="color: #666;"><i class="fa-regular fa-clock"></i> รับงานเมื่อ: ${displayTime}</small>
                     </div>
-                    <strong>🦽 สรุปผลคิวงาน [ระดับ: ${priority}]:</strong> ${type}<br>
+                    <strong>🦽 อุปกรณ์:</strong> ${type} | <strong>🚨 ระดับ:</strong> ${priority}<br>
                     จาก ${from} ไป ${to}
                     <p style="color: var(--success-color); margin: 8px 0 0 0; font-weight: bold;">
-                        <i class="fa-solid fa-circle-check"></i> คุณ ${currentStaff} รับงานแล้ว! ระบบบันทึกวันเวลาสำหรับหักลบค่าอัตโนมัติสำเร็จค่ะ
+                        <i class="fa-solid fa-circle-check"></i> คุณ ${currentStaff} รับงานแล้ว! แยกคอลัมน์บันทึกลงสเปรดชีตสำเร็จค่ะ
                     </p>
                 `;
             }).catch(err => {
