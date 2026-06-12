@@ -163,7 +163,6 @@
 
     <div class="container">
         
-        <!-- แถบสลับโหมดผู้ใช้งาน -->
         <div class="role-switcher">
             <button id="btnNurseMode" class="role-btn active" onclick="switchMode('nurse')">
                 <i class="fa-solid fa-user-nurse"></i> 1. ฝั่งพยาบาลสั่งงาน
@@ -173,7 +172,6 @@
             </button>
         </div>
 
-        <!-- ================= โหมด 1: ฝั่งพยาบาลสั่งงาน ================= -->
         <div id="nurseModeSection" class="app-mode active">
             <div class="card">
                 <h3 style="margin-top:0; color: var(--primary-color);"><i class="fa-solid fa-paper-plane"></i> คีย์ส่งงานคิวเปลด่วน</h3>
@@ -260,7 +258,6 @@
         </div>
 
 
-        <!-- ================= โหมด 2: ฝั่งพนักงานเปลรับงาน ================= -->
         <div id="staffModeSection" class="app-mode">
             <div id="loginSection" class="card">
                 <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
@@ -285,9 +282,7 @@
             <div class="card">
                 <h3 style="margin-top: 0; color: #333;">📋 บอร์ดคิวงานรับส่งผู้ป่วยด่วน</h3>
                 
-                <!-- 📦 ตรงนี้แหละค่ะ กล่องรับคิวงานเปลก้อนกลางที่จะรองรับการแตกใบงานแบบต่อเนื่อง -->
                 <div id="queueList">
-                    <!-- ข้อความเริ่มต้นถ้ายังไม่มีคนกดส่งคิวงานเข้ามาเลย -->
                     <div id="emptyMessage" style="text-align: center; color: #999; padding: 20px;">
                         <i class="fa-solid fa-circle-info" style="font-size: 24px; color: #ccc;"></i><br>
                         ขณะนี้ยังไม่มีคิวค้างในระบบ สบายใจได้ค่ะ
@@ -305,7 +300,7 @@
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyTphuN_EvBQnhK99aLUgJw8WWjoOtj9WV6ybLyN-mXyV4aoPdSZ0yXDPmZLyoYSx82aw/exec";
 
         let currentStaff = "";
-        let jobCounter = 0; // ตัวนับ ID ประจำใบงานแต่ละใบเพื่อไม่ให้ตีกันค่ะ 🌟
+        let jobCounter = 0;
 
         window.onload = function() {
             const savedName = localStorage.getItem("OPD_Staff_Name");
@@ -332,7 +327,6 @@
             }
         }
 
-        // --- ฝั่งพยาบาลสั่งงาน: แตกการ์ดคิวใบใหม่เพิ่มขึ้นเรื่อย ๆ ไม่จำกัดจำนวนตามครั้งที่กดจริง 🌟 ---
         function sendJobFromNurse() {
             const priority = document.getElementById("jobPriority").value;
             const type = document.getElementById("jobType").value;
@@ -344,15 +338,19 @@
                 return;
             }
 
-            jobCounter++; // เพิ่มยอดสะสมคิวงานใหม่
+            jobCounter++;
             const now = new Date();
-            const orderTimeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
             
-            // ลบข้อความ "ยังไม่มีคิวงาน" ออกเมื่อเริ่มมีการคีย์ข้อมูลเข้ามาจริง
+            // 🛠️ คลีนฟอร์แมตวันเวลาบนหน้าจอให้อ่านง่าย
+            const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const displayTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
+            
+            // 🌟 คลีนข้อมูลส่งหลังบ้าน: ส่งแค่ "วัน/เดือน/ปี ชั่วโมง:นาที" ล้วน ๆ เพื่อให้สูตรสเปรดชีตลบกันได้ทันที
+            const cleanStartDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+
             const emptyMsg = document.getElementById("emptyMessage");
             if (emptyMsg) emptyMsg.remove();
 
-            // 🛠️ กลไกมหัศจรรย์: สร้างโครงสร้างการ์ด HTML ใบใหม่ขึ้นมาสด ๆ ดึงข้อมูลผูกค่ารายรอบ
             const queueList = document.getElementById("queueList");
             const newCard = document.createElement("div");
             
@@ -373,32 +371,29 @@
             }
 
             newCard.className = cardClass;
-            newCard.id = "job-card-" + jobCounter; // ติดป้ายกำกับ ID เฉพาะตัว
+            newCard.id = "job-card-" + jobCounter;
             
-            // นำเนื้อหาผูกใส่ในการ์ดคิวใบใหม่
             newCard.innerHTML = `
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     ${tagHTML}
-                    <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${orderTimeStr}</small>
+                    <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${displayTime}</small>
                 </div>
                 <strong>🚨 อุปกรณ์:</strong> ${type}<br>
                 <strong>📍 ต้นทาง:</strong> ${from}<br>
                 <strong>➡️ ปลายทาง:</strong> ${to}
                 <div style="margin-top: 12px;">
-                    <button class="btn btn-success" onclick="acceptJobFromStaff(${jobCounter}, '${orderTimeStr}', '${priority}', '${type}', '${from}', '${to}', this)">
+                    <button class="btn btn-success" onclick="acceptJobFromStaff(${jobCounter}, '${cleanStartDateTime}', '${priority}', '${type}', '${from}', '${to}', this)">
                         <i class="fa-solid fa-person-running"></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)
                     </button>
                 </div>
             `;
             
-            // เอาการ์ดใบใหม่ แปะแทรกไปด้านบนสุดของรายการ เพื่อให้งานล่าสุดโชว์เด่นสุดค่ะ
             queueList.insertBefore(newCard, queueList.firstChild);
 
-            alert(`📝 ส่งงานคิวที่ [${jobCounter}] ระดับ [${priority}] เข้าระบบคิวบอร์ดเรียบร้อยค่ะ`);
+            alert(`📝 ส่งงานคิวที่ [${jobCounter}] เข้าระบบสำเร็จค่ะ`);
             switchMode('staff'); 
         }
 
-        // --- ฝั่งพนักงานเปลรับงาน ---
         function saveProfile() {
             const selectedName = document.getElementById("staffName").value;
             if (!selectedName) {
@@ -420,8 +415,7 @@
             }
         }
 
-        // ฟังก์ชันรับงานแบบระบุระเบิดพิกัดตาม ID ของการ์ดใบนั้นๆ ข้อมูลจึงไม่ทับซ้อนกันแน่นอนค่ะ 🌟
-        function acceptJobFromStaff(id, orderTime, priority, type, from, to, btnElement) {
+        function acceptJobFromStaff(id, cleanStartDateTime, priority, type, from, to, btnElement) {
             if (!currentStaff) {
                 alert("⚠️ พนักงานเปลกรุณาเลือกชื่อยืนยันตัวตนด้านบนก่อนกดรับงานค่ะ!");
                 return;
@@ -431,15 +425,19 @@
             btnElement.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> กำลังบันทึกสถิติลง Google Sheets...";
 
             const now = new Date();
-            const acceptTimeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
+            const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            // 🌟 คลีนข้อมูลส่งหลังบ้านฝั่งเวลารับงานให้เป็นแบบตัวเลขล้วนสอดคล้องกันค่ะ
+            const cleanEndDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+            const displayTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
 
             const payload = {
-                time: orderTime, 
+                time: cleanStartDateTime, 
                 type: `[ความเร็ว: ${priority}] ${type}`, 
                 from: from,      
                 to: to,          
                 staff: currentStaff,            
-                status: `✔️ รับงานเมื่อ ${acceptTimeStr}` 
+                status: cleanEndDateTime // 🌟 ส่งเฉพาะตัวเลขวันเวลาคลีน ๆ เข้าช่องสถานะเรียบร้อยค่ะ
             };
 
             fetch(GOOGLE_SHEET_URL, {
@@ -454,7 +452,6 @@
                 document.getElementById("normalSound").pause();
                 document.getElementById("normalSound").currentTime = 0;
                 
-                // ค้นหาเป้าหมายตำแหน่งการ์ด ID ใบที่พนักงานกดคลิก แล้วเปลี่ยนเป็นหน้าตาสำเร็จรูปเฉพาะใบนั้น 🌟
                 const targetCard = document.getElementById("job-card-" + id);
                 targetCard.className = "queue-item";
                 targetCard.style.borderColor = "var(--success-color)";
@@ -462,12 +459,12 @@
                 targetCard.innerHTML = `
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         <span class="tag tag-success">✔️ บันทึกตัวชี้วัดสำเร็จ</span>
-                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่ง: ${orderTime} | รับ: ${acceptTimeStr}</small>
+                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> รับงานเมื่อ: ${displayTime}</small>
                     </div>
                     <strong>🦽 สรุปผลคิวงาน [ระดับ: ${priority}]:</strong> ${type}<br>
                     จาก ${from} ไป ${to}
                     <p style="color: var(--success-color); margin: 8px 0 0 0; font-weight: bold;">
-                        <i class="fa-solid fa-circle-check"></i> คุณ ${currentStaff} รับงานแล้ว! ระบบจับเวลาจัดเก็บข้อมูลสำเร็จค่ะ
+                        <i class="fa-solid fa-circle-check"></i> คุณ ${currentStaff} รับงานแล้ว! ระบบบันทึกวันเวลาสำหรับหักลบค่าอัตโนมัติสำเร็จค่ะ
                     </p>
                 `;
             }).catch(err => {
