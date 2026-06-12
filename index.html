@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบริหารคิวงานเปล - โรงพยาบาล</title>
+    <title>ระบบบริหารคิวงานเปล - โรงพยาบาล (ตารางสรุปเอกสารจริง)</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -16,7 +16,7 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        .container { width: 100%; max-width: 500px; }
+        .container { width: 100%; max-width: 600px; }
         
         /* Header */
         .header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -35,8 +35,8 @@
         .btn-submit:hover { background: #1e272e; }
 
         /* Tab Menu */
-        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: #dcdde1; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #dcdde1; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
         .tab-btn.active { background: var(--primary); color: white; }
 
         /* Task List */
@@ -53,14 +53,15 @@
         .status-pending { background: #fef9e7; color: #f39c12; }
         .status-done { background: #d4efdf; color: #27ae60; cursor: default; }
 
-        /* Summary Table */
-        .summary-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .summary-table th, .summary-table td { border: 1px solid #dcdde1; padding: 10px; text-align: center; font-size: 14px; }
-        .summary-table th { background: #f1f2f6; color: var(--primary); }
+        /* สไตล์ตารางทะเบียนรายงานแบบเอกสารเดิม */
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid #dcdde1; }
+        .report-table { width: 100%; border-collapse: collapse; background: white; min-width: 500px; }
+        .report-table th, .report-table td { border: 1px solid #dcdde1; padding: 8px 6px; text-align: center; font-size: 13px; }
+        .report-table th { background: #f1f2f6; color: var(--primary); font-weight: bold; }
+        .report-table tr:nth-child(even) { background-color: #f8f9fa; }
 
         .btn-danger { background: var(--danger); color: white; margin-top: 10px; }
         .btn-danger:hover { background: #c0392b; }
-
         .hidden { display: none; }
     </style>
 </head>
@@ -74,7 +75,7 @@
 
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('job-tab')">📋 คิวงานปัจจุบัน</button>
-            <button class="tab-btn" onclick="switchTab('summary-tab')">📊 สรุปยอดประจำวัน</button>
+            <button class="tab-btn" onclick="switchTab('summary-tab')">📄 ทะเบียนใบงานประจำวัน</button>
         </div>
 
         <div id="job-tab" class="tab-content">
@@ -83,10 +84,10 @@
                 
                 <label>ประเภทที่เรียกใช้งาน</label>
                 <select id="request-type">
-                    <option value="รถเข็น 🦽">รถเข็น 🦽</option>
-                    <option value="รถนอน 🛌">รถนอน 🛌</option>
-                    <option value="พนักงานเปล 🏃‍♂️">พนักงานเปล 🏃‍♂️</option>
-                    <option value="ออกซิเจน 💨">ออกซิเจน 💨</option>
+                    <option value="รถเข็น">รถเข็น 🦽</option>
+                    <option value="รถนอน">รถนอน 🛌</option>
+                    <option value="พนักงานเปล">พนักงานเปล 🏃‍♂️</option>
+                    <option value="ออกซิเจน">ออกซิเจน 💨</option>
                 </select>
 
                 <label>จุดบริการต้นทาง</label>
@@ -140,36 +141,55 @@
         </div>
 
         <div id="summary-tab" class="tab-content hidden">
-            <div class="card">
-                <h2>📈 สรุปจำนวนเคสรายบุคคล (3 คน)</h2>
-                <table class="summary-table">
-                    <thead>
-                        <tr>
-                            <th>ชื่อเจ้าหน้าที่เปล</th>
-                            <th>จำนวนงานที่ทำ (รอบ)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summary-table-body"></tbody>
-                </table>
-                <button class="btn btn-submit" style="margin-top: 15px; background: #27ae60;" onclick="exportToLine()">💬 ก๊อบปี้ข้อความเพื่อส่งรายงาน Line</button>
-                <button class="btn btn-danger" onclick="clearAllJobs()">⚙️ รีเซ็ตคิวงาน (เริ่มวันใหม่)</button>
+            <div class="card" style="max-width: 100%;">
+                <h2 id="report-title">📄 รายการทะเบียนงานเคลื่อนย้ายผู้ป่วย</h2>
+                
+                <div class="table-responsive">
+                    <table class="report-table" id="excel-table">
+                        <thead>
+                            <tr>
+                                <th width="8%">ลำดับ</th>
+                                <th width="12%">เวลา</th>
+                                <th width="18%">ประเภท</th>
+                                <th width="40%">การปฏิบัติงาน (ต้นทาง ➡️ ปลายทาง)</th>
+                                <th width="14%">ผู้ปฏิบัติ</th>
+                                <th width="8%">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                            </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-submit" style="margin-top: 15px; background: #3498db;" onclick="copyTableForExcel()">📊 คัดลอกตารางเพื่อไปวางใน Google Sheet / Excel</button>
+                <button class="btn btn-submit" style="margin-top: 10px; background: #27ae60;" onclick="exportToLine()">💬 ก๊อบปี้ข้อความเพื่อส่งรายงาน Line</button>
+                <button class="btn btn-danger" onclick="manualClearJobs()">⚙️ รีเซ็ตคิวงาน (เริ่มวันใหม่)</button>
             </div>
         </div>
     </div>
 
     <script>
-        // บุคลากร 3 คนตามจริง
         const staffList = ["สมใจ", "สมบัติ", "นิรันดร์"];
-
-        // ฐานข้อมูลคิวงานเก็บใน LocalStorage
         let jobDatabase = JSON.parse(localStorage.getItem('stretcher_jobs')) || [];
+
+        function checkAndDateReset() {
+            let today = new Date();
+            let currentDateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            let lastSavedDate = localStorage.getItem('last_active_date');
+
+            if (!lastSavedDate || lastSavedDate !== currentDateStr) {
+                jobDatabase = [];
+                localStorage.setItem('stretcher_jobs', JSON.stringify(jobDatabase));
+                localStorage.setItem('last_active_date', currentDateStr);
+            }
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.remove('hidden');
             if(event) event.target.classList.add('active');
-            if(tabId === 'summary-tab') renderSummary();
+            if(tabId === 'summary-tab') renderReportTable();
         }
 
         function addNewJob() {
@@ -185,13 +205,13 @@
                 type: reqType,
                 from: fromLoc,
                 to: toLoc,
-                staff: "",
+                staff: "-",
                 status: "Pending"
             };
 
-            jobDatabase.unshift(newJob); 
+            jobDatabase.push(newJob); // ต่อท้ายเพื่อเรียงลำดับ 1,2,3 จากบนลงล่างตามเอกสารจริง
             saveAndRender();
-            alert("📌 บันทึกคิวงานและระบุอุปกรณ์เรียบร้อยแล้วค่ะ!");
+            alert("📌 บันทึกคิวงานเรียบร้อยแล้วค่ะ!");
         }
 
         function claimJob(jobId) {
@@ -220,12 +240,17 @@
             let container = document.getElementById('task-list-container');
             container.innerHTML = "";
 
-            if (jobDatabase.length === 0) {
+            // สำหรับหน้ารายการคิวงานหลัก ให้โชว์งานที่ค้าง (Pending) ขึ้นก่อนเพื่อความสะดวก
+            let pendingJobs = jobDatabase.filter(j => j.status === "Pending");
+            let doneJobs = jobDatabase.filter(j => j.status === "Done");
+            let displayList = [...pendingJobs, ...doneJobs];
+
+            if (displayList.length === 0) {
                 container.innerHTML = "<p style='text-align:center; color:#95a5a6; font-size:14px; padding: 20px 0;'>🎉 ยังไม่มีคิวงานในระบบขณะนี้</p>";
                 return;
             }
 
-            jobDatabase.forEach(job => {
+            displayList.forEach(job => {
                 let isDone = job.status === "Done";
                 let cardClass = isDone ? "task-card success" : "task-card";
                 let badgeClass = isDone ? "status-badge status-done" : "status-badge status-pending";
@@ -248,36 +273,52 @@
             });
         }
 
-        function renderSummary() {
-            let counts = {};
-            staffList.forEach(name => counts[name] = 0);
+        // 📊 ฟังก์ชันวาดตารางสรุปยอดให้หน้าตาเหมือนระบบเอกสารเดิมแบบเป๊ะๆ
+        function renderReportTable() {
+            const monthsTH = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            let today = new Date();
+            let dateStr = `${today.getDate()} ${monthsTH[today.getMonth()]} ${today.getFullYear() + 543}`;
+            document.getElementById('report-title').innerHTML = `📄 ทะเบียนงานเปลประจำวันที่ ${dateStr}`;
 
-            jobDatabase.forEach(job => {
-                if (job.status === "Done" && counts[job.staff] !== undefined) {
-                    counts[job.staff]++;
-                }
-            });
-
-            let tbody = document.getElementById('summary-table-body');
+            let tbody = document.getElementById('report-table-body');
             tbody.innerHTML = "";
-            let total = 0;
 
-            staffList.forEach(name => {
-                total += counts[name];
+            if (jobDatabase.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6' style='color:#95a5a6;'>ยังไม่มีข้อมูลทะเบียนงานของวันนี้</td></tr>";
+                return;
+            }
+
+            // แสดงผลเรียงลำดับจากงานชิ้นแรก (1) ลงมาหาชิ้นล่าสุดตามเอกสารกระดาษ
+            jobDatabase.forEach((job, index) => {
+                let statusIcon = job.status === "Done" ? "✔️" : "⏳";
                 tbody.innerHTML += `
                     <tr>
-                        <td style="font-weight:bold; color:#2c3e50;">${name}</td>
-                        <td style="font-weight:bold; color:#2ecc71;">${counts[name]} รอบ</td>
+                        <td>${index + 1}</td>
+                        <td>${job.time}</td>
+                        <td style="font-weight:600;">${job.type}</td>
+                        <td style="text-align:left; padding-left:10px;">${job.from} ➡️ ${job.to}</td>
+                        <td style="font-weight:bold; color:#2c3e50;">${job.staff}</td>
+                        <td>${statusIcon}</td>
                     </tr>
                 `;
             });
+        }
 
-            tbody.innerHTML += `
-                <tr style="background:#eaeded; font-weight:bold;">
-                    <td>รวมยอดทั้งหมด</td>
-                    <td style="color:#e74c3c; font-size:16px;">${total} เคส</td>
-                </tr>
-            `;
+        // 📋 ฟังก์ชันแปลงตารางเป็นรูปแบบ Excel เพื่อให้ก๊อบปี้ไปกดวาง (Paste) ใน Google Sheet ได้ทันที
+        function copyTableForExcel() {
+            let table = document.getElementById("excel-table");
+            let text = "";
+            for (let i = 0; i < table.rows.length; i++) {
+                let row = table.rows[i];
+                for (let j = 0; j < row.cells.length; j++) {
+                    text += row.cells[j].innerText + "\t"; // ใช้ Tab แบ่งคอลัมน์สำหรับ Excel
+                }
+                text += "\n";
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert("📊 คัดลอกตารางทะเบียนงานลงเครื่องแล้วค่ะ! อาจารย์สามารถเปิด Google Sheet หรือ Excel ขึ้นมา แล้วกด 'วาง' (Ctrl+V) ได้เลย ข้อมูลจะลงบล็อกแยกคอลัมน์ให้ทันทีค่ะ");
+            });
         }
 
         function exportToLine() {
@@ -290,24 +331,21 @@
             let dateStr = `${today.getDate()} ${monthsTH[today.getMonth()]} ${today.getFullYear() + 543}`;
 
             let text = `📊 สรุปยอดปฏิบัติงานหน่วยงานเปล\nประจำวันที่ ${dateStr}\n\n🏃‍♂️ จำนวนรอบรายบุคคล:\n`;
-            staffList.forEach((name, i) => {
-                text += `${i+1}. คุณ${name} : ${counts[name]} รอบ\n`;
-            });
-            
-            let total = Object.values(counts).reduce((a, b) => a + b, 0);
+            staffList.forEach((name, i) => { text += `${i+1}. คุณ${name} : ${counts[name]} รอบ\n`; });
+            let total = jobDatabase.filter(j => j.status === "Done").length;
             text += `\n✅ รวมส่งผลงานทั้งสิ้น: ${total} เคส\nระบบบันทึกคิวอัตโนมัติเรียบร้อยค่ะ 💻`;
 
             navigator.clipboard.writeText(text).then(() => {
-                alert("📋 ก๊อบปี้รายงานสรุปยอดของทั้ง 3 ท่านเรียบร้อย! สามารถนำไปวางส่งในกลุ่ม LINE ได้เลยค่ะ");
+                alert("📋 ก๊อบปี้รายงานสรุปยอดรายบุคคลสำหรับส่ง Line เรียบร้อยแล้วค่ะ");
             });
         }
 
-        function clearAllJobs() {
-            if (confirm("คุณแน่ใจใช่หรือไม่ที่จะล้างคิวงานทั้งหมดเพื่อเริ่มต้นวันใหม่? (แนะนำให้กดส่งยอด Line ก่อนนะคะ)")) {
+        function manualClearJobs() {
+            if (confirm("คุณแน่ใจใช่หรือไม่ที่จะล้างคิวงานทั้งหมดด้วยตัวเอง?")) {
                 jobDatabase = [];
                 saveAndRender();
-                renderSummary();
-                alert("ล้างคิวงานเรียบร้อยแล้วค่ะ ระบบพร้อมรับงานของวันใหม่แล้ว");
+                renderReportTable();
+                alert("ล้างคิวงานเรียบร้อยแล้วค่ะ");
             }
         }
 
@@ -317,6 +355,7 @@
         }
 
         window.onload = function() {
+            checkAndDateReset();
             renderJobList();
         };
     </script>
