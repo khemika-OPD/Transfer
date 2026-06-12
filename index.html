@@ -3,458 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบริหารคิวงานเปล - โรงพยาบาล (ระบบเตือนภัยคิวค้าง)</title>
+    <title>ระบบคิวงานเปลอัจฉริยะ OPD Takhli Hospital</title>
+    <!-- ลิงก์ฟอนต์และไอคอนเพื่อความสวยงาม -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-family-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #2c3e50;
-            --success: #2ecc71;
-            --warning: #f1c40f;
-            --danger: #e74c3c;
-            --bg: #f5f6fa;
-            --card-bg: #ffffff;
+            --primary-color: #0288d1;
+            --success-color: #2e7d32;
+            --warning-color: #d32f2f;
+            --bg-color: #f4f6f9;
         }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        .container { width: 100%; max-width: 600px; }
-        
-        /* Header */
-        .header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header h1 { margin: 0; font-size: 20px; }
-        .header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.8; }
-
-        /* Card Form */
-        .card { background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .card h2 { margin: 0 0 12px 0; font-size: 16px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 8px; }
-        
-        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #57606f; }
-        select { width: 100%; padding: 12px; border: 1px solid #ced6e0; border-radius: 8px; font-size: 15px; margin-bottom: 12px; background-color: #f8f9fa; }
-        
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .btn-submit { background: var(--primary); color: white; }
-        .btn-submit:hover { background: #1e272e; }
-
-        /* Tab Menu */
-        .tabs { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: #dcdde1; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .tab-btn.active { background: var(--primary); color: white; }
-
-        /* 🚨 สไตล์ไฟกระพริบเตือนภัยสลับสีสำหรับคิวงานที่ยังไม่สำเร็จ */
-        @keyframes pulse-border {
-            0% { border-left-color: #e74c3c; background-color: #fff; box-shadow: 0 0 4px rgba(231, 76, 60, 0.2); }
-            50% { border-left-color: #f39c12; background-color: #fff2f2; box-shadow: 0 0 15px rgba(231, 76, 60, 0.6); }
-            100% { border-left-color: #e74c3c; background-color: #fff; box-shadow: 0 0 4px rgba(231, 76, 60, 0.2); }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
         }
-        @keyframes text-flash {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
+        .header {
+            background: linear-gradient(135deg, #01579b, #0288d1);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
-        .task-card { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 6px solid var(--warning); box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; }
-        
-        /* ใส่เอฟเฟกต์ไฟกระพริบให้คิวที่ค้างอยู่ */
-        .task-card.pending-alert {
-            animation: pulse-border 1.5s infinite;
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
         }
-        .flash-text {
-            color: #d35400;
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .profile-zone {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e1f5fe;
+            border-left: 5px solid var(--primary-color);
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
-            animation: text-flash 1s infinite;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-
-        .task-card.success { border-left-color: var(--success); }
-        .task-info { flex: 1; }
-        .task-meta { font-size: 11px; color: #7f8c8d; margin-bottom: 4px; display: flex; gap: 8px; }
-        .task-type-tag { background: #eee; padding: 1px 6px; border-radius: 4px; font-weight: bold; color: #333; }
-        .task-route { font-size: 15px; font-weight: bold; color: #2c3e50; }
-        .task-staff { font-size: 13px; color: #2ecc71; font-weight: bold; margin-top: 2px; }
-        
-        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; }
-        .status-pending { background: #e74c3c; color: white; font-size: 13px; box-shadow: 0 3px 6px rgba(231,76,60,0.3); }
-        .status-done { background: #d4efdf; color: #27ae60; cursor: default; }
-
-        /* สไตล์ตารางทะเบียนรายงาน */
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid #dcdde1; }
-        .report-table { width: 100%; border-collapse: collapse; background: white; min-width: 550px; }
-        .report-table th, .report-table td { border: 1px solid #dcdde1; padding: 8px 6px; text-align: center; font-size: 13px; }
-        .report-table th { background: #f1f2f6; color: var(--primary); font-weight: bold; }
-        .report-table tr:nth-child(even) { background-color: #f8f9fa; }
-
-        .btn-danger { background: var(--danger); color: white; margin-top: 10px; }
-        .btn-danger:hover { background: #c0392b; }
-        .hidden { display: none; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-success { background-color: var(--success-color); color: white; }
+        .select-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-family: 'Sarabun', sans-serif;
+        }
+        .queue-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fff;
+            position: relative;
+        }
+        .queue-item.pending {
+            border-color: var(--warning-color);
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+        }
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .tag-pending { background-color: var(--warning-color); }
+        .tag-success { background-color: var(--success-color); }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <h1>🚑 ระบบคิวงานเคลื่อนย้ายผู้ป่วย</h1>
-            <p>หน่วยงานเปล สรุปยอดและจัดคิวส่ง Google Sheet อัตโนมัติ</p>
-        </div>
-
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('job-tab')">📋 คิวงานปัจจุบัน</button>
-            <button class="tab-btn" onclick="switchTab('summary-tab')">📄 ทะเบียนใบงานประจำวัน</button>
-        </div>
-
-        <div id="job-tab" class="tab-content">
-            <div class="card">
-                <h2>➕ แจ้งคิวงานใหม่ / เรียกเปล</h2>
-                
-                <label>ประเภทที่เรียกใช้งาน</label>
-                <select id="request-type">
-                    <option value="รถเข็น">รถเข็น 🦽</option>
-                    <option value="รถนอน">รถนอน 🛌</option>
-                    <option value="พนักงานเปล">พนักงานเปล 🏃‍♂️</option>
-                    <option value="ออกซิเจน">ออกซิเจน 💨</option>
-                </select>
-
-                <label>จุดบริการต้นทาง</label>
-                <select id="from-location">
-                    <option value="จุดแยกตรวจ">จุดแยกตรวจ</option>
-                    <option value="จุดซักประวัติ">จุดซักประวัติ</option>
-                    <option value="หน้าห้องบัตร">หน้าห้องบัตร</option>
-                    <option value="จุดรถนั่งรถนอน">จุดรถนั่งรถนอน</option>
-                    <option value="จุด10">จุด10</option>
-                    <option value="ห้องฉีดยาOPD">ห้องฉีดยาOPD</option>
-                    <option value="จุด99">จุด99</option>
-                    <option value="หน้าห้อง Lab">หน้าห้อง Lab</option>
-                    <option value="หน้าห้องการเงิน">หน้าห้องการเงิน</option>
-                    <option value="คลินิกพิเศษ">คลินิกพิเศษ</option>
-                    <option value="ห้องน้ำ">ห้องน้ำ</option>
-                    <option value="จุดประชาสัมพันธ์">จุดประชาสัมพันธ์</option>
-                    <option value="ห้องผ่าตัด">ห้องผ่าตัด</option>
-                    <option value="ห้องคลอด">ห้องคลอด</option>
-                    <option value="ห้องฝากครรภ์">ห้องฝากครรภ์</option>
-                    <option value="ICU">ICU</option>
-                </select>
-
-                <label>จุดบริการปลายทาง</label>
-                <select id="to-location">
-                    <option value="จุดแยกตรวจ">จุดแยกตรวจ</option>
-                    <option value="จุดซักประวัติ">จุดซักประวัติ</option>
-                    <option value="หน้าห้องบัตร">หน้าห้องบัตร</option>
-                    <option value="จุดรถนั่งรถนอน">จุดรถนั่งรถนอน</option>
-                    <option value="จุด10">จุด10</option>
-                    <option value="ห้องฉีดยาOPD">ห้องฉีดยาOPD</option>
-                    <option value="จุด99">จุด99</option>
-                    <option value="หน้าห้อง Lab">หน้าห้อง Lab</option>
-                    <option value="หน้าห้องการเงิน">หน้าห้องการเงิน</option>
-                    <option value="คลินิกพิเศษ">คลินิกพิเศษ</option>
-                    <option value="ห้องน้ำ">ห้องน้ำ</option>
-                    <option value="จุดประชาสัมพันธ์">จุดประชาสัมพันธ์</option>
-                    <option value="ห้องผ่าตัด">ห้องผ่าตัด</option>
-                    <option value="ห้องคลอด">ห้องคลอด</option>
-                    <option value="ห้องฝากครรภ์">ห้องฝากครรภ์</option>
-                    <option value="ICU">ICU</option>
-                    <option value="ห้องฉุกเฉิน (ER)">ห้องฉุกเฉิน (ER)</option>
-                    <option value="ห้องเอกซเรย์">ห้องเอกซเรย์</option>
-                    <option value="ห้องกายภาพ">ห้องกายภาพ</option>
-                    <option value="ห้อง CT">ห้อง CT</option>
-                    <option value="ห้องจิตเวช">ห้องจิตเวช</option>
-                    <option value="ตึกผู้ป่วยหญิง">ตึกผู้ป่วยหญิง</option>
-                    <option value="ตึกผู้ป่วยเด็ก">ตึกผู้ป่วยเด็ก</option>
-                    <option value="ตึกผู้ป่วยพิเศษ">ตึกผู้ป่วยพิเศษ</option>
-                    <option value="ตึกผู้ป่วยชาย">ตึกผู้ป่วยชาย</option>
-                    <option value="ห้องทันตกรรมบน">ห้องทันตกรรมบน</option>
-                    <option value="ห้องทันตกรรมล่าง">ห้องทันตกรรมล่าง</option>
-                </select>
-
-                <button class="btn btn-submit" onclick="addNewJob()">📌 บันทึกเข้าคิวงานกลาง</button>
-            </div>
-
-            <div class="card">
-                <h2>⏳ กระดานจัดคิวงานเปล</h2>
-                <div id="task-list-container"></div>
-            </div>
-        </div>
-
-        <div id="summary-tab" class="tab-content hidden">
-            <div class="card" style="max-width: 100%;">
-                <h2 id="report-title">📄 รายการทะเบียนงานเคลื่อนย้ายผู้ป่วย</h2>
-                
-                <div class="table-responsive">
-                    <table class="report-table" id="excel-table">
-                        <thead>
-                            <tr>
-                                <th width="8%">ลำดับ</th>
-                                <th width="12%">เวลา</th>
-                                <th width="18%">ประเภท</th>
-                                <th width="40%">การปฏิบัติงาน (ต้นทาง ➡️ ปลายทาง)</th>
-                                <th width="14%">ผู้ปฏิบัติ</th>
-                                <th width="8%">สถานะ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-table-body"></tbody>
-                    </table>
-                </div>
-
-                <button class="btn btn-submit" style="margin-top: 15px; background: #27ae60;" onclick="exportToLine()">💬 ก๊อบปี้ข้อความเพื่อส่งรายงาน Line</button>
-                <button class="btn btn-danger" onclick="manualClearJobs()">⚙️ รีเซ็ตคิวงาน (เริ่มวันใหม่)</button>
-            </div>
-        </div>
+    <div class="header">
+        <h2>🏥 ระบบจัดการคิวงานเปลอัจฉริยะ</h2>
+        <p>หน่วยงานผู้ป่วยนอก (OPD) โรงพยาบาลตาคลี</p>
     </div>
 
+    <div class="container">
+        
+        <!-- โซนลงทะเบียนระบุตัวตนพนักงาน (จำค่าถาวร) -->
+        <div id="loginSection" class="card">
+            <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
+            <label for="staffName">เลือกชื่อของท่านเพื่อเข้าระบบคิว:</label>
+            <select id="staffName" class="select-input">
+                <option value="">-- กรุณาเลือกชื่อของท่าน --</option>
+                <option value="สมใจ">พนักงานเปล - สมใจ</option>
+                <option value="สมบัติ">พนักงานเปล - สมบัติ</option>
+                <option value="นิรันดร์">พนักงานเปล - นิรันดร์</option>
+            </select>
+            <button class="btn btn-primary" onclick="saveProfile()">บันทึกเข้าใช้งานเครื่องนี้</button>
+        </div>
+
+        <!-- หน้าต่างแสดงชื่อผู้ใช้งานปัจจุบัน -->
+        <div id="profileSection" class="profile-zone" style="display: none;">
+            <div>
+                <i class="fa-solid fa-user-nurse" style="color: #0288d1;"></i> 
+                ผู้ใช้งานมือถือเครื่องนี้: <strong id="currentStaffLabel"></strong>
+            </div>
+            <button style="background: none; border: none; color: #d32f2f; cursor: pointer; text-decoration: underline;" onclick="clearProfile()">เปลี่ยนบัญชี</button>
+        </div>
+
+        <!-- รายการคิวงานด่วน -->
+        <div class="card">
+            <h3 style="margin-top: 0; display: flex; justify-content: space-between; align-items: center;">
+                📋 รายการคิวงานรับส่งผู้ป่วยด่วน 
+                <span id=" sirenContainer"></span>
+            </h3>
+            <div id="queueList">
+                <!-- ตัวอย่างคิวจำลองรอการกดรับงานจริง -->
+                <div class="queue-item pending">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span class="tag tag-pending">🚨 รอพนักงานกดรับงาน</span>
+                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> 20:05 น.</small>
+                    </div>
+                    <strong>🚨 อุปกรณ์:</strong> รถเข็นนั่ง (Wheelchair) 🦽<br>
+                    <strong>📍 ต้นทาง:</strong> จุดแยกตรวจ OPD ผู้ป่วยนอก<br>
+                    <strong>➡️ ปลายทาง:</strong> ห้องแผนกเอ็กซเรย์ (X-Ray)<br>
+                    <div style="margin-top: 12px;">
+                        <button class="btn btn-success" onclick="acceptJob(this, 'รถเข็นนั่ง 🦽', 'จุดแยกตรวจ OPD', 'ห้องเอ็กซเรย์')">
+                            <i class="fa-solid fa-person-running"></i> 🏃‍♂️ รับคิวงานนี้ทันที
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- ลิงก์เปิดเสียงเตือนไซเรนดึงดูดสายตาพนักงาน -->
+    <audio id="sirenSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-84.wav" loop></audio>
+
     <script>
-        const GOOGLE_SHEET_URL = "วาง_URL_เว็บแอปของอาจารย์ตรงนี้ค่ะ";
+        // 🚨 นำลิงก์ URL เว็บแอปจาก Google Sheets ที่คัดลอกเมื่อกี้ มาแปะแทนในเครื่องหมายคำพูดด้านล่างนี้ได้เลยค่ะ!
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyTphuN_EvBQnhK99aLUgJw8WWjoOtj9WV6ybLyN-mXyV4aoPdSZ0yXDPmZLyoYSx82aw/exec";
 
-        const staffList = ["สมใจ", "สมบัติ", "นิรันดร์"];
-        let jobDatabase = JSON.parse(localStorage.getItem('stretcher_jobs')) || [];
-        let alertInterval = null; // ตัวแปรคุมจังหวะเสียงไซเรน
+        let currentStaff = "";
 
-        // 🔊 ฟังก์ชันสังเคราะห์เสียงบี๊ปเตือนภัยผ่านลำโพงระบบ
-        function playAlertSound() {
-            try {
-                let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // เสียงที่ 1
-                let osc1 = audioCtx.createOscillator();
-                let gain1 = audioCtx.createGain();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(880, audioCtx.currentTime); // ความถี่เสียงแหลมสูง
-                gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                osc1.connect(gain1);
-                gain1.connect(audioCtx.destination);
-                osc1.start();
-                osc1.stop(audioCtx.currentTime + 0.15); // ดัง 0.15 วินาที
-                
-                // เสียงที่ 2 (เว้นจังหวะนิดนึงให้เป็นเสียงปี๊ปๆ)
-                setTimeout(() => {
-                    let osc2 = audioCtx.createOscillator();
-                    let gain2 = audioCtx.createGain();
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(880, audioCtx.currentTime);
-                    gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                    osc2.connect(gain2);
-                    gain2.connect(audioCtx.destination);
-                    osc2.start();
-                    osc2.stop(audioCtx.currentTime + 0.15);
-                }, 200);
+        // ฟังก์ชันตรวจสอบและดึงชื่อที่เซฟไว้ในมือถือขึ้นมาทำงานทันทีเมื่อเปิดแอป
+        window.onload = function() {
+            const savedName = localStorage.getItem("OPD_Staff_Name");
+            if (savedName) {
+                currentStaff = savedName;
+                document.getElementById("currentStaffLabel").innerText = "คุณ " + savedName;
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("profileSection").style.display = "flex";
+                // เปิดเสียงไซเรนเตือนงานค้างกรณีมีคิวPending (จำลองระบบ)
+                document.getElementById("sirenSound").play().catch(e => console.log("รอการกดปุ่มเพื่อเล่นเสียง"));
+            }
+        };
 
-            } catch (e) {
-                console.log("เบราว์เซอร์บล็อกเสียง รอการคลิกจากผู้ใช้งานก่อน");
+        // ฟังก์ชันบันทึกตัวตนพนักงานลงเครื่องในครั้งแรก
+        function saveProfile() {
+            const selectedName = document.getElementById("staffName").value;
+            if (!selectedName) {
+                alert("กรุณาเลือกชื่อของท่านก่อนกดบันทึกเข้าใช้งานด้วยค่ะอาจารย์");
+                return;
+            }
+            localStorage.setItem("OPD_Staff_Name", selectedName);
+            currentStaff = selectedName;
+            document.getElementById("currentStaffLabel").innerText = "คุณ " + selectedName;
+            document.getElementById("loginSection").style.display = "none";
+            document.getElementById("profileSection").style.display = "flex";
+            alert("ยินดีต้อนรับคุณ " + selectedName + " ระบบจำชื่อของท่านเรียบร้อยแล้วค่ะ!");
+        }
+
+        // ฟังก์ชันลบตัวตนเพื่อเปลี่ยนมือถือผู้ใช้งาน
+        function clearProfile() {
+            if(confirm("ท่านต้องการออกจากระบบเพื่อเปลี่ยนชื่อพนักงานใช่หรือไม่?")) {
+                localStorage.removeItem("OPD_Staff_Name");
+                location.reload();
             }
         }
 
-        // ⏱️ ตรวจสอบคิวค้างเพื่อคุมการเปิด-ปิดระบบเสียงอัตโนมัติ
-        function checkPendingAlerts() {
-            let hasPending = jobDatabase.some(j => j.status === "Pending");
+        // ฟังก์ชันหัวใจสำคัญ: คลิกเดียวรับงาน ยิงข้อมูลขึ้น Google Sheet ทันทีโดยไม่ต้องกรอกชื่อซ้ำ
+        function acceptJob(buttonElement, type, from, to) {
+            if (!currentStaff) {
+                alert("⚠️ ข้อผิดพลาด: โทรศัพท์เครื่องนี้ยังไม่ได้ยืนยันตัวตนพนักงาน กรุณาเลือกชื่อด้านบนก่อนรับงานค่ะ!");
+                return;
+            }
+
+            // เปลี่ยนสถานะหน้าจอให้พนักงานเห็นทันทีว่ากดสำเร็จ
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> กำลังบันทึกข้อมูลเข้าฐานข้อมูล...";
             
-            if (hasPending) {
-                // ถ้ามีคิวค้างและยังไม่ได้เปิดเสียง ให้เริ่มรันเสียงเตือนทุกๆ 10 วินาที
-                if (!alertInterval) {
-                    playAlertSound(); // ดังทันทีรอบแรก
-                    alertInterval = setInterval(playAlertSound, 10000);
-                }
-            } else {
-                // ถ้าไม่มีคิวงานค้างเลย ให้สั่งปิดเสียงเตือนให้เงียบสนิท
-                if (alertInterval) {
-                    clearInterval(alertInterval);
-                    alertInterval = null;
-                }
-            }
-        }
+            // ดึงเวลาปัจจุบันในโทรศัพท์
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
 
-        function checkAndDateReset() {
-            let today = new Date();
-            let currentDateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            let lastSavedDate = localStorage.getItem('last_active_date');
-
-            if (!lastSavedDate || lastSavedDate !== currentDateStr) {
-                jobDatabase = [];
-                localStorage.setItem('stretcher_jobs', JSON.stringify(jobDatabase));
-                localStorage.setItem('last_active_date', currentDateStr);
-            }
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.remove('hidden');
-            if(event) event.target.classList.add('active');
-            if(tabId === 'summary-tab') renderReportTable();
-        }
-
-        function addNewJob() {
-            let reqType = document.getElementById('request-type').value;
-            let fromLoc = document.getElementById('from-location').value;
-            let toLoc = document.getElementById('to-location').value;
-            let now = new Date();
-            let timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-            let newJob = {
-                id: Date.now(),
+            // บรรจุหีบห่อข้อมูลยิงหา Google Sheets
+            const payload = {
                 time: timeStr,
-                type: reqType,
-                from: fromLoc,
-                to: toLoc,
-                staff: "-",
-                status: "Pending"
+                type: type,
+                from: from,
+                to: to,
+                staff: currentStaff, // ดึงชื่อที่ล็อกอินค้างไว้ส่งไปบันทึกอัตโนมัติ 🌟
+                status: "✔️ สำเร็จ (รับงานแล้ว)"
             };
 
-            if (GOOGLE_SHEET_URL !== "วาง_URL_เว็บแอปของอาจารย์ตรงนี้ค่ะ") {
-                fetch(GOOGLE_SHEET_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(newJob)
-                });
-            }
-
-            jobDatabase.push(newJob);
-            saveAndRender();
-            playAlertSound(); // ส่งเสียงเตือนทันทีที่มีการคีย์งานชิ้นใหม่เข้าตาราง
-        }
-
-        function claimJob(jobId) {
-            let job = jobDatabase.find(j => j.id === jobId);
-            if (!job || job.status === "Done") return;
-
-            let selectText = "📱 กรุณาเลือกหมายเลขชื่อของคุณเพื่อรับงานนี้:\n";
-            staffList.forEach((name, index) => { selectText += `${index + 1}. ${name}\n`; });
-            
-            let staffIndex = prompt(selectText);
-            if (staffIndex === null) return; 
-            
-            let selectedStaff = staffList[parseInt(staffIndex) - 1];
-
-            if (selectedStaff) {
-                job.staff = selectedStaff;
-                job.status = "Done";
-
-                let updateData = {
-                    time: job.time,
-                    type: job.type,
-                    from: job.from,
-                    to: job.to,
-                    staff: selectedStaff,
-                    status: "✔️ สำเร็จ"
-                };
-
-                if (GOOGLE_SHEET_URL !== "https://script.google.com/macros/s/AKfycbyTphuN_EvBQnhK99aLUgJw8WWjoOtj9WV6ybLyN-mXyV4aoPdSZ0yXDPmZLyoYSx82aw/exec") {
-                    fetch(GOOGLE_SHEET_URL, {
-                        method: "POST",
-                        mode: "no-cors",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(updateData)
-                    });
-                }
-
-                saveAndRender();
-                alert(`✔️ บันทึกงานสำเร็จ! ระบบลดยอดคิวค้างและบันทึกข้อมูลเรียบร้อยแล้วค่ะ`);
-            } else {
-                alert("❌ หมายเลขไม่ถูกต้อง การบันทึกไม่สำเร็จ");
-            }
-        }
-
-        function renderJobList() {
-            let container = document.getElementById('task-list-container');
-            container.innerHTML = "";
-
-            let pendingJobs = jobDatabase.filter(j => j.status === "Pending");
-            let doneJobs = jobDatabase.filter(j => j.status === "Done");
-            let displayList = [...pendingJobs, ...doneJobs];
-
-            if (displayList.length === 0) {
-                container.innerHTML = "<p style='text-align:center; color:#95a5a6; font-size:14px; padding: 20px 0;'>🎉 ยังไม่มีคิวงานในระบบขณะนี้</p>";
-                checkPendingAlerts();
-                return;
-            }
-
-            displayList.forEach(job => {
-                let isDone = job.status === "Done";
-                // ถ้ายังไม่เสร็จ ให้ใส่ Class พิเศษ "pending-alert" เพื่อเปิดเอฟเฟกต์ไฟกระพริบ
-                let cardClass = isDone ? "task-card success" : "task-card pending-alert";
-                let badgeClass = isDone ? "status-badge status-done" : "status-badge status-pending";
-                let badgeText = isDone ? "✔️ สำเร็จ" : "🏃‍♂️ รับคิวงานนี้";
-                let staffText = isDone ? `<div class="task-staff">ผู้ปฏิบัติงาน: ${job.staff}</div>` : `<div class="task-staff flash-text">🚨 [ด่วน] รอพนักงานเปลมาเคลียร์คิว</div>`;
-
-                container.innerHTML += `
-                    <div class="${cardClass}">
-                        <div class="task-info">
-                            <div class="task-meta">
-                                <span>⏱️ ${job.time} น.</span>
-                                <span class="task-type-tag">${job.type}</span>
-                            </div>
-                            <div class="task-route">${job.from} ➡️ ${job.to}</div>
-                            ${staffText}
-                        </div>
-                        <button class="${badgeClass}" onclick="claimJob(${job.id})">${badgeText}</button>
+            // ใช้ระบบ Fetch ยิงส่งข้อมูลผ่านสะพานเชื่อม API ของพี่เขมิกา
+            fetch(GOOGLE_SHEET_URL, {
+                method: "POST",
+                mode: "no-cors",
+                cache: "no-cache",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                // เคลียร์เสียงไซเรนและเปลี่ยนสีแสดงความสำเร็จ
+                document.getElementById("sirenSound").pause();
+                const container = buttonElement.closest('.queue-item');
+                container.classList.remove('pending');
+                container.style.borderColor = "var(--success-color)";
+                container.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span class="tag tag-success">✔️ จัดการเคสเรียบร้อย</span>
+                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> ${timeStr}</small>
                     </div>
+                    <strong>🦽 งาน:</strong> ${type} จาก ${from} ไป ${to}<br>
+                    <p style="color: var(--success-color); margin: 8px 0 0 0; font-weight: bold;">
+                        <i class="fa-solid fa-circle-check"></i> คุณ ${currentStaff} รับงานและปฏิบัติหน้าที่เสร็จสิ้นสำเร็จ!
+                    </p>
                 `;
-            });
-
-            checkPendingAlerts(); // ทุกครั้งที่วาดตารางใหม่ ให้คอยเช็กสถานะเสียงเตือนเสมอ
-        }
-
-        function renderReportTable() {
-            const monthsTH = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-            let today = new Date();
-            let dateStr = `${today.getDate()} ${monthsTH[today.getMonth()]} ${today.getFullYear() + 543}`;
-            document.getElementById('report-title').innerHTML = `📄 ทะเบียนงานเปลประจำวันที่ ${dateStr}`;
-
-            let tbody = document.getElementById('report-table-body');
-            tbody.innerHTML = "";
-
-            if (jobDatabase.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='6' style='color:#95a5a6;'>ยังไม่มีข้อมูลทะเบียนงานของวันนี้</td></tr>";
-                return;
-            }
-
-            jobDatabase.forEach((job, index) => {
-                let statusIcon = job.status === "Done" ? "✔️" : "⏳";
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${job.time}</td>
-                        <td style="font-weight:600;">${job.type}</td>
-                        <td style="text-align:left; padding-left:10px;">${job.from} ➡️ ${job.to}</td>
-                        <td style="font-weight:bold; color:#2c3e50;">${job.staff}</td>
-                        <td>${statusIcon}</td>
-                    </tr>
-                `;
+            }).catch(err => {
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่ออินเทอร์เน็ต กรุณาลองใหม่อีกครั้งค่ะพี่");
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = "<i class='fa-solid fa-person-running'></i> 🏃‍♂️ รับคิวงานนี้ทันที";
             });
         }
-
-        function exportToLine() {
-            let counts = {};
-            staffList.forEach(name => counts[name] = 0);
-            jobDatabase.forEach(job => { if (job.status === "Done" && counts[job.staff] !== undefined) counts[job.staff]++; });
-
-            const monthsTH = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-            let today = new Date();
-            let dateStr = `${today.getDate()} ${monthsTH[today.getMonth()]} ${today.getFullYear() + 543}`;
-
-            let text = `📊 สรุปยอดปฏิบัติงานหน่วยงานเปล\nประจำวันที่ ${dateStr}\n\n🏃‍♂️ จำนวนรอบรายบุคคล:\n`;
-            staffList.forEach((name, i) => { text += `${i+1}. คุณ${name} : ${counts[name]} รอบ\n`; });
-            let total = jobDatabase.filter(j => j.status === "Done").length;
-            text += `\n✅ รวมส่งผลงานทั้งสิ้น: ${total} เคส\nระบบบันทึกคิวอัตโนมัติเรียบร้อยค่ะ 💻`;
-
-            navigator.clipboard.writeText(text).then(() => {
-                alert("📋 ก๊อบปี้รายงานสรุปยอดรายบุคคลสำหรับส่ง Line เรียบร้อยแล้วค่ะ");
-            });
-        }
-
-        function manualClearJobs() {
-            if (confirm("คุณแน่ใจใช่หรือไม่ที่จะล้างคิวงานทั้งหมดด้วยตัวเอง?")) {
-                jobDatabase = [];
-                saveAndRender();
-                renderReportTable();
-                alert("ล้างคิวงานเรียบร้อยแล้วค่ะ");
-            }
-        }
-
-        function saveAndRender() {
-            localStorage.setItem('stretcher_jobs', JSON.stringify(jobDatabase));
-            renderJobList();
-        }
-
-        window.onload = function() {
-            checkAndDateReset();
-            renderJobList();
-        };
     </script>
 </body>
 </html>
