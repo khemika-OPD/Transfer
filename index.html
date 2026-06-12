@@ -13,8 +13,8 @@
             --bg: #f5f6fa;
             --card-bg: #ffffff;
         }
-        * { box-sizing: border-box; font-family: 'Prompt', 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
         .container { width: 100%; max-width: 500px; }
         
@@ -44,7 +44,8 @@
         .task-card.success { border-left-color: var(--success); }
         
         .task-info { flex: 1; }
-        .task-meta { font-size: 12px; color: #7f8c8d; margin-bottom: 4px; }
+        .task-meta { font-size: 11px; color: #7f8c8d; margin-bottom: 4px; display: flex; gap: 8px; }
+        .task-type-tag { background: #eee; padding: 1px 6px; border-radius: 4px; font-weight: bold; color: #333; }
         .task-route { font-size: 15px; font-weight: bold; color: #2c3e50; }
         .task-staff { font-size: 13px; color: #2ecc71; font-weight: bold; margin-top: 2px; }
         
@@ -57,70 +58,90 @@
         .summary-table th, .summary-table td { border: 1px solid #dcdde1; padding: 10px; text-align: center; font-size: 14px; }
         .summary-table th { background: #f1f2f6; color: var(--primary); }
 
+        .btn-danger { background: var(--danger); color: white; margin-top: 10px; }
+        .btn-danger:hover { background: #c0392b; }
+
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- ส่วนหัวแอป -->
         <div class="header">
             <h1>🚑 ระบบคิวงานเคลื่อนย้ายผู้ป่วย</h1>
             <p>หน่วยงานเปล สรุปยอดและจัดคิว Real-time</p>
         </div>
 
-        <!-- แท็บสลับหน้าจอ (หน้าจองงาน / หน้าสรุปยอด) -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('job-tab')">📋 คิวงานปัจจุบัน</button>
             <button class="tab-btn" onclick="switchTab('summary-tab')">📊 สรุปยอดประจำวัน</button>
         </div>
 
-        <!-- ส่วนที่ 1: หน้าจอคิวงานปัจจุบัน -->
         <div id="job-tab" class="tab-content">
-            <!-- ฟอร์มเพิ่มงานใหม่ -->
             <div class="card">
-                <h2>➕ แจ้งคิวงานใหม่ / ขอรถเปล</h2>
-                <label>จุดรับผู้ป่วย</label>
-                <select id="from-location">
-                    <option value="OPD">OPD (ผู้ป่วยนอก)</option>
-                    <option value="ER">ER (ห้องฉุกเฉิน)</option>
-                    <option value="LAB">LAB (ห้องแลป)</option>
-                    <option value="X-RAY">X-RAY</option>
-                    <option value="3pt">3pt (ตึกผู้ป่วยใน)</option>
-                    <option value="DCC">DCC</option>
-                    <option value="คลินิกพิเศษ">คลินิกพิเศษ</option>
-                    <option value="กายภาพ">กายภาพ</option>
+                <h2>➕ แจ้งคิวงานใหม่ / เรียกเปล</h2>
+                
+                <label>ประเภทที่เรียกใช้งาน</label>
+                <select id="request-type">
+                    <option value="รถเข็น 🦽">รถเข็น 🦽</option>
+                    <option value="รถนอน 🛌">รถนอน 🛌</option>
+                    <option value="พนักงานเปล 🏃‍♂️">พนักงานเปล 🏃‍♂️</option>
+                    <option value="ออกซิเจน 💨">ออกซิเจน 💨</option>
                 </select>
 
-                <label>จุดส่งผู้ป่วย</label>
+                <label>จุดบริการต้นทาง</label>
+                <select id="from-location">
+                    <option value="จุดแยกตรวจ">จุดแยกตรวจ</option>
+                    <option value="จุดซักประวัติ">จุดซักประวัติ</option>
+                    <option value="หน้าห้องบัตร">หน้าห้องบัตร</option>
+                    <option value="จุดรถนั่งรถนอน">จุดรถนั่งรถนอน</option>
+                    <option value="จุด10">จุด10</option>
+                    <option value="ห้องฉีดยาOPD">ห้องฉีดยาOPD</option>
+                    <option value="จุด99">จุด99</option>
+                    <option value="หน้าห้อง Lab">หน้าห้อง Lab</option>
+                    <option value="หน้าห้องการเงิน">หน้าห้องการเงิน</option>
+                    <option value="คลินิกพิเศษ">คลินิกพิเศษ</option>
+                    <option value="ห้องน้ำ">ห้องน้ำ</option>
+                </select>
+
+                <label>จุดบริการปลายทาง</label>
                 <select id="to-location">
-                    <option value="ER">ER (ห้องฉุกเฉิน)</option>
-                    <option value="OPD">OPD (ผู้ป่วยนอก)</option>
-                    <option value="LAB">LAB (ห้องแลป)</option>
-                    <option value="X-RAY">X-RAY</option>
-                    <option value="3pt">3pt (ตึกผู้ป่วยใน)</option>
-                    <option value="DCC">DCC</option>
-                    <option value="กายภาพ">กายภาพ</option>
-                    <option value="ขอรถนั่ง">ขอรถนั่ง</option>
-                    <option value="ส่งกลับบ้าน">ส่งกลับบ้าน</option>
+                    <option value="จุดแยกตรวจ">จุดแยกตรวจ</option>
+                    <option value="จุดซักประวัติ">จุดซักประวัติ</option>
+                    <option value="หน้าห้องบัตร">หน้าห้องบัตร</option>
+                    <option value="จุดรถนั่งรถนอน">จุดรถนั่งรถนอน</option>
+                    <option value="จุด10">จุด10</option>
+                    <option value="ห้องฉีดยาOPD">ห้องฉีดยาOPD</option>
+                    <option value="จุด99">จุด99</option>
+                    <option value="หน้าห้อง Lab">หน้าห้อง Lab</option>
+                    <option value="หน้าห้องการเงิน">หน้าห้องการเงิน</option>
+                    <option value="คลินิกพิเศษ">คลินิกพิเศษ</option>
+                    <option value="ห้องน้ำ">ห้องน้ำ</option>
+                    <option value="ห้องฉุกเฉิน (ER)">ห้องฉุกเฉิน (ER)</option>
+                    <option value="ห้องเอกซเรย์">ห้องเอกซเรย์</option>
+                    <option value="ห้องกายภาพ">ห้องกายภาพ</option>
+                    <option value="ห้อง CT">ห้อง CT</option>
+                    <option value="ห้องจิตเวช">ห้องจิตเวช</option>
+                    <option value="ตึกผู้ป่วยหญิง">ตึกผู้ป่วยหญิง</option>
+                    <option value="ตึกผู้ป่วยเด็ก">ตึกผู้ป่วยเด็ก</option>
+                    <option value="ตึกผู้ป่วยพิเศษ">ตึกผู้ป่วยพิเศษ</option>
+                    <option value="ตึกผู้ป่วยชาย">ตึกผู้ป่วยชาย</option>
+                    <option value="ห้องทันตกรรมบน">ห้องทันตกรรมบน</option>
+                    <option value="ห้องทันตกรรมล่าง">ห้องทันตกรรมล่าง</option>
                 </select>
 
                 <button class="btn btn-submit" onclick="addNewJob()">📌 บันทึกเข้าคิวงานกลาง</button>
             </div>
 
-            <!-- รายการคิวงาน -->
             <div class="card">
                 <h2>⏳ กระดานจัดคิวงานเปล</h2>
-                <div id="task-list-container">
-                    <!-- ข้อมูลคิวงานจะถูกโหลดมาแสดงตรงนี้ -->
-                </div>
+                <div id="task-list-container"></div>
             </div>
         </div>
 
-        <!-- ส่วนที่ 2: หน้าจอสรุปยอดประจำวัน (Dashboard) -->
         <div id="summary-tab" class="tab-content hidden">
             <div class="card">
-                <h2>📈 สรุปจำนวนเคสรายบุคคล (Excel Preview)</h2>
+                <h2>📈 สรุปจำนวนเคสรายบุคคล (3 คน)</h2>
                 <table class="summary-table">
                     <thead>
                         <tr>
@@ -128,42 +149,31 @@
                             <th>จำนวนงานที่ทำ (รอบ)</th>
                         </tr>
                     </thead>
-                    <tbody id="summary-table-body">
-                        <!-- ยอดรวมจะคำนวณอัตโนมัติตรงนี้ -->
-                    </tbody>
+                    <tbody id="summary-table-body"></tbody>
                 </table>
                 <button class="btn btn-submit" style="margin-top: 15px; background: #27ae60;" onclick="exportToLine()">💬 ก๊อบปี้ข้อความเพื่อส่งรายงาน Line</button>
+                <button class="btn btn-danger" onclick="clearAllJobs()">⚙️ รีเซ็ตคิวงาน (เริ่มวันใหม่)</button>
             </div>
         </div>
     </div>
 
-    <!-- ส่วนของระบบสคริปต์ควบคุมการทำงาน -->
     <script>
-        // รายชื่อเจ้าหน้าที่เปล อิงตามใบงานจริงในรูปภาพของอาจารย์
-        const staffList = ["สมใจ", "นิรันดร์", "สมบัติ", "สมจิต", "พัชรินทร์", "สมพงษ์", "สมฤดี"];
+        // บุคลากร 3 คนตามจริง
+        const staffList = ["สมใจ", "สมบัติ", "นิรันดร์"];
 
-        // จำลองข้อมูลเริ่มต้นให้เห็นภาพตามใบงานของอาจารย์ก่อน
-        let jobDatabase = JSON.parse(localStorage.getItem('stretcher_jobs')) || [
-            { id: 1, time: "09:43", from: "OPD", to: "ER", staff: "สมฤดี", status: "Done" },
-            { id: 2, time: "09:50", from: "LAB", to: "คลินิกพิเศษ", staff: "สมใจ", status: "Done" },
-            { id: 3, time: "10:00", from: "OPD", to: "ขอรถนั่ง", staff: "นิรันดร์", status: "Done" },
-            { id: 4, time: "11:53", from: "OPD", to: "LAB", staff: "พัชรินทร์", status: "Done" },
-            { id: 5, time: "13:26", from: "OPD", to: "กายภาพ", staff: "สมใจ", status: "Done" },
-            // เคสค้างอยู่รอลูกน้องมากดรับงาน
-            { id: 6, time: "17:45", from: "ER", to: "X-RAY", staff: "", status: "Pending" }
-        ];
+        // ฐานข้อมูลคิวงานเก็บใน LocalStorage
+        let jobDatabase = JSON.parse(localStorage.getItem('stretcher_jobs')) || [];
 
-        // ฟังก์ชันสลับหน้าจอแท็บ
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.remove('hidden');
-            event.target.classList.add('active');
+            if(event) event.target.classList.add('active');
             if(tabId === 'summary-tab') renderSummary();
         }
 
-        // ฟังก์ชันเพิ่มคิวงานใหม่เข้าสู่ระบบกลาง
         function addNewJob() {
+            let reqType = document.getElementById('request-type').value;
             let fromLoc = document.getElementById('from-location').value;
             let toLoc = document.getElementById('to-location').value;
             let now = new Date();
@@ -172,28 +182,27 @@
             let newJob = {
                 id: Date.now(),
                 time: timeStr,
+                type: reqType,
                 from: fromLoc,
                 to: toLoc,
                 staff: "",
                 status: "Pending"
             };
 
-            jobDatabase.unshift(newJob); // เพิ่มเข้าด้านบนสุด
+            jobDatabase.unshift(newJob); 
             saveAndRender();
-            alert("เพิ่มคิวงานเข้าสู่ระบบส่วนกลางเรียบร้อยค่ะ! ลูกน้องสามารถกดรับคิวได้ทันที");
+            alert("📌 บันทึกคิวงานและระบุอุปกรณ์เรียบร้อยแล้วค่ะ!");
         }
 
-        // ฟังก์ชันเมื่อเจ้าหน้าที่เปลมากดรับงาน/ส่งงานสำเร็จ
         function claimJob(jobId) {
             let job = jobDatabase.find(j => j.id === jobId);
             if (!job || job.status === "Done") return;
 
-            // ให้ผู้ใช้เลือกชื่อตัวเองเพื่อเคลียร์คิว
-            let selectText = "กรุณาเลือกชื่อของคุณผู้ปฏิบัติงาน:\n";
+            let selectText = "📱 กรุณาเลือกหมายเลขชื่อของคุณเพื่อรับงานนี้:\n";
             staffList.forEach((name, index) => { selectText += `${index + 1}. ${name}\n`; });
             
             let staffIndex = prompt(selectText);
-            if (staffIndex === null) return;
+            if (staffIndex === null) return; 
             
             let selectedStaff = staffList[parseInt(staffIndex) - 1];
 
@@ -201,19 +210,18 @@
                 job.staff = selectedStaff;
                 job.status = "Done";
                 saveAndRender();
-                alert(`บันทึกการส่งผู้ป่วยเรียบร้อย! คิวงานหมายเลขนี้ถูกบันทึกลงยอดของคุณ ${selectedStaff} แล้วค่ะ`);
+                alert(`✔️ บันทึกงานสำเร็จ! งานนี้ลงยอดของ คุณ${selectedStaff} แล้วค่ะ`);
             } else {
-                alert("❌ ลำดับชื่อไม่ถูกต้อง การบันทึกไม่สำเร็จ");
+                alert("❌ หมายเลขไม่ถูกต้อง การบันทึกไม่สำเร็จ");
             }
         }
 
-        // ฟังก์ชันวาดรายการคิวลงบนกระดาน
         function renderJobList() {
             let container = document.getElementById('task-list-container');
             container.innerHTML = "";
 
             if (jobDatabase.length === 0) {
-                container.innerHTML = "<p style='text-align:center; color:#95a5a6; font-size:14px;'>🎉 ไม่มีคิวงานค้างอยู่ขณะนี้</p>";
+                container.innerHTML = "<p style='text-align:center; color:#95a5a6; font-size:14px; padding: 20px 0;'>🎉 ยังไม่มีคิวงานในระบบขณะนี้</p>";
                 return;
             }
 
@@ -221,13 +229,16 @@
                 let isDone = job.status === "Done";
                 let cardClass = isDone ? "task-card success" : "task-card";
                 let badgeClass = isDone ? "status-badge status-done" : "status-badge status-pending";
-                let badgeText = isDone ? "✔️ สำเร็จ" : "🏃‍♂️ กดรับงานคิวนี้";
-                let staffText = isDone ? `<div class="task-staff">ผู้ปฏิบัติงาน: ${job.staff}</div>` : `<div class="task-staff" style="color:#e67e22;">⏳ รอเจ้าหน้าที่มารับงาน</div>`;
+                let badgeText = isDone ? "✔️ สำเร็จ" : "🏃‍♂️ รับคิวนี้";
+                let staffText = isDone ? `<div class="task-staff">ผู้ปฏิบัติงาน: ${job.staff}</div>` : `<div class="task-staff" style="color:#e67e22;">⏳ รอเจ้าหน้าที่เปล</div>`;
 
                 container.innerHTML += `
                     <div class="${cardClass}">
                         <div class="task-info">
-                            <div class="task-meta">⏱️ เวลาแจ้งคิว: ${job.time} น.</div>
+                            <div class="task-meta">
+                                <span>⏱️ ${job.time} น.</span>
+                                <span class="task-type-tag">${job.type}</span>
+                            </div>
                             <div class="task-route">${job.from} ➡️ ${job.to}</div>
                             ${staffText}
                         </div>
@@ -237,12 +248,10 @@
             });
         }
 
-        // ฟังก์ชันคำนวณและวาดตารางสรุปยอดให้หัวหน้างานดู (หน้าจอที่ 2)
         function renderSummary() {
             let counts = {};
             staffList.forEach(name => counts[name] = 0);
 
-            // นับยอดเฉพาะที่ทำสำเร็จแล้ว
             jobDatabase.forEach(job => {
                 if (job.status === "Done" && counts[job.staff] !== undefined) {
                     counts[job.staff]++;
@@ -271,14 +280,14 @@
             `;
         }
 
-        // ฟังก์ชันก๊อบปี้ข้อความเพื่อยิงเข้ากลุ่มไลน์หน่วยงาน
         function exportToLine() {
             let counts = {};
             staffList.forEach(name => counts[name] = 0);
             jobDatabase.forEach(job => { if (job.status === "Done" && counts[job.staff] !== undefined) counts[job.staff]++; });
 
+            const monthsTH = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
             let today = new Date();
-            let dateStr = `${today.getDate()} ม.ย. ${today.getFullYear()+543}`; // ทำรูปแบบปี พ.ศ. ให้สวยงาม
+            let dateStr = `${today.getDate()} ${monthsTH[today.getMonth()]} ${today.getFullYear() + 543}`;
 
             let text = `📊 สรุปยอดปฏิบัติงานหน่วยงานเปล\nประจำวันที่ ${dateStr}\n\n🏃‍♂️ จำนวนรอบรายบุคคล:\n`;
             staffList.forEach((name, i) => {
@@ -289,17 +298,24 @@
             text += `\n✅ รวมส่งผลงานทั้งสิ้น: ${total} เคส\nระบบบันทึกคิวอัตโนมัติเรียบร้อยค่ะ 💻`;
 
             navigator.clipboard.writeText(text).then(() => {
-                alert("📋 ก๊อบปี้รายงานสรุปยอดของวันนี้ลงคลิปบอร์ดแล้วค่ะ! อาจารย์สามารถเปิดแอป LINE แล้วกด 'วาง (Paste)' ส่งเข้ากลุ่มหน่วยงานได้เลยค่ะ");
+                alert("📋 ก๊อบปี้รายงานสรุปยอดของทั้ง 3 ท่านเรียบร้อย! สามารถนำไปวางส่งในกลุ่ม LINE ได้เลยค่ะ");
             });
         }
 
-        // บันทึกและดึงข้อมูลมาแสดงผล
+        function clearAllJobs() {
+            if (confirm("คุณแน่ใจใช่หรือไม่ที่จะล้างคิวงานทั้งหมดเพื่อเริ่มต้นวันใหม่? (แนะนำให้กดส่งยอด Line ก่อนนะคะ)")) {
+                jobDatabase = [];
+                saveAndRender();
+                renderSummary();
+                alert("ล้างคิวงานเรียบร้อยแล้วค่ะ ระบบพร้อมรับงานของวันใหม่แล้ว");
+            }
+        }
+
         function saveAndRender() {
             localStorage.setItem('stretcher_jobs', JSON.stringify(jobDatabase));
             renderJobList();
         }
 
-        // เริ่มต้นระบบเมื่อเปิดเว็บครั้งแรก
         window.onload = function() {
             renderJobList();
         };
