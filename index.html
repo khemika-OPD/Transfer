@@ -263,7 +263,10 @@
         
     </div>
 
-    <audio id="normalSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav"></audio> <audio id="urgentSound" src="https://assets.mixkit.co/active_storage/sfx/972/972-84.wav" loop></audio> <script>
+    <audio id="normalSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
+    <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
+
+    <script>
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyTphuN_EvBQnhK99aLUgJw8WWjoOtj9WV6ybLyN-mXyV4aoPdSZ0yXDPmZLyoYSx82aw/exec";
 
         let currentStaff = "";
@@ -322,31 +325,28 @@
             const item = document.getElementById("demoQueueItem");
             const tag = document.getElementById("priorityTag");
             
-            // ปิดเสียงเก่าทั้งหมดก่อนเพื่อความชัวร์
-            document.getElementById("normalSound").pause();
-            document.getElementById("urgentSound").pause();
-            document.getElementById("normalSound").currentTime = 0;
+            // รีเซ็ตสถานะเสียงเก่าก่อนเล่นใหม่
+            const nSound = document.getElementById("normalSound");
+            const uSound = document.getElementById("urgentSound");
+            nSound.pause(); nSound.currentTime = 0;
+            uSound.pause(); uSound.currentTime = 0;
 
             if (priority === "เร่งด่วน") {
                 item.className = "queue-item urgent-pending";
                 tag.className = "tag tag-urgent";
                 tag.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> ความเร่งด่วน: 🔴 เร่งด่วน";
-                
-                // 🚨 ยิงเสียง ปี๊บๆๆๆๆ วนลูปทันที!
-                document.getElementById("urgentSound").play().catch(e => {});
+                uSound.play().catch(e => { console.log("Audio play blocked by browser setup"); });
             } else {
                 item.className = "queue-item normal-pending";
                 tag.className = "tag tag-normal";
                 tag.innerHTML = "🟡 ความเร่งด่วน: ปกติ";
-                
-                // 🟡 ยิงเสียงแจ้งเตือนนุ่มๆ สั้นๆ 1 ครั้ง
-                document.getElementById("normalSound").play().catch(e => {});
+                nSound.play().catch(e => { console.log("Audio play blocked by browser setup"); });
             }
 
             item.querySelector("button").disabled = false;
             item.querySelector("button").innerHTML = "<i class='fa-solid fa-person-running'></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)";
 
-            alert(`📝 ส่งงานระดับ [${priority}] ไปยังบอร์ดพนักงานเปลและเปิดระบบเสียงเตือนแล้วค่ะ`);
+            alert(`📝 ส่งงานระดับ [${priority}] ไปยังบอร์ดพนักงานเปลเรียบร้อยค่ะ`);
             switchMode('staff'); 
         }
 
@@ -400,9 +400,11 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                // 🤫 ดับเสียงปี๊บๆๆ ทันทีเมื่อเปลกดรับงานสำเร็จควิเอลเสียงเงียบสนิท
+                // ดับเสียงแจ้งเตือนทันทีเมื่อเปลกดยอมรับงานสำเร็จ
                 document.getElementById("urgentSound").pause();
                 document.getElementById("urgentSound").currentTime = 0;
+                document.getElementById("normalSound").pause();
+                document.getElementById("normalSound").currentTime = 0;
                 
                 const item = document.getElementById("demoQueueItem");
                 item.className = "queue-item";
