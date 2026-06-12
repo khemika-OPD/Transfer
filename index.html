@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบริหารคิวงานเปล - โรงพยาบาล (ตารางสรุปเอกสารจริง)</title>
+    <title>ระบบบริหารคิวงานเปล - โรงพยาบาล (เชื่อมต่อ Google Sheet อัตโนมัติ)</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -55,7 +55,7 @@
 
         /* สไตล์ตารางทะเบียนรายงานแบบเอกสารเดิม */
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid #dcdde1; }
-        .report-table { width: 100%; border-collapse: collapse; background: white; min-width: 500px; }
+        .report-table { width: 100%; border-collapse: collapse; background: white; min-width: 550px; }
         .report-table th, .report-table td { border: 1px solid #dcdde1; padding: 8px 6px; text-align: center; font-size: 13px; }
         .report-table th { background: #f1f2f6; color: var(--primary); font-weight: bold; }
         .report-table tr:nth-child(even) { background-color: #f8f9fa; }
@@ -70,7 +70,7 @@
     <div class="container">
         <div class="header">
             <h1>🚑 ระบบคิวงานเคลื่อนย้ายผู้ป่วย</h1>
-            <p>หน่วยงานเปล สรุปยอดและจัดคิว Real-time</p>
+            <p>หน่วยงานเปล สรุปยอดและจัดคิวส่ง Google Sheet อัตโนมัติ</p>
         </div>
 
         <div class="tabs">
@@ -103,6 +103,11 @@
                     <option value="หน้าห้องการเงิน">หน้าห้องการเงิน</option>
                     <option value="คลินิกพิเศษ">คลินิกพิเศษ</option>
                     <option value="ห้องน้ำ">ห้องน้ำ</option>
+                    <option value="จุดประชาสัมพันธ์">จุดประชาสัมพันธ์</option>
+                    <option value="ห้องผ่าตัด">ห้องผ่าตัด</option>
+                    <option value="ห้องคลอด">ห้องคลอด</option>
+                    <option value="ห้องฝากครรภ์">ห้องฝากครรภ์</option>
+                    <option value="ICU">ICU</option>
                 </select>
 
                 <label>จุดบริการปลายทาง</label>
@@ -118,6 +123,11 @@
                     <option value="หน้าห้องการเงิน">หน้าห้องการเงิน</option>
                     <option value="คลินิกพิเศษ">คลินิกพิเศษ</option>
                     <option value="ห้องน้ำ">ห้องน้ำ</option>
+                    <option value="จุดประชาสัมพันธ์">จุดประชาสัมพันธ์</option>
+                    <option value="ห้องผ่าตัด">ห้องผ่าตัด</option>
+                    <option value="ห้องคลอด">ห้องคลอด</option>
+                    <option value="ห้องฝากครรภ์">ห้องฝากครรภ์</option>
+                    <option value="ICU">ICU</option>
                     <option value="ห้องฉุกเฉิน (ER)">ห้องฉุกเฉิน (ER)</option>
                     <option value="ห้องเอกซเรย์">ห้องเอกซเรย์</option>
                     <option value="ห้องกายภาพ">ห้องกายภาพ</option>
@@ -156,19 +166,22 @@
                                 <th width="8%">สถานะ</th>
                             </tr>
                         </thead>
-                        <tbody id="report-table-body">
-                            </tbody>
+                        <tbody id="report-table-body"></tbody>
                     </table>
                 </div>
 
-                <button class="btn btn-submit" style="margin-top: 15px; background: #3498db;" onclick="copyTableForExcel()">📊 คัดลอกตารางเพื่อไปวางใน Google Sheet / Excel</button>
-                <button class="btn btn-submit" style="margin-top: 10px; background: #27ae60;" onclick="exportToLine()">💬 ก๊อบปี้ข้อความเพื่อส่งรายงาน Line</button>
+                <button class="btn btn-submit" style="margin-top: 15px; background: #27ae60;" onclick="exportToLine()">💬 ก๊อบปี้ข้อความเพื่อส่งรายงาน Line</button>
                 <button class="btn btn-danger" onclick="manualClearJobs()">⚙️ รีเซ็ตคิวงาน (เริ่มวันใหม่)</button>
             </div>
         </div>
     </div>
 
     <script>
+        // ==========================================
+        // 🔗 1. เอาลิงก์ Web App จาก Google Apps Script มาวางแทนในเครื่องหมายคำพูดด้านล่างนี้ได้เลยค่ะ
+        // ==========================================
+        const GOOGLE_SHEET_URL = "วาง_URL_เว็บแอปของอาจารย์ตรงนี้ค่ะ";
+
         const staffList = ["สมใจ", "สมบัติ", "นิรันดร์"];
         let jobDatabase = JSON.parse(localStorage.getItem('stretcher_jobs')) || [];
 
@@ -192,6 +205,7 @@
             if(tabId === 'summary-tab') renderReportTable();
         }
 
+        // ฟังก์ชันแจ้งงานใหม่ (ยิงข้อมูลส่งเข้าสู่ Google Sheet แบบอัตโนมัติทันทีกดปุ่ม)
         function addNewJob() {
             let reqType = document.getElementById('request-type').value;
             let fromLoc = document.getElementById('from-location').value;
@@ -200,7 +214,6 @@
             let timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
             let newJob = {
-                id: Date.now(),
                 time: timeStr,
                 type: reqType,
                 from: fromLoc,
@@ -209,14 +222,32 @@
                 status: "Pending"
             };
 
-            jobDatabase.push(newJob); // ต่อท้ายเพื่อเรียงลำดับ 1,2,3 จากบนลงล่างตามเอกสารจริง
+            // 🚀 ฟังก์ชันคลิกเดียวยิงตรงเข้า Google Sheet อัตโนมัติหลังบ้าน
+            if (GOOGLE_SHEET_URL !== "วาง_URL_เว็บแอปของอาจารย์ตรงนี้ค่ะ") {
+                fetch(GOOGLE_SHEET_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(newJob)
+                });
+            }
+
+            jobDatabase.push(newJob);
             saveAndRender();
-            alert("📌 บันทึกคิวงานเรียบร้อยแล้วค่ะ!");
+            alert("📌 บันทึกคิวงานเรียบร้อย และข้อมูลส่งเข้า Google Sheet ส่วนกลางแล้วค่ะ!");
         }
 
+        // ฟังก์ชันรับคิวงาน (เมื่อลูกน้องเคลียร์งาน จะทำอัปเดตข้อมูลแถวใหม่ในแอป)
         function claimJob(jobId) {
-            let job = jobDatabase.find(j => j.id === jobId);
-            if (!job || job.status === "Done") return;
+            let pendingJobs = jobDatabase.filter(j => j.status === "Pending");
+            let doneJobs = jobDatabase.filter(j => j.status === "Done");
+            let displayList = [...pendingJobs, ...doneJobs];
+            
+            let job = displayList.find(j => j.id === jobId || (j.time === jobDatabase.find(x => x.id === jobId)?.time && j.from === jobDatabase.find(x => x.id === jobId)?.from));
+            
+            // หา object จริงในฐานข้อมูลหลัก
+            let realJob = jobDatabase.find(j => j.time === job.time && j.from === job.from && j.to === job.to && j.status === "Pending");
+            if (!realJob) return;
 
             let selectText = "📱 กรุณาเลือกหมายเลขชื่อของคุณเพื่อรับงานนี้:\n";
             staffList.forEach((name, index) => { selectText += `${index + 1}. ${name}\n`; });
@@ -227,10 +258,30 @@
             let selectedStaff = staffList[parseInt(staffIndex) - 1];
 
             if (selectedStaff) {
-                job.staff = selectedStaff;
-                job.status = "Done";
+                realJob.staff = selectedStaff;
+                realJob.status = "Done";
+
+                // ยิงอัปเดตข้อมูลแถวการเคลียร์งานขึ้น Google Sheet เพิ่มด้วยอัตโนมัติ
+                let updateData = {
+                    time: realJob.time,
+                    type: realJob.type,
+                    from: realJob.from,
+                    to: realJob.to,
+                    staff: selectedStaff,
+                    status: "✔️ สำเร็จ"
+                };
+
+                if (GOOGLE_SHEET_URL !== "วาง_URL_เว็บแอปของอาจารย์ตรงนี้ค่ะ") {
+                    fetch(GOOGLE_SHEET_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(updateData)
+                    });
+                }
+
                 saveAndRender();
-                alert(`✔️ บันทึกงานสำเร็จ! งานนี้ลงยอดของ คุณ${selectedStaff} แล้วค่ะ`);
+                alert(`✔️ บันทึกงานสำเร็จ! ระบบลงยอดงานของ คุณ${selectedStaff} เข้าสู่ระบบ Sheet เรียบร้อยแล้วค่ะ`);
             } else {
                 alert("❌ หมายเลขไม่ถูกต้อง การบันทึกไม่สำเร็จ");
             }
@@ -240,7 +291,6 @@
             let container = document.getElementById('task-list-container');
             container.innerHTML = "";
 
-            // สำหรับหน้ารายการคิวงานหลัก ให้โชว์งานที่ค้าง (Pending) ขึ้นก่อนเพื่อความสะดวก
             let pendingJobs = jobDatabase.filter(j => j.status === "Pending");
             let doneJobs = jobDatabase.filter(j => j.status === "Done");
             let displayList = [...pendingJobs, ...doneJobs];
@@ -257,6 +307,9 @@
                 let badgeText = isDone ? "✔️ สำเร็จ" : "🏃‍♂️ รับคิวนี้";
                 let staffText = isDone ? `<div class="task-staff">ผู้ปฏิบัติงาน: ${job.staff}</div>` : `<div class="task-staff" style="color:#e67e22;">⏳ รอเจ้าหน้าที่เปล</div>`;
 
+                // การระบุ ID ชั่วคราวสำหรับการรับคลิก
+                let clickId = job.id ? job.id : Date.now();
+
                 container.innerHTML += `
                     <div class="${cardClass}">
                         <div class="task-info">
@@ -267,13 +320,12 @@
                             <div class="task-route">${job.from} ➡️ ${job.to}</div>
                             ${staffText}
                         </div>
-                        <button class="${badgeClass}" onclick="claimJob(${job.id})">${badgeText}</button>
+                        <button class="${badgeClass}" onclick="claimJob(${clickId})">${badgeText}</button>
                     </div>
                 `;
             });
         }
 
-        // 📊 ฟังก์ชันวาดตารางสรุปยอดให้หน้าตาเหมือนระบบเอกสารเดิมแบบเป๊ะๆ
         function renderReportTable() {
             const monthsTH = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
             let today = new Date();
@@ -288,7 +340,6 @@
                 return;
             }
 
-            // แสดงผลเรียงลำดับจากงานชิ้นแรก (1) ลงมาหาชิ้นล่าสุดตามเอกสารกระดาษ
             jobDatabase.forEach((job, index) => {
                 let statusIcon = job.status === "Done" ? "✔️" : "⏳";
                 tbody.innerHTML += `
@@ -301,23 +352,6 @@
                         <td>${statusIcon}</td>
                     </tr>
                 `;
-            });
-        }
-
-        // 📋 ฟังก์ชันแปลงตารางเป็นรูปแบบ Excel เพื่อให้ก๊อบปี้ไปกดวาง (Paste) ใน Google Sheet ได้ทันที
-        function copyTableForExcel() {
-            let table = document.getElementById("excel-table");
-            let text = "";
-            for (let i = 0; i < table.rows.length; i++) {
-                let row = table.rows[i];
-                for (let j = 0; j < row.cells.length; j++) {
-                    text += row.cells[j].innerText + "\t"; // ใช้ Tab แบ่งคอลัมน์สำหรับ Excel
-                }
-                text += "\n";
-            }
-
-            navigator.clipboard.writeText(text).then(() => {
-                alert("📊 คัดลอกตารางทะเบียนงานลงเครื่องแล้วค่ะ! อาจารย์สามารถเปิด Google Sheet หรือ Excel ขึ้นมา แล้วกด 'วาง' (Ctrl+V) ได้เลย ข้อมูลจะลงบล็อกแยกคอลัมน์ให้ทันทีค่ะ");
             });
         }
 
