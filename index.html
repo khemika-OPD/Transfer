@@ -108,6 +108,7 @@
         }
         .btn-primary { background-color: var(--primary-color); color: white; }
         .btn-success { background-color: var(--success-color); color: white; }
+        .btn-warning { background-color: #e65100; color: white; } /* สีปุ่มล้างคิววันใหม่ */
         
         .profile-zone {
             display: flex;
@@ -172,6 +173,7 @@
             </button>
         </div>
 
+        <!-- ================= โหมด 1: ฝั่งพยาบาลสั่งงาน ================= -->
         <div id="nurseModeSection" class="app-mode active">
             <div class="card">
                 <h3 style="margin-top:0; color: var(--primary-color);"><i class="fa-solid fa-paper-plane"></i> คีย์ส่งงานคิวเปลด่วน</h3>
@@ -212,9 +214,15 @@
                 <button class="btn btn-primary" onclick="sendJobFromNurse()">
                     <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
                 </button>
+                
+                <!-- 🚨 ปุ่มเคลียร์กระดานเริ่มคิววันใหม่สำหรับหัวหน้าวอร์ดพยาบาล 🌟 -->
+                <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
+                    <i class="fa-solid fa-trash-can"></i> 🌅 กดล้างกระดานเริ่มต้นคิวใหม่ (สำหรับขึ้นวันใหม่)
+                </button>
             </div>
         </div>
 
+        <!-- ================= โหมด 2: ฝั่งพนักงานเปลรับงาน ================= -->
         <div id="staffModeSection" class="app-mode">
             <div id="loginSection" class="card">
                 <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
@@ -257,8 +265,8 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🌟 ลิงก์สะพานเชื่อมตัวล่าสุดของพี่เขมิกาค่ะ
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxhV2bKtviWSmzJpa-WzUN5tg0MgEdAudQt63WNolGH613l8F8FQAgrOLDW4Q5gzjU2bA/exec";
+        // 🚨 อย่าลืม! หลังจากกด Deploy ในแอปสคริปต์สเต็ปที่ 1 แล้ว นำลิงก์ใหม่มาวางทับในเครื่องหมายคำพูดตรงนี้แทนนะคะ 🌟
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyt_1QOZQxb7y7Ts5Kc8yq9_7ZpO91bqECGVhFkSSrl8GowmcQ4TCZHU0T5_hCQwcfPAQ/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -303,9 +311,8 @@
 
             const now = new Date();
             const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const cleanStartDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+            const cleanStartDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`; // ล็อกวินาทีกันรหัสซ้ำ
 
-            // 🎯 ปรับโครงสร้างส่งให้ตรงล็อกกับฟังก์ชัน doPost หลังบ้านเป๊ะๆ
             const payload = {
                 time: cleanStartDateTime,
                 type: type,
@@ -333,6 +340,28 @@
             });
         }
 
+        // 🌟 ฟังก์ชันพิเศษสำหรับกดล้างคิวเริ่มวันใหม่
+        function clearAllDataForNewDay() {
+            if (confirm("🚨 คำเตือนวิกฤต: คุณต้องการลบประวัติงานคิวเปลทั้งหมดเพื่อเริ่มต้นคิววันใหม่ใช่หรือไม่? (ข้อมูลเดิมจะถูกล้างเกลี้ยง)")) {
+                const payload = { action: "clearAllData" };
+                
+                alert("⏳ กำลังกวาดล้างข้อมูลสเปรดชีตส่วนกลาง...");
+                
+                fetch(GOOGLE_SHEET_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    cache: "no-cache",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                }).then(() => {
+                    alert("🌅 ล้างข้อมูลกระดานรับงานขึ้นวันใหม่เรียบร้อยค่ะ! เริ่มรันคิวที่ 1 ของวันนี้ได้เลย");
+                    fetchDataFromSheet();
+                }).catch(err => {
+                    alert("ไม่สามารถล้างข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ");
+                });
+            }
+        }
+
         function fetchDataFromSheet() {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-rotate fa-spin'></i> กำลังตรวจเช็กคิวงานด่วน...";
             
@@ -345,7 +374,6 @@
             document.body.appendChild(script);
         }
 
-        // 🎯 ฟังก์ชันรับค่า JSONP: จูนชื่อตัวแปรให้ถอดรหัสออกมาตรงล็อกกับหลังบ้านเป๊ะๆ ไม่เว้นว่างแล้วค่ะ!
         function handleSheetData(data) {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-circle-check'></i> เชื่อมต่อเรียลไทม์";
             if (!Array.isArray(data)) return;
@@ -353,7 +381,7 @@
             const queueList = document.getElementById("queueList");
             queueList.innerHTML = "";
 
-            // 🎯 คัดกรองงานค้าง: ต้องมีจุดต้นทาง (timestamp) และคอลัมน์พนักงานเปล (porter) กับเวลารับ (acceptTime) ต้องไม่มีข้อมูล
+            // 🎯 คัดกรองคิวค้าง: คัดกรองเอากล่องงานที่ คอลัมน์ F (พนักงานเปล) และ คอลัมน์ G (เวลารับงาน) เป็นค่าว่างจริง ๆ มาโชว์เท่านั้น
             const pendingJobs = data.filter(job => job.timestamp && job.timestamp.toString().trim() !== "" && !job.porter && !job.acceptTime);
 
             if (pendingJobs.length === 0) {
@@ -427,7 +455,6 @@
             const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const cleanEndDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
 
-            // 🎯 ปรับจูนโครงสร้างส่งรับงานของพนักงานเปล ให้ตรงกับหน้า doPost เพื่อแมตช์หาแถวเก่าเจอทันที ปุ่มไม่ล็อกแล้วค่ะ!
             const payload = {
                 time: timestamp,
                 type: equipment,
