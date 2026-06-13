@@ -262,7 +262,14 @@
         </div>
 
         <div id="staffModeSection" class="app-mode">
-            <div id="loginSection" class="card">
+            <div id="audioUnlockZone" class="card" style="text-align: center; background-color: #fffde7; border: 1px dashed #fbc02d;">
+                <p style="margin: 0 0 10px 0; font-size: 14px; color: #f57f17; font-weight: bold;">📢 เพื่อให้เสียงไซเรนเตือนภัยเคสเร่งด่วนดังขึ้นบนมือถือเครื่องนี้แน่นอน</p>
+                <button class="btn btn-warning" style="padding: 8px; font-size: 14px; background-color: #fbc02d; color: #333;" onclick="unlockAudioElements()">
+                    <i class="fa-solid fa-volume-high"></i> คลิกเปิดระบบเสียงเตือนอัจฉริยะครั้งแรก
+                </button>
+            </div>
+
+            <div id="loginSection" class="card" style="margin-top: 15px;">
                 <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
                 <label for="staffName">เลือกชื่อของท่านเพื่อผูกกับมือถือเครื่องนี้:</label>
                 <select id="staffName" class="select-input">
@@ -274,7 +281,7 @@
                 <button class="btn btn-primary" style="margin-top:10px;" onclick="saveProfile()">บันทึกเข้าใช้งานเครื่องนี้</button>
             </div>
 
-            <div id="profileSection" class="profile-zone" style="display: none;">
+            <div id="profileSection" class="profile-zone" style="display: none; margin-top: 15px;">
                 <div>
                     <i class="fa-solid fa-id-card" style="color: #0288d1;"></i> 
                     ผู้ใช้งานเครื่องนี้: <strong id="currentStaffLabel"></strong>
@@ -303,10 +310,11 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyqyd6BvRyMql4rkclwzVea3X5Cp5YFKvASFAjA84lI3Js7_n0pmyjFXwKJpaLFlhUW0A/exec";
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwB4F75Q_OdbDIm_VogYu7j75ME75Z7coZXYAaq3h-afJ-qg0YL6R28yof_efgCzSFhKw/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
+        let isAudioUnlocked = false;
 
         window.onload = function() {
             const savedName = localStorage.getItem("OPD_Staff_Name");
@@ -319,6 +327,19 @@
             fetchDataFromSheet();
             setInterval(fetchDataFromSheet, 4000); 
         };
+
+        // ฟังก์ชัน Bypass นโยบายบราวเซอร์มือถือเพื่อยอมรับคำสั่ง .play() ล่วงหน้า
+        function unlockAudioElements() {
+            const sSound = document.getElementById("successSound");
+            const uSound = document.getElementById("urgentSound");
+            if(sSound && uSound) {
+                sSound.play().then(() => { sSound.pause(); }).catch(e => {});
+                uSound.play().then(() => { uSound.pause(); }).catch(e => {});
+                isAudioUnlocked = true;
+                document.getElementById("audioUnlockZone").style.display = "none";
+                alert("🔊 เปิดระบบเสียงแจ้งเตือนเรียลไทม์สำเร็จ!");
+            }
+        }
 
         function switchMode(role) {
             document.getElementById("btnNurseMode").classList.remove("active");
@@ -346,6 +367,7 @@
                 return;
             }
 
+            // ใช้ระบบ ISO String เป็น Key หลักห้ามเปลี่ยนฟอร์แมต
             const cleanStartDateTime = new Date().toISOString();
 
             const payload = {
@@ -428,14 +450,15 @@
             const queueList = document.getElementById("queueList");
             queueList.innerHTML = ""; 
 
+            // แก้ไขบั๊กการคัดกรองแถวคิวค้างให้สอดคล้องกับหัวฟิลด์อย่างปลอดภัย
             const pendingJobs = data.filter(job => {
-                const timestamp = job.เวลาสั่งงาน || job.timestamp || job.time;
-                const porter = job.พนักงานเปล || job.porter || job.staff;
-                const acceptTime = job.เวลารับงาน || job.acceptTime || job.status;
+                const timestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
+                const porter = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
+                const acceptTime = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
                 
-                return timestamp && 
-                       (!porter || porter.toString().trim() === "") && 
-                       (!acceptTime || acceptTime.toString().trim() === "");
+                return timestamp.toString().trim() !== "" && 
+                       porter.toString().trim() === "" && 
+                       acceptTime.toString().trim() === "";
             });
 
             if (pendingJobs.length === 0) {
@@ -454,13 +477,13 @@
                 const newCard = document.createElement("div");
                 let cardClass = "queue-item normal-pending";
                 
-                const currentRawTimestamp = job.เวลาสั่งงาน || job.timestamp || job.time || "";
+                const currentRawTimestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
                 let displayTime = formatThaiDisplayTime(currentRawTimestamp);
 
-                const currentEquipment = job.ประเภทอุปกรณ์ที่ต้องใช้ || job.equipment || job.type || "รถเข็นนั่ง";
-                const currentPriority = job.ระดับความเร่งด่วน || job.priority || "ปกติ";
-                const currentOrigin = job.จุดต้นทาง || job.origin || "";
-                const currentDestination = job.จุดปลายทาง || job.destination || job.to || "";
+                const currentEquipment = job["ประเภทอุปกรณ์ที่ต้องใช้"] || job.ประเภทอุปกรณ์ที่ต้องใช้ || "รถเข็นนั่ง";
+                const currentPriority = job["ระดับความเร่งด่วน"] || job.ระดับความเร่งด่วน || "ปกติ";
+                const currentOrigin = job["จุดต้นทาง"] || job.จุดต้นทาง || "";
+                const currentDestination = job["จุดปลายทาง"] || job.จุดปลายทาง || "";
 
                 let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${currentPriority}</span>`;
 
@@ -520,9 +543,7 @@
             btnElement.disabled = true;
             btnElement.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> กำลังบันทึกสถิติลง Google Sheets...";
 
-            const now = new Date();
-            const cleanEndDateTime = now.toLocaleDateString('th-TH') + " " + now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
-
+            // ส่งค่า ISO หรือวันที่กลับไปให้ตรงตามรูปแบบแผ่นงานเพื่อป้องกันคีย์หลุดคู่อัปเดต
             const payload = {
                 time: rawTimestamp, 
                 type: equipment,
@@ -530,7 +551,7 @@
                 origin: origin,
                 to: destination,
                 staff: currentStaff,
-                status: cleanEndDateTime 
+                status: new Date().toISOString() // เปลี่ยนมาส่งค่าเป็น ISO เพื่อการประมวลผลข้อมูลในระบบหลังบ้านและชีตที่เสถียรกว่าค่ะ
             };
 
             fetch(GOOGLE_SHEET_URL, {
