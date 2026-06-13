@@ -188,7 +188,7 @@
                     <label>🦽 ประเภทอุปกรณ์ที่ต้องใช้:</label>
                     <select id="jobType" class="select-input">
                         <option value="รถเข็นนั่ง (Wheelchair) 🦽">รถเข็นนั่ง (Wheelchair) 🦽</option>
-                        <option value="รถนอน (Stretcher) 🛏️">รถนอน (Stretcher) 🛏️</option>
+                        <option value="รถนอน (Stretcher) 𛏱">รถนอน (Stretcher) 𛏱</option>
                         <option value="เดินประคอง 🚶‍♂️">เดินประคอง 🚶‍♂️</option>
                     </select>
                 </div>
@@ -296,8 +296,8 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🌟 ฝังลิงก์ Web App URL ล่าสุดของพี่เรียบร้อยแล้วค่ะ
-     const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby6kaIEw02Oxir9ow6i41sjpMBO0GRrmRBR920VEUKVGStpKoEi3is9Gb69yt_WPrFc2Q/exec";
+        // 🌟 อัปเดตผูกลิงก์ท่อสะพานเชื่อมตัวล่าสุดเรียบร้อยแล้วค่ะพี่เขมิกา
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyxsFkk1Ov2CbEPcmUkviMvXIynLrycc-a4tb37kaJ7pwuo7oFUXwCS9glb_v-XD6_j7_A/exec";
 
         let currentStaff = "";
         let jobCounter = 0;
@@ -427,11 +427,12 @@
             const cleanEndDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
             const displayTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
 
+            // 🎯 แก้โครงสร้างให้จับคู่ส่งคำว่า "origin" ไปแมตช์หลังบ้านพ้นบั๊กสีน้ำเงินแล้วค่ะ 
             const payload = {
                 time: cleanStartDateTime,
                 type: type,
                 priority: priority,
-                from: from,
+                origin: from, 
                 to: to,
                 staff: currentStaff,
                 status: cleanEndDateTime
@@ -461,7 +462,7 @@
                     <strong>🦽 อุปกรณ์:</strong> ${type} | <strong>🚨 ระดับ:</strong> ${priority}<br>
                     จาก ${from} ไป ${to}
                     <p style="color: var(--success-color); margin: 8px 0 0 0; font-weight: bold;">
-                        <i class="fa-solid fa-circle-check"></i> คุณ ${currentStaff} รับงานแล้ว! แยกคอลัมน์บันทึกลงสเปรดชีตสำเร็จค่ะ
+                        <i class="fa-solid fa-circle-check"></i> คุณ ${currentStaff} รับงานแล้ว! บันทึกลงสเปรดชีตแยกคอลแลมน์สำเร็จเรียบร้อยค่ะ
                     </p>
                 `;
             }).catch(err => {
