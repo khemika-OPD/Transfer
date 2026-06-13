@@ -303,7 +303,7 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🎯 ผูกลิงก์กับ Web App URL ตัวล่าสุดของพี่เรียบร้อยแล้วค่ะ
+        // 🎯 ยิงตรงเข้าสู่ระบบล็อกลิ้งค์ตัวอัปเกรดล่าสุดของพี่เขมิกาเรียบร้อยค่ะ
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzR3xdHUd9s182eMzCMbt_9M-Bb6tOrbxP_aDyY68vvzRTrMIVL-igZ7AgluqP1iO5e_Q/exec";
 
         let currentStaff = "";
@@ -347,7 +347,9 @@
                 return;
             }
 
-            const cleanStartDateTime = new Date().toISOString();
+            // บันทึกเวลาด้วยรูปแบบข้อความอ่านง่าย เพื่อเป็นรหัส String ID คุยหลังบ้านตรงตัว ไม่สับสนวินาที
+            const now = new Date();
+            const cleanStartDateTime = now.getFullYear() + "/" + (now.getMonth()+1) + "/" + now.getDate() + " " + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();
 
             const payload = {
                 time: cleanStartDateTime,
@@ -361,7 +363,7 @@
 
             try {
                 document.getElementById("successSound").play();
-            } catch(e) { console.log("Audio play deferred"); }
+            } catch(e) {}
 
             fetch(GOOGLE_SHEET_URL, {
                 method: "POST",
@@ -447,12 +449,12 @@
                 const currentRawTimestamp = job.เวลาสั่งงาน || job.timestamp || job.time || "";
                 let displayTime = currentRawTimestamp;
                 
-                try {
-                    if (currentRawTimestamp.includes("T")) {
+                if (currentRawTimestamp.includes("T")) {
+                    try {
                         const d = new Date(currentRawTimestamp);
                         displayTime = d.toLocaleDateString('th-TH') + " " + d.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
-                    }
-                } catch(e) {}
+                    } catch(e) {}
+                }
 
                 const currentEquipment = job.ประเภทอุปกรณ์ที่ต้องใช้ || job.equipment || job.type || "รถเข็นนั่ง";
                 const currentPriority = job.ระดับความเร่งด่วน || job.priority || "ปกติ";
