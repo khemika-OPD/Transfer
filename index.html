@@ -331,8 +331,7 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🎯 อัปเดตผูกเข้ากับลิงก์ใหม่ของพี่เรียบร้อยแล้วค่ะ
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbysdmStjIReDt4N7g-8LL3ou2Gb60aD4is4clLwTjYyK3YnSog0nddY-24nSzNL1mjmnA/exec";
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwB4F75Q_OdbDIm_VogYu7j75ME75Z7coZXYAaq3h-afJ-qg0YL6R28yof_efgCzSFhKw/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -506,6 +505,7 @@
             document.body.appendChild(script);
         }
 
+        // ฟังก์ชันช่วยจัดฟอร์แมตเวลาข้อความสากลให้คนหน้างานอ่านง่าย
         function formatThaiDisplayTime(rawTime) {
             if (!rawTime) return "";
             try {
