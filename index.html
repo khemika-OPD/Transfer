@@ -404,15 +404,15 @@
             const queueList = document.getElementById("queueList");
             queueList.innerHTML = "";
 
-            // 🎯 ปรับการกรองให้ยืดหยุ่นและสอดคล้องกับคอลัมน์ชีตของระบบ
+            // 🎯 ซิงค์หัวตารางภาษาไทยให้ดึงข้อมูลคิวที่ค้างอยู่มาแสดงผล
             const pendingJobs = data.filter(job => {
-                const hasTimestamp = job.timestamp || job.time;
-                const porterValue = job.porter || job.staff;
-                const acceptValue = job.acceptTime || job.status;
+                const timestamp = job.เวลาสั่งงาน || job.timestamp || job.time;
+                const porter = job.พนักงานเปล || job.porter || job.staff;
+                const acceptTime = job.เวลารับงาน || job.acceptTime || job.status;
                 
-                return hasTimestamp && 
-                       (!porterValue || porterValue.toString().trim() === "") && 
-                       (!acceptValue || acceptValue.toString().trim() === "");
+                return timestamp && 
+                       (!porter || porter.toString().trim() === "") && 
+                       (!acceptTime || acceptTime.toString().trim() === "");
             });
 
             if (pendingJobs.length === 0) {
@@ -431,16 +431,15 @@
                 const newCard = document.createElement("div");
                 let cardClass = "queue-item normal-pending";
                 
-                // แมพค่าเผื่อชื่อคอลัมน์สลับกันระหว่างรับเข้า-ส่งออก
-                const currentPriority = job.priority || "ปกติ";
-                const currentTimestamp = job.timestamp || job.time || "";
-                const currentEquipment = job.equipment || job.type || "รถเข็นนั่ง";
-                const currentOrigin = job.origin || "";
-                const currentDestination = job.destination || job.to || "";
+                const currentTimestamp = job.เวลาสั่งงาน || job.timestamp || job.time || "";
+                const currentEquipment = job.ประเภทอุปกรณ์ที่ต้องใช้ || job.equipment || job.type || "รถเข็นนั่ง";
+                const currentPriority = job.ระดับความเร่งด่วน || job.priority || "ปกติ";
+                const currentOrigin = job.จุดต้นทาง || job.origin || "";
+                const currentDestination = job.จุดปลายทาง || job.destination || job.to || "";
 
                 let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${currentPriority}</span>`;
 
-                if (currentPriority === "เร่งด่วน") {
+                if (currentPriority === "เร่งด่วน" || currentPriority.includes("เร่งด่วน")) {
                     cardClass = "queue-item urgent-pending";
                     tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${currentPriority}</span>`;
                     hasUrgent = true;
