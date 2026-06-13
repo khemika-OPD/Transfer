@@ -299,12 +299,13 @@
         
     </div>
 
+    <!-- ระบบเสียงสัญญาณคัดสรรความสะอาด -->
     <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🎯 ผูกลิงก์ระบบความปลอดภัยตัวล่าสุดของพี่เขมิกาเรียบร้อยแล้วค่ะ
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyqyd6BvRyMql4rkclwzVea3X5Cp5YFKvASFAjA84lI3Js7_n0pmyjFXwKJpaLFlhUW0A/exec";
+        // 🎯 สับเปลี่ยนมาผูกลิงก์ตัวล็อก ID สเปรตชีตสมบูรณ์แบบตัวจริงของคุณเขมิกาแล้วค่ะ
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzR3xdHUd9s182eMzCMbt_9M-Bb6tOrbxP_aDyY68vvzRTrMIVL-igZ7AgluqP1iO5e_Q/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -347,7 +348,7 @@
                 return;
             }
 
-            // บันทึกเวลามาตรฐานสากล ISO เพื่อส่งไปเปรียบเทียบใน Apps Script หลังบ้านได้แมตช์แถวกันตรงเป๊ะๆ
+            // บันทึกเวลามาตรฐาน ISO ส่งตรงไปหลังบ้าน
             const cleanStartDateTime = new Date().toISOString();
 
             const payload = {
@@ -360,6 +361,11 @@
                 status: "" 
             };
 
+            // เล่นเสียงสัญญาณสั่งงานทันทีที่กดส่ง
+            try {
+                document.getElementById("successSound").play();
+            } catch(e) { console.log("Audio deferred"); }
+
             fetch(GOOGLE_SHEET_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -367,10 +373,6 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                try {
-                    document.getElementById("successSound").play();
-                } catch(e) { console.log("Audio play deferred"); }
-                
                 alert("📝 สั่งงานคิวเปลเข้าชีตสำเร็จ! ระบบจะดีดคิวแสดงผลอัตโนมัติภายใน 4 วินาทีค่ะ");
                 document.getElementById("jobFrom").value = "";
                 document.getElementById("jobTo").value = "";
@@ -417,7 +419,7 @@
             if (!data || !Array.isArray(data)) return;
 
             const queueList = document.getElementById("queueList");
-            queueList.innerHTML = ""; // ล้างคิวการ์ดเก่าออกก่อนวาดใหม่ เพื่อตัดปัญหาคิวซ้ำซ้อนซ้อนกันเต็มหน้าจอ
+            queueList.innerHTML = ""; // ล้างคิวการ์ดเก่าออกก่อนวาดใหม่เสมอตราบเท่าที่มีการตรวจสอบคิวรีเฟรช
 
             const pendingJobs = data.filter(job => {
                 const timestamp = job.เวลาสั่งงาน || job.timestamp || job.time;
