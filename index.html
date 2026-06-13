@@ -299,12 +299,11 @@
         
     </div>
 
-    <!-- ไฟล์เสียงเอฟเฟกต์ส่งคิวสำเร็จ -->
     <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwB4F75Q_OdbDIm_VogYu7j75ME75Z7coZXYAaq3h-afJ-qg0YL6R28yof_efgCzSFhKw/exec";
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyqyd6BvRyMql4rkclwzVea3X5Cp5YFKvASFAjA84lI3Js7_n0pmyjFXwKJpaLFlhUW0A/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -347,7 +346,6 @@
                 return;
             }
 
-            // 🎯 เปลี่ยนส่งเวลาเป็น ISO String ดิบๆ จากหน้าเว็บตรงๆ เพื่อให้หลังบ้านบันทึกเป็นฐานเวลาสากลเดียวกัน
             const cleanStartDateTime = new Date().toISOString();
 
             const payload = {
@@ -412,11 +410,9 @@
             document.body.appendChild(script);
         }
 
-        // ฟังก์ชันแปลงเวลาสากลมาแสดงผลภาษาไทยให้คนอ่านง่าย แต่ยังคงเก็บค่าดิบไว้ข้างหลังเป็น ID
         function formatThaiDisplayTime(rawTime) {
             if (!rawTime) return "";
             try {
-                // รองรับทั้งฟอร์แมตที่มีตัว T และแบบสตริงธรรมดา
                 const d = new Date(rawTime);
                 if (!isNaN(d.getTime())) {
                     return d.toLocaleDateString('th-TH') + " " + d.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
@@ -458,7 +454,6 @@
                 const newCard = document.createElement("div");
                 let cardClass = "queue-item normal-pending";
                 
-                // 🎯 จุดสำคัญ: ดึงคีย์ข้อความดั้งเดิมมาเก็บไว้เลย ไม่ต้องมานั่งเสกใหม่ตอนกดส่งรับงาน
                 const currentRawTimestamp = job.เวลาสั่งงาน || job.timestamp || job.time || "";
                 let displayTime = formatThaiDisplayTime(currentRawTimestamp);
 
@@ -485,7 +480,6 @@
                     <strong>📍 ต้นทาง:</strong> ${currentOrigin}<br>
                     <strong>➡️ ปลายทาง:</strong> ${currentDestination}
                     <div style="margin-top: 12px;">
-                        <!-- 🎯 ปุ่มรับงานจะส่งตัวแปรข้อความดิบดั้งเดิมที่อ่านได้จากชีตกลับไปล้างแถวขจัดปัญหาไม่แมตช์สตริง -->
                         <button class="btn btn-success" onclick="acceptJobFromStaff('${escapeHtml(currentRawTimestamp.toString())}', '${currentPriority}', '${currentEquipment}', '${currentOrigin}', '${currentDestination}', this)">
                             <i class="fa-solid fa-person-running"></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)
                         </button>
@@ -504,7 +498,83 @@
             }
         }
 
-        // ฟังก์ชันตัวช่วยป้องกันรหัส HTML พังกรณีจุดส่งมีเครื่องหมายพิเศษ
+        function handleSheetData(data) {
+            document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-circle-check'></i> เชื่อมต่อเรียลไทม์";
+            if (!data || !Array.isArray(data)) return;
+
+            const queueList = document.getElementById("queueList");
+            queueList.innerHTML = ""; 
+
+            const pendingJobs = data.filter(job => {
+                const timestamp = job.เวลาสั่งงาน || job.timestamp || job.time;
+                const porter = job.พนักงานเปล || job.porter || job.staff;
+                const acceptTime = job.เวลารับงาน || job.acceptTime || job.status;
+                
+                return timestamp && 
+                       (!porter || porter.toString().trim() === "") && 
+                       (!acceptTime || acceptTime.toString().trim() === "");
+            });
+
+            if (pendingJobs.length === 0) {
+                queueList.innerHTML = `
+                    <div id="emptyMessage" style="text-align: center; color: #999; padding: 20px;">
+                        <i class="fa-solid fa-circle-info" style="font-size: 24px; color: #ccc;"></i><br>
+                        ขณะนี้ยังไม่มีคิวค้างในระบบ สบายใจได้ค่ะ
+                    </div>`;
+                stopUrgentSound();
+                return;
+            }
+
+            let hasUrgent = false;
+
+            pendingJobs.forEach((job) => {
+                const newCard = document.createElement("div");
+                let cardClass = "queue-item normal-pending";
+                
+                const currentRawTimestamp = job.เวลาสั่งงาน || job.timestamp || job.time || "";
+                let displayTime = formatThaiDisplayTime(currentRawTimestamp);
+
+                const currentEquipment = job.ประเภทอุปกรณ์ที่ต้องใช้ || job.equipment || job.type || "รถเข็นนั่ง";
+                const currentPriority = job.ระดับความเร่งด่วน || job.priority || "ปกติ";
+                const currentOrigin = job.จุดต้นทาง || job.origin || "";
+                const currentDestination = job.จุดปลายทาง || job.destination || job.to || "";
+
+                let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${currentPriority}</span>`;
+
+                if (currentPriority === "เร่งด่วน" || currentPriority.includes("เร่งด่วน")) {
+                    cardClass = "queue-item urgent-pending";
+                    tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${currentPriority}</span>`;
+                    hasUrgent = true;
+                }
+
+                newCard.className = cardClass;
+                newCard.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        ${tagHTML}
+                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${displayTime}</small>
+                    </div>
+                    <strong>🚨 อุปกรณ์:</strong> ${currentEquipment}<br>
+                    <strong>📍 ต้นทาง:</strong> ${currentOrigin}<br>
+                    <strong>➡️ ปลายทาง:</strong> ${currentDestination}
+                    <div style="margin-top: 12px;">
+                        <button class="btn btn-success" onclick="acceptJobFromStaff('${escapeHtml(currentRawTimestamp.toString())}', '${currentPriority}', '${currentEquipment}', '${currentOrigin}', '${currentDestination}', this)">
+                            <i class="fa-solid fa-person-running"></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)
+                        </button>
+                    </div>
+                `;
+                queueList.appendChild(newCard);
+            });
+
+            if (hasUrgent && !urgentPlaying) {
+                try {
+                    document.getElementById("urgentSound").play();
+                } catch(e) {}
+                urgentPlaying = true;
+            } else if (!hasUrgent) {
+                stopUrgentSound();
+            }
+        }
+
         function escapeHtml(string) {
             return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
