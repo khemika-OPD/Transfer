@@ -172,7 +172,6 @@
             </button>
         </div>
 
-        <!-- ================= โหมด 1: ฝั่งพยาบาลสั่งงาน ================= -->
         <div id="nurseModeSection" class="app-mode active">
             <div class="card">
                 <h3 style="margin-top:0; color: var(--primary-color);"><i class="fa-solid fa-paper-plane"></i> คีย์ส่งงานคิวเปลด่วน</h3>
@@ -216,7 +215,6 @@
             </div>
         </div>
 
-        <!-- ================= โหมด 2: ฝั่งพนักงานเปลรับงาน ================= -->
         <div id="staffModeSection" class="app-mode">
             <div id="loginSection" class="card">
                 <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
@@ -259,7 +257,7 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🌟 ฝังลิงก์สะพานเชื่อมตัวล่าสุดเรียบร้อยค่ะพี่เขมิกา
+        // 🌟 ลิงก์สะพานเชื่อมตัวล่าสุดของพี่เขมิกาค่ะ
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxhV2bKtviWSmzJpa-WzUN5tg0MgEdAudQt63WNolGH613l8F8FQAgrOLDW4Q5gzjU2bA/exec";
 
         let currentStaff = "";
@@ -292,7 +290,6 @@
             }
         }
 
-        // 🌟 ปรับปรุงฟังก์ชันส่งงาน: ยิงข้อมูล payload จับคู่ตรงกับ Apps Script เป๊ะๆ 
         function sendJobFromNurse() {
             const priority = document.getElementById("jobPriority").value;
             const type = document.getElementById("jobType").value;
@@ -308,7 +305,7 @@
             const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const cleanStartDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
 
-            // 🎯 ล็อกพิกัดตัวแปรจับคู่ตรงตามหลังบ้าน Apps Script
+            // 🎯 ปรับโครงสร้างส่งให้ตรงล็อกกับฟังก์ชัน doPost หลังบ้านเป๊ะๆ
             const payload = {
                 time: cleanStartDateTime,
                 type: type,
@@ -348,6 +345,7 @@
             document.body.appendChild(script);
         }
 
+        // 🎯 ฟังก์ชันรับค่า JSONP: จูนชื่อตัวแปรให้ถอดรหัสออกมาตรงล็อกกับหลังบ้านเป๊ะๆ ไม่เว้นว่างแล้วค่ะ!
         function handleSheetData(data) {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-circle-check'></i> เชื่อมต่อเรียลไทม์";
             if (!Array.isArray(data)) return;
@@ -355,8 +353,8 @@
             const queueList = document.getElementById("queueList");
             queueList.innerHTML = "";
 
-            // 🎯 กรองล้างแถวว่าง และเอาเฉพาะใบงานที่คอลัมน์พนักงานเปล (porter) และเวลารับ (acceptTime) ยังว่างอยู่
-            const pendingJobs = data.filter(job => job.origin && job.origin.toString().trim() !== "" && !job.porter && !job.acceptTime);
+            // 🎯 คัดกรองงานค้าง: ต้องมีจุดต้นทาง (timestamp) และคอลัมน์พนักงานเปล (porter) กับเวลารับ (acceptTime) ต้องไม่มีข้อมูล
+            const pendingJobs = data.filter(job => job.timestamp && job.timestamp.toString().trim() !== "" && !job.porter && !job.acceptTime);
 
             if (pendingJobs.length === 0) {
                 queueList.innerHTML = `
@@ -416,7 +414,6 @@
             urgentPlaying = false;
         }
 
-        // 🌟 ปรับปรุงฟังก์ชันรับงานของเปล: ยิงตัวแปรอัปเดตกลับไปหา Apps Script ให้ตรงกันเป๊ะ
         function acceptJobFromStaff(timestamp, priority, equipment, origin, destination, btnElement) {
             if (!currentStaff) {
                 alert("⚠️ พนักงานเปลกรุณาเลือกชื่อยืนยันตัวตนด้านบนก่อนกดรับงานค่ะ!");
@@ -430,7 +427,7 @@
             const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const cleanEndDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
 
-            // 🎯 หยอดพิกัดตัวแปรให้ตรงกัน หลังบ้านจะได้จับคู่แถวเก่าถูกช่องค่ะ
+            // 🎯 ปรับจูนโครงสร้างส่งรับงานของพนักงานเปล ให้ตรงกับหน้า doPost เพื่อแมตช์หาแถวเก่าเจอทันที ปุ่มไม่ล็อกแล้วค่ะ!
             const payload = {
                 time: timestamp,
                 type: equipment,
