@@ -257,11 +257,10 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🌟 อัปเดตผูกลิงก์ตัวล่าสุดที่อาจารย์ส่งมาให้เรียบร้อยแล้วค่ะ!
+        // 🌟 ฝังลิงก์ Web App URL ตัวล่าสุดของพี่เรียบร้อยแล้วค่ะ 
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxhV2bKtviWSmzJpa-WzUN5tg0MgEdAudQt63WNolGH613l8F8FQAgrOLDW4Q5gzjU2bA/exec";
 
         let currentStaff = "";
-        let localJobs = [];
         let urgentPlaying = false;
 
         window.onload = function() {
@@ -272,8 +271,6 @@
                 document.getElementById("loginSection").style.display = "none";
                 document.getElementById("profileSection").style.display = "flex";
             }
-            
-            // สั่งระบบเช็กงานเรียงคิวทันที และแอบวิ่งไปดึงข้อมูลทุก 5 วินาทีตลอดเวลาค้างแอป
             fetchDataFromSheet();
             setInterval(fetchDataFromSheet, 5000); 
         };
@@ -325,7 +322,7 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert("📝 สั่งงานคิวคิวเปลสำเร็จ! บอร์ดฝั่งพนักงานเปลจะเด้งแสดงผลภายใน 5 วินาทีค่ะ");
+                alert("📝 สั่งงานคิวเปลสำเร็จ! บอร์ดคิวจะอัปเดตอัตโนมัติภายใน 5 วินาทีค่ะ");
                 document.getElementById("jobFrom").value = "";
                 document.getElementById("jobTo").value = "";
                 switchMode('staff');
@@ -338,143 +335,14 @@
         function fetchDataFromSheet() {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-rotate fa-spin'></i> กำลังตรวจเช็กคิวงานด่วน...";
             
-            fetch(GOOGLE_SHEET_URL + "?nocache=" + new Date().getTime())
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-circle-check'></i> เชื่อมต่อเรียลไทม์";
-                if (!Array.isArray(data)) return;
-                
-                localJobs = data;
-                renderQueueList();
-            })
-            .catch(err => {
-                document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-circle-exclamation' style='color:#d32f2f'></i> หลุดการเชื่อมต่อหลังบ้าน";
-            });
+            const oldScript = document.getElementById("jsonpScript");
+            if (oldScript) oldScript.remove();
+
+            const script = document.createElement("script");
+            script.id = "jsonpScript";
+            script.src = GOOGLE_SHEET_URL + "?callback=handleSheetData&nocache=" + new Date().getTime();
+            document.body.appendChild(script);
         }
 
-        function renderQueueList() {
-            const queueList = document.getElementById("queueList");
-            queueList.innerHTML = "";
-
-            // กรองเอางานที่ไม่มีชื่อพนักงานเปลกดรับ
-            const pendingJobs = localJobs.filter(job => !job.porter && !job.acceptTime);
-
-            if (pendingJobs.length === 0) {
-                queueList.innerHTML = `
-                    <div id="emptyMessage" style="text-align: center; color: #999; padding: 20px;">
-                        <i class="fa-solid fa-circle-info" style="font-size: 24px; color: #ccc;"></i><br>
-                        ขณะนี้ยังไม่มีคิวค้างในระบบ สบายใจได้ค่ะ
-                    </div>`;
-                stopUrgentSound();
-                return;
-            }
-
-            let hasUrgent = false;
-
-            pendingJobs.forEach((job) => {
-                const newCard = document.createElement("div");
-                let cardClass = "queue-item normal-pending";
-                let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${job.priority}</span>`;
-
-                if (job.priority === "เร่งด่วน") {
-                    cardClass = "queue-item urgent-pending";
-                    tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${job.priority}</span>`;
-                    hasUrgent = true;
-                }
-
-                newCard.className = cardClass;
-                newCard.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        ${tagHTML}
-                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${job.timestamp}</small>
-                    </div>
-                    <strong>🚨 อุปกรณ์:</strong> ${job.equipment}<br>
-                    <strong>📍 ต้นทาง:</strong> ${job.origin}<br>
-                    <strong>➡️ ปลายทาง:</strong> ${job.destination}
-                    <div style="margin-top: 12px;">
-                        <button class="btn btn-success" onclick="acceptJobFromStaff('${job.timestamp}', '${job.priority}', '${job.equipment}', '${job.origin}', '${job.destination}', this)">
-                            <i class="fa-solid fa-person-running"></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)
-                        </button>
-                    </div>
-                `;
-                queueList.appendChild(newCard);
-            });
-
-            if (hasUrgent && !urgentPlaying) {
-                document.getElementById("urgentSound").play().catch(e => {});
-                urgentPlaying = true;
-            } else if (!hasUrgent) {
-                stopUrgentSound();
-            }
-        }
-
-        function stopUrgentSound() {
-            const uSound = document.getElementById("urgentSound");
-            uSound.pause();
-            uSound.currentTime = 0;
-            urgentPlaying = false;
-        }
-
-        function acceptJobFromStaff(timestamp, priority, equipment, origin, destination, btnElement) {
-            if (!currentStaff) {
-                alert("⚠️ พนักงานเปลกรุณาเลือกชื่อยืนยันตัวตนด้านบนก่อนกดรับงานค่ะ!");
-                return;
-            }
-
-            btnElement.disabled = true;
-            btnElement.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> กำลังบันทึกสถิติลง Google Sheets...";
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const cleanEndDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
-
-            const payload = {
-                time: timestamp,
-                type: equipment,
-                priority: priority,
-                origin: origin,
-                to: destination,
-                staff: currentStaff,
-                status: cleanEndDateTime 
-            };
-
-            fetch(GOOGLE_SHEET_URL, {
-                method: "POST",
-                mode: "no-cors",
-                cache: "no-cache",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                stopUrgentSound();
-                alert(`✔️ สำเร็จ! คุณ ${currentStaff} รับงานคิวนี้เรียบร้อย ข้อมูลลงชีตเรียบร้อยค่ะ`);
-                fetchDataFromSheet();
-            }).catch(err => {
-                alert("การเชื่อมต่อขัดข้อง กรุณาลองใหม่อีกครั้งค่ะ");
-                btnElement.disabled = false;
-            });
-        }
-
-        function saveProfile() {
-            const selectedName = document.getElementById("staffName").value;
-            if (!selectedName) {
-                alert("กรุณาเลือกชื่อพนักงานก่อนค่ะ");
-                return;
-            }
-            localStorage.setItem("OPD_Staff_Name", selectedName);
-            currentStaff = selectedName;
-            document.getElementById("currentStaffLabel").innerText = "คุณ " + selectedName;
-            document.getElementById("loginSection").style.display = "none";
-            document.getElementById("profileSection").style.display = "flex";
-            alert("บันทึกตัวตนเรียบร้อยค่ะ");
-            fetchDataFromSheet();
-        }
-
-        function clearProfile() {
-            if(confirm("ต้องการเปลี่ยนบัญชีผู้ใช้งานใช่หรือไม่?")) {
-                localStorage.removeItem("OPD_Staff_Name");
-                location.reload();
-            }
-        }
-    </script>
-</body>
-</html>
+        function handleSheetData(data) {
+            document.getElementById("syncStatus").innerHTML =
