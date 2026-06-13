@@ -310,7 +310,8 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwVBzYdxc7G8QAi0xHC_exaOgqQPKjnL3OlsFy8-CRatnZmHSvsZ3z82UnfAlREj_Di-g/exec";
+        // อัปเดตลิงก์ให้เป็นตัวล่าสุดของพี่เขมิกาเรียบร้อยแล้วค่ะ
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby_2OaEsoCyxvLAPEd-XrV-pTjdP9O_Gz8I3jbCJ9YOZM1sMZoGqs3dd8-JEfPgFh28bA/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -328,7 +329,6 @@
             setInterval(fetchDataFromSheet, 4000); 
         };
 
-        // ฟังก์ชัน Bypass นโยบายบราวเซอร์มือถือเพื่อยอมรับคำสั่ง .play() ล่วงหน้า
         function unlockAudioElements() {
             const sSound = document.getElementById("successSound");
             const uSound = document.getElementById("urgentSound");
@@ -367,7 +367,6 @@
                 return;
             }
 
-            // ใช้ระบบ ISO String เป็น Key หลักห้ามเปลี่ยนฟอร์แมต
             const cleanStartDateTime = new Date().toISOString();
 
             const payload = {
@@ -450,7 +449,6 @@
             const queueList = document.getElementById("queueList");
             queueList.innerHTML = ""; 
 
-            // แก้ไขบั๊กการคัดกรองแถวคิวค้างให้สอดคล้องกับหัวฟิลด์อย่างปลอดภัย
             const pendingJobs = data.filter(job => {
                 const timestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
                 const porter = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
@@ -543,7 +541,6 @@
             btnElement.disabled = true;
             btnElement.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> กำลังบันทึกสถิติลง Google Sheets...";
 
-            // ส่งค่า ISO หรือวันที่กลับไปให้ตรงตามรูปแบบแผ่นงานเพื่อป้องกันคีย์หลุดคู่อัปเดต
             const payload = {
                 time: rawTimestamp, 
                 type: equipment,
@@ -551,7 +548,7 @@
                 origin: origin,
                 to: destination,
                 staff: currentStaff,
-                status: new Date().toISOString() // เปลี่ยนมาส่งค่าเป็น ISO เพื่อการประมวลผลข้อมูลในระบบหลังบ้านและชีตที่เสถียรกว่าค่ะ
+                status: new Date().toISOString()
             };
 
             fetch(GOOGLE_SHEET_URL, {
@@ -587,11 +584,4 @@
         }
 
         function clearProfile() {
-            if(confirm("ต้องการเปลี่ยนบัญชีผู้ใช้งานใช่หรือไม่?")) {
-                localStorage.removeItem("OPD_Staff_Name");
-                location.reload();
-            }
-        }
-    </script>
-</body>
-</html>
+            if(confirm
