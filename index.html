@@ -19,6 +19,9 @@
             background-color: var(--bg-color);
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         .header {
             background: linear-gradient(135deg, #01579b, #0288d1);
@@ -31,6 +34,7 @@
             max-width: 600px;
             margin: 20px auto;
             padding: 0 15px;
+            flex: 1;
         }
         .role-switcher {
             display: flex;
@@ -107,8 +111,11 @@
             gap: 8px;
         }
         .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: #01579b; }
         .btn-success { background-color: var(--success-color); color: white; }
+        .btn-success:hover { background-color: #1b5e20; }
         .btn-warning { background-color: #e65100; color: white; }
+        .btn-warning:hover { background-color: #b33c00; }
         
         .profile-zone {
             display: flex;
@@ -153,6 +160,17 @@
         .tag-success { background-color: var(--success-color); }
         .app-mode { display: none; }
         .app-mode.active { display: block; }
+
+        /* Footer Credit Style */
+        .footer-credit {
+            text-align: center;
+            padding: 15px;
+            font-size: 13px;
+            color: #777;
+            background-color: #eaedf1;
+            border-top: 1px solid #dcdcdc;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -306,11 +324,14 @@
         
     </div>
 
+    <div class="footer-credit">
+        <i class="fa-solid fa-code"></i> พัฒนาโดย Khemika-OPD Takhli
+    </div>
+
     <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // อัปเดตลิงก์ให้เป็นตัวล่าสุดของพี่เขมิกาเรียบร้อยแล้วค่ะ
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby_2OaEsoCyxvLAPEd-XrV-pTjdP9O_Gz8I3jbCJ9YOZM1sMZoGqs3dd8-JEfPgFh28bA/exec";
 
         let currentStaff = "";
@@ -359,8 +380,8 @@
         function sendJobFromNurse() {
             const priority = document.getElementById("jobPriority").value;
             const type = document.getElementById("jobType").value;
-            const from = document.getElementById("jobFrom").value;
-            const to = document.getElementById("jobTo").value;
+            const from = document.getElementById("jobFrom").value.trim();
+            const to = document.getElementById("jobTo").value.trim();
 
             if (!from || !to) {
                 alert("⚠️ ข้อผิดพลาด: กรุณาระบุจุดต้นทางและจุดปลายทางก่อนกดส่งงานด้วยค่ะ");
@@ -564,24 +585,4 @@
             }).catch(err => {
                 alert("การเชื่อมต่อขัดข้อง กรุณาลองใหม่อีกครั้งค่ะ");
                 btnElement.disabled = false;
-                btnElement.innerHTML = "<i class='fa-solid fa-person-running'></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)";
-            });
-        }
-
-        function saveProfile() {
-            const selectedName = document.getElementById("staffName").value;
-            if (!selectedName) {
-                alert("กรุณาเลือกชื่อพนักงานก่อนค่ะ");
-                return;
-            }
-            localStorage.setItem("OPD_Staff_Name", selectedName);
-            currentStaff = selectedName;
-            document.getElementById("currentStaffLabel").innerText = "คุณ " + selectedName;
-            document.getElementById("loginSection").style.display = "none";
-            document.getElementById("profileSection").style.display = "flex";
-            alert("บันทึกตัวตนเรียบร้อยค่ะ");
-            fetchDataFromSheet();
-        }
-
-        function clearProfile() {
-            if(confirm
+                btnElement.innerHTML = "<i class='fa-solid fa
