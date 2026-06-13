@@ -331,8 +331,8 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🎯 ผูกลิงก์ระบบใหม่ล่าสุด (...5sfw9Dg/exec) ให้พี่เขมิกาเรียบร้อยแล้วค่ะ
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwtG4Jdozr7a2ZOOkXhp_o-nbUOZSzTHo3EDO9yGddothijGRm_TTtoOKk8vp5-sfw9Dg/exec";
+        // 🎯 ผูกลิงก์ระบบใหม่ล่าสุดมิลลิวินาทีคงที่ตัวจริงของพี่เรียบร้อยสมบูรณ์ค่ะ
+        const GOOGLE_SHEET_URL = "const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyDg6_gUNdR5TRwBVSf5szMejvXB0H23Vvd0waoEK92EJ_ByNOq2jEYIcXV0zn0dD_bzQ/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -444,7 +444,6 @@
             });
         }
 
-        // ฟังก์ชันรับงานพนักงานเปล ล็อกเวลาสากลบริสุทธิ์
         function acceptJob(timestamp) {
             if (!currentStaff) {
                 alert("⚠️ กรุณาเลือกชื่อพนักงานเปลและบันทึกข้อมูลก่อนรับงานค่ะ");
