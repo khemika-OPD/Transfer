@@ -299,12 +299,14 @@
         
     </div>
 
+    <!-- 🔊 ระบบฝังไฟล์เสียงสัญญาณสำหรับการกดสั่งงาน และสัญญาณเตือนภัยพนักงานเปล -->
+    <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
     <audio id="normalSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🎯 ผูกลิงก์ระบบใหม่ล่าสุดเรียบร้อยแล้วค่ะ
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyqyd6BvRyMql4rkclwzVea3X5Cp5YFKvASFAjA84lI3Js7_n0pmyjFXwKJpaLFlhUW0A/exec";
+        // 🎯 ดักจับลิงก์สคริปต์ตัวจริงของคุณเขมิกาเพื่อส่งข้อมูลไปสเปรตชีตเรียลไทม์
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwB4F75Q_OdbDIm_VogYu7j75ME75Z7coZXYAaq3h-afJ-qg0YL6R28yof_efgCzSFhKw/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -318,7 +320,7 @@
                 document.getElementById("profileSection").style.display = "flex";
             }
             fetchDataFromSheet();
-            setInterval(fetchDataFromSheet, 5000); 
+            setInterval(fetchDataFromSheet, 4000); // ปรับเวลาดึงคิวให้เร็วขึ้นพยาบาลสั่งปุ๊บเปลเห็นปั๊บ
         };
 
         function switchMode(role) {
@@ -351,6 +353,7 @@
             const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const cleanStartDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
 
+            // จัดโครงสร้างส่งคีย์คอลัมน์ให้ตรงเป๊ะกับฟังก์ชันหลังบ้านในชีต
             const payload = {
                 time: cleanStartDateTime,
                 type: type,
@@ -368,7 +371,12 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert("📝 สั่งงานคิวเปลเข้าชีตสำเร็จ! ระบบจะดีดคิวแสดงผลอัตโนมัติภายใน 5 วินาทีค่ะ");
+                // 🔊 เล่นเสียงสัญญาณฝั่งพยาบาลเมื่อกดส่งคิวงานสำเร็จ
+                try {
+                    document.getElementById("successSound").play();
+                } catch(e) { console.log("Audio play deferred"); }
+                
+                alert("📝 สั่งงานคิวเปลเข้าชีตสำเร็จ! ระบบจะดีดคิวแสดงผลอัตโนมัติภายใน 4 วินาทีค่ะ");
                 document.getElementById("jobFrom").value = "";
                 document.getElementById("jobTo").value = "";
                 switchMode('staff');
@@ -416,6 +424,7 @@
             const queueList = document.getElementById("queueList");
             queueList.innerHTML = "";
 
+            // กรองดึงเฉพาะงานที่หัวตารางระบุเวลาสั่งงาน และยังไม่มีพนักงานเปลกดรับไปทำ
             const pendingJobs = data.filter(job => {
                 const timestamp = job.เวลาสั่งงาน || job.timestamp || job.time;
                 const porter = job.พนักงานเปล || job.porter || job.staff;
