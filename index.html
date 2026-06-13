@@ -218,7 +218,6 @@
                     <label>➡️ จุดปลายทาง:</label>
                     <input list="toLocations" id="jobTo" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดปลายทาง..." autocomplete="off">
                     <datalist id="toLocations">
-                        <!-- รายการภายในหน่วยงานที่เพิ่มเข้ามาตามจุดต้นทาง -->
                         <option value="จุดแยกตรวจ">
                         <option value="จุดซักประวัติ">
                         <option value="หน้าห้องบัตร">
@@ -232,7 +231,6 @@
                         <option value="หน้าห้องการเงิน">
                         <option value="คลินิกพิเศษ">
                         <option value="ห้องน้ำ">
-                        <!-- รายการจุดปลายทางส่งข้ามแผนกเดิม -->
                         <option value="กลับบ้าน OPD 🏠">
                         <option value="กลับบ้าน ER 🏠">
                         <option value="ห้องผ่าตัด">
@@ -305,6 +303,7 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
+        // 🎯 ผูกลิงก์ระบบใหม่ล่าสุดเรียบร้อยแล้วค่ะ
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyqyd6BvRyMql4rkclwzVea3X5Cp5YFKvASFAjA84lI3Js7_n0pmyjFXwKJpaLFlhUW0A/exec";
 
         let currentStaff = "";
