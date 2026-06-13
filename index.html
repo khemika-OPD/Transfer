@@ -189,7 +189,7 @@
                     <label>🦽 ประเภทอุปกรณ์ที่ต้องใช้:</label>
                     <select id="jobType" class="select-input">
                         <option value="รถเข็นนั่ง (Wheelchair) 🦽">รถเข็นนั่ง (Wheelchair) 🦽</option>
-                        <option value="รถนอน (Stretcher) 𛏱">รถนอน (Stretcher) 𛏱</option>
+                        <option value="รถนอน (Stretcher) 🚑">รถนอน (Stretcher) 🚑</option>
                         <option value="เดินประคอง 🚶‍♂️">เดินประคอง 🚶‍♂️</option>
                     </select>
                 </div>
@@ -198,7 +198,20 @@
                     <label>📍 จุดต้นทาง:</label>
                     <input list="fromLocations" id="jobFrom" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดต้นทาง..." autocomplete="off">
                     <datalist id="fromLocations">
-                        <option value="จุดแยกตรวจ"><option value="จุดซักประวัติ"><option value="หน้าห้องบัตร"><option value="จุดรถนั่ง"><option value="จุด 10"><option value="หน้าห้องตรวจ 6"><option value="จุด 99"><option value="หน้าห้อง Lab"><option value="หน้าห้องยา"><option value="ประชาสัมพันธ์"><option value="หน้าห้องการเงิน"><option value="คลินิกพิเศษ"><option value="ห้องน้ำ"><option value="ห้องฉุกเฉิน (ER)">
+                        <option value="จุดแยกตรวจ">
+                        <option value="จุดซักประวัติ">
+                        <option value="หน้าห้องบัตร">
+                        <option value="จุดรถนั่ง">
+                        <option value="จุด 10">
+                        <option value="หน้าห้องตรวจ 6">
+                        <option value="จุด 99">
+                        <option value="หน้าห้อง Lab">
+                        <option value="หน้าห้องยา">
+                        <option value="ประชาสัมพันธ์">
+                        <option value="หน้าห้องการเงิน">
+                        <option value="คลินิกพิเศษ">
+                        <option value="ห้องน้ำ">
+                        <option value="ห้องฉุกเฉิน (ER)">
                     </datalist>
                 </div>
 
@@ -206,7 +219,23 @@
                     <label>➡️ จุดปลายทาง:</label>
                     <input list="toLocations" id="jobTo" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดปลายทาง..." autocomplete="off">
                     <datalist id="toLocations">
-                        <option value="กลับบ้าน OPD 🏠"><option value="กลับบ้าน ER 🏠"><option value="ห้องผ่าตัด"><option value="ห้องคลอด"><option value="ห้องฝากครรภ์"><option value="ห้อง ICU"><option value="ห้องฉุกเฉิน ER"><option value="ห้องเอกซเรย์"><option value="ห้องจิตเวช"><option value="ห้องกายภาพ"><option value="ห้อง CT"><option value="ทันตกรรมบน"><option value="ทันตกรรมล่าง"><option value="ตึกหญิง"><option value="ตึกเด็ก"><option value="ตึกชาย"><option value="ตึกพิเศษ">
+                        <option value="กลับบ้าน OPD 🏠">
+                        <option value="กลับบ้าน ER 🏠">
+                        <option value="ห้องผ่าตัด">
+                        <option value="ห้องคลอด">
+                        <option value="ห้องฝากครรภ์">
+                        <option value="ห้อง ICU">
+                        <option value="ห้องฉุกเฉิน ER">
+                        <option value="ห้องเอกซเรย์">
+                        <option value="ห้องจิตเวช">
+                        <option value="ห้องกายภาพ">
+                        <option value="ห้อง CT">
+                        <option value="ทันตกรรมบน">
+                        <option value="ทันตกรรมล่าง">
+                        <option value="ตึกหญิง">
+                        <option value="ตึกเด็ก">
+                        <option value="ตึกชาย">
+                        <option value="ตึกพิเศษ">
                     </datalist>
                 </div>
 
@@ -262,8 +291,8 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🎯 ผูกลิงก์ตัวล็อก ID สเปรดชีตสมบูรณ์แบบตัวจริงของพี่เขมิกาแล้วค่ะ
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxo4O9Vb7B36fS0bQJq6w3_O7Vp-L3vD7M7h1b3L_U2_9S_Z9oR_9Z_Y7W_V-XD6_j7_A/exec" ? "https://script.google.com/macros/s/AKfycbysFkk1Ov2CbEPcmUkviMvXIynLrycc-a4tb37kaJ7pwuo7oFUXwCS9glb_v-XD6_j7_A/exec" : "https://script.google.com/macros/s/AKfycbxhV2bKtviWSmzJpa-WzUN5tg0MgEdAudQt63WNolGH613l8F8FQAgrOLDW4Q5gzjU2bA/exec" ? "https://script.google.com/macros/s/AKfycbzDUGxBXZsMGk3pKWxdzg0rHdo1KqsNoDSGbAYGeQDoziZOPZhBvY7PR2wqm1XLnZturw/exec" : "https://script.google.com/macros/s/AKfycbzDUGxBXZsMGk3pKWxdzg0rHdo1KqsNoDSGbAYGeQDoziZOPZhBvY7PR2wqm1XLnZturw/exec";
+        // 🎯 ลิงก์ Web App URL จากกูเกิลสคริปต์
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxo4O9Vb7B36fS0bQJq6w3_O7Vp-L3vD7M7h1b3L_U2_9S_Z9oR_9Z_Y7W_V-XD6_j7_A/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -370,13 +399,21 @@
 
         function handleSheetData(data) {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-circle-check'></i> เชื่อมต่อเรียลไทม์";
-            if (!Array.isArray(data)) return;
+            if (!data || !Array.isArray(data)) return;
 
             const queueList = document.getElementById("queueList");
             queueList.innerHTML = "";
 
-            // 🎯 กรองล้าง: แสดงเฉพาะงานที่ คอลัมน์พนักงานเปล (porter) และ เวลารับ (acceptTime) เป็นช่องว่างจริง ๆ เท่านั้น!
-            const pendingJobs = data.filter(job => job.timestamp && job.timestamp.toString().trim() !== "" && (!job.porter || job.porter.toString().trim() === "") && (!job.acceptTime || job.acceptTime.toString().trim() === ""));
+            // 🎯 ปรับการกรองให้ยืดหยุ่นและสอดคล้องกับคอลัมน์ชีตของระบบ
+            const pendingJobs = data.filter(job => {
+                const hasTimestamp = job.timestamp || job.time;
+                const porterValue = job.porter || job.staff;
+                const acceptValue = job.acceptTime || job.status;
+                
+                return hasTimestamp && 
+                       (!porterValue || porterValue.toString().trim() === "") && 
+                       (!acceptValue || acceptValue.toString().trim() === "");
+            });
 
             if (pendingJobs.length === 0) {
                 queueList.innerHTML = `
@@ -393,11 +430,19 @@
             pendingJobs.forEach((job) => {
                 const newCard = document.createElement("div");
                 let cardClass = "queue-item normal-pending";
-                let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${job.priority}</span>`;
+                
+                // แมพค่าเผื่อชื่อคอลัมน์สลับกันระหว่างรับเข้า-ส่งออก
+                const currentPriority = job.priority || "ปกติ";
+                const currentTimestamp = job.timestamp || job.time || "";
+                const currentEquipment = job.equipment || job.type || "รถเข็นนั่ง";
+                const currentOrigin = job.origin || "";
+                const currentDestination = job.destination || job.to || "";
 
-                if (job.priority === "เร่งด่วน") {
+                let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${currentPriority}</span>`;
+
+                if (currentPriority === "เร่งด่วน") {
                     cardClass = "queue-item urgent-pending";
-                    tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${job.priority}</span>`;
+                    tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${currentPriority}</span>`;
                     hasUrgent = true;
                 }
 
@@ -405,13 +450,13 @@
                 newCard.innerHTML = `
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         ${tagHTML}
-                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${job.timestamp}</small>
+                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${currentTimestamp}</small>
                     </div>
-                    <strong>🚨 อุปกรณ์:</strong> ${job.equipment}<br>
-                    <strong>📍 ต้นทาง:</strong> ${job.origin}<br>
-                    <strong>➡️ ปลายทาง:</strong> ${job.destination}
+                    <strong>🚨 อุปกรณ์:</strong> ${currentEquipment}<br>
+                    <strong>📍 ต้นทาง:</strong> ${currentOrigin}<br>
+                    <strong>➡️ ปลายทาง:</strong> ${currentDestination}
                     <div style="margin-top: 12px;">
-                        <button class="btn btn-success" onclick="acceptJobFromStaff('${job.timestamp}', '${job.priority}', '${job.equipment}', '${job.origin}', '${job.destination}', this)">
+                        <button class="btn btn-success" onclick="acceptJobFromStaff('${currentTimestamp}', '${currentPriority}', '${currentEquipment}', '${currentOrigin}', '${currentDestination}', this)">
                             <i class="fa-solid fa-person-running"></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)
                         </button>
                     </div>
