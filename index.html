@@ -161,7 +161,6 @@
         .app-mode { display: none; }
         .app-mode.active { display: block; }
 
-        /* Footer Credit Style */
         .footer-credit {
             text-align: center;
             padding: 15px;
@@ -350,6 +349,29 @@
             setInterval(fetchDataFromSheet, 4000); 
         };
 
+        function saveProfile() {
+            const name = document.getElementById("staffName").value;
+            if (!name) {
+                alert("กรุณาเลือกชื่อก่อนบันทึกค่ะ");
+                return;
+            }
+            localStorage.setItem("OPD_Staff_Name", name);
+            currentStaff = name;
+            document.getElementById("currentStaffLabel").innerText = "คุณ " + name;
+            document.getElementById("loginSection").style.display = "none";
+            document.getElementById("profileSection").style.display = "flex";
+            fetchDataFromSheet();
+        }
+
+        function clearProfile() {
+            if (confirm("ต้องการเปลี่ยนชื่อผู้ใช้งานหรือไม่?")) {
+                localStorage.removeItem("OPD_Staff_Name");
+                currentStaff = "";
+                document.getElementById("loginSection").style.display = "block";
+                document.getElementById("profileSection").style.display = "none";
+            }
+        }
+
         function unlockAudioElements() {
             const sSound = document.getElementById("successSound");
             const uSound = document.getElementById("urgentSound");
@@ -389,8 +411,8 @@
             }
 
             const cleanStartDateTime = new Date().toISOString();
-
             const payload = {
+                action: "insert",
                 time: cleanStartDateTime,
                 type: type,
                 priority: priority,
@@ -418,6 +440,37 @@
                 fetchDataFromSheet();
             }).catch(err => {
                 alert("การเชื่อมต่อขัดข้อง กรุณาลองส่งใหม่อีกครั้งค่ะ");
+            });
+        }
+
+        function acceptJob(timestamp) {
+            if (!currentStaff) {
+                alert("⚠️ กรุณาเลือกชื่อพนักงานเปลและบันทึกข้อมูลก่อนรับงานค่ะ");
+                switchMode('staff');
+                document.getElementById("staffName").focus();
+                return;
+            }
+
+            const cleanEndDateTime = new Date().toISOString();
+
+            const payload = {
+                action: "update",
+                time: timestamp,
+                staff: currentStaff,
+                status: cleanEndDateTime
+            };
+
+            fetch(GOOGLE_SHEET_URL, {
+                method: "POST",
+                mode: "no-cors",
+                cache: "no-cache",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert("✅ คุณ " + currentStaff + " รับงานเรียบร้อยแล้ว เดินทางปลอดภัยค่ะ");
+                fetchDataFromSheet();
+            }).catch(err => {
+                alert("ไม่สามารถบันทึกการรับงานได้ กรุณาลองใหม่อีกครั้ง");
             });
         }
 
@@ -504,13 +557,15 @@
                 const currentOrigin = job["จุดต้นทาง"] || job.จุดต้นทาง || "";
                 const currentDestination = job["จุดปลายทาง"] || job.จุดปลายทาง || "";
 
-                let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${currentPriority}</span>`;
+                let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${escapeHtml(currentPriority)}</span>`;
 
                 if (currentPriority === "เร่งด่วน" || currentPriority.includes("เร่งด่วน")) {
                     cardClass = "queue-item urgent-pending";
-                    tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${currentPriority}</span>`;
+                    tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${escapeHtml(currentPriority)}</span>`;
                     hasUrgent = true;
                 }
+
+                const safeTime = escapeHtml(currentRawTimestamp.toString());
 
                 newCard.className = cardClass;
                 newCard.innerHTML = `
@@ -518,71 +573,53 @@
                         ${tagHTML}
                         <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${displayTime}</small>
                     </div>
-                    <strong>🚨 อุปกรณ์:</strong> ${currentEquipment}<br>
-                    <strong>📍 ต้นทาง:</strong> ${currentOrigin}<br>
-                    <strong>➡️ ปลายทาง:</strong> ${currentDestination}
-                    <div style="margin-top: 12px;">
-                        <button class="btn btn-success" onclick="acceptJobFromStaff('${escapeHtml(currentRawTimestamp.toString())}', '${currentPriority}', '${currentEquipment}', '${currentOrigin}', '${currentDestination}', this)">
-                            <i class="fa-solid fa-person-running"></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)
-                        </button>
+                    <div style="margin-bottom: 12px; font-size: 16px; line-height: 1.5;">
+                        <strong>🚨 อุปกรณ์:</strong> ${escapeHtml(currentEquipment)}<br>
+                        <strong>📍 ต้นทาง:</strong> <span style="color:#01579b; font-weight:bold;">${escapeHtml(currentOrigin)}</span><br>
+                        <strong>➡️ ปลายทาง:</strong> <span style="color:#b71c1c; font-weight:bold;">${escapeHtml(currentDestination)}</span>
                     </div>
+                    <button class="btn btn-success" onclick="acceptJob('${safeTime}')">
+                        <i class="fa-solid fa-check"></i> 👍 กดรับเคสนี้ทันที
+                    </button>
                 `;
                 queueList.appendChild(newCard);
             });
 
-            if (hasUrgent && !urgentPlaying) {
-                try {
-                    document.getElementById("urgentSound").play();
-                } catch(e) {}
-                urgentPlaying = true;
-            } else if (!hasUrgent) {
+            if (hasUrgent && isAudioUnlocked) {
+                playUrgentSound();
+            } else {
                 stopUrgentSound();
             }
         }
 
-        function escapeHtml(string) {
-            return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        function playUrgentSound() {
+            const uSound = document.getElementById("urgentSound");
+            if (uSound && !urgentPlaying) {
+                uSound.play().then(() => {
+                    urgentPlaying = true;
+                }).catch(e => {});
+            }
         }
 
         function stopUrgentSound() {
             const uSound = document.getElementById("urgentSound");
-            if(uSound) {
+            if (uSound && urgentPlaying) {
                 uSound.pause();
                 uSound.currentTime = 0;
+                urgentPlaying = false;
             }
-            urgentPlaying = false;
         }
 
-        function acceptJobFromStaff(rawTimestamp, priority, equipment, origin, destination, btnElement) {
-            if (!currentStaff) {
-                alert("⚠️ พนักงานเปลกรุณาเลือกชื่อยืนยันตัวตนด้านบนก่อนกดรับงานค่ะ!");
-                return;
-            }
-
-            btnElement.disabled = true;
-            btnElement.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> กำลังบันทึกสถิติลง Google Sheets...";
-
-            const payload = {
-                time: rawTimestamp, 
-                type: equipment,
-                priority: priority,
-                origin: origin,
-                to: destination,
-                staff: currentStaff,
-                status: new Date().toISOString()
-            };
-
-            fetch(GOOGLE_SHEET_URL, {
-                method: "POST",
-                mode: "no-cors",
-                cache: "no-cache",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                stopUrgentSound();
-                alert(`✔️ สำเร็จ! คุณ ${currentStaff} รับงานคิวนี้เรียบร้อย ข้อมูลลงชีตเรียบร้อยค่ะ`);
-                fetchDataFromSheet();
-            }).catch(err => {
-                alert("การเชื่อมต่อขัดข้อง กรุณาลองใหม่อีกครั้งค่ะ");
-                btnElement.disabled = false;
-                btnElement.innerHTML = "<i class='fa-solid fa
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text
+                .toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
