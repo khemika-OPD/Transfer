@@ -257,7 +257,6 @@
             </div>
         </div>
 
-
         <div id="staffModeSection" class="app-mode">
             <div id="loginSection" class="card">
                 <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
@@ -297,7 +296,8 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyhpB3N3sGnDYRH_tO4kJnK3YQkHmVbFtXJglRRT3FZCHF2wpa8pyqM8sg7gnMakn5P8Q/exec";
+        // 🌟 ฝังลิงก์ Web App URL ล่าสุดของพี่เรียบร้อยแล้วค่ะ
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwDYvnJfjN9f-P-5R4p1mGyUqo7b_IPvDlvl2vxQ3zoT49J8PMkw-5vhBhZ-N0NnE2NiA/exec";
 
         let currentStaff = "";
         let jobCounter = 0;
@@ -427,19 +427,19 @@
             const cleanEndDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
             const displayTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
 
-            // 🌟 ปรับปรุงการส่ง Payload: แยกข้อมูลเป็น 2 ส่วนอิสระออกจากกันชัดเจนตามสัญญาล่าสุดค่ะ
             const payload = {
-                time: cleanStartDateTime,   // คอลัมน์ A
-                type: type,                 // คอลัมน์ B (เหลือแค่อุปกรณ์ล้วน ๆ เช่น รถเข็นนั่ง)
-                priority: priority,         // คอลัมน์ C (ช่องความเร่งด่วนใหม่แยกออกมาต่างหาก)
-                from: from,                 // คอลัมน์ D
-                to: to,                     // คอลัมน์ E
-                staff: currentStaff,        // คอลัมน์ F
-                status: cleanEndDateTime    // คอลัมน์ G
+                time: cleanStartDateTime,
+                type: type,
+                priority: priority,
+                from: from,
+                to: to,
+                staff: currentStaff,
+                status: cleanEndDateTime
             };
 
             fetch(GOOGLE_SHEET_URL, {
                 method: "POST",
+                margin: "no-cors",
                 mode: "no-cors",
                 cache: "no-cache",
                 headers: { "Content-Type": "application/json" },
