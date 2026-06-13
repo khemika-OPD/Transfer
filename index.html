@@ -108,7 +108,7 @@
         }
         .btn-primary { background-color: var(--primary-color); color: white; }
         .btn-success { background-color: var(--success-color); color: white; }
-        .btn-warning { background-color: #e65100; color: white; } /* สีปุ่มล้างคิววันใหม่ */
+        .btn-warning { background-color: #e65100; color: white; }
         
         .profile-zone {
             display: flex;
@@ -173,7 +173,6 @@
             </button>
         </div>
 
-        <!-- ================= โหมด 1: ฝั่งพยาบาลสั่งงาน ================= -->
         <div id="nurseModeSection" class="app-mode active">
             <div class="card">
                 <h3 style="margin-top:0; color: var(--primary-color);"><i class="fa-solid fa-paper-plane"></i> คีย์ส่งงานคิวเปลด่วน</h3>
@@ -215,14 +214,12 @@
                     <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
                 </button>
                 
-                <!-- 🚨 ปุ่มเคลียร์กระดานเริ่มคิววันใหม่สำหรับหัวหน้าวอร์ดพยาบาล 🌟 -->
                 <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
                     <i class="fa-solid fa-trash-can"></i> 🌅 กดล้างกระดานเริ่มต้นคิวใหม่ (สำหรับขึ้นวันใหม่)
                 </button>
             </div>
         </div>
 
-        <!-- ================= โหมด 2: ฝั่งพนักงานเปลรับงาน ================= -->
         <div id="staffModeSection" class="app-mode">
             <div id="loginSection" class="card">
                 <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
@@ -265,8 +262,8 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🚨 อย่าลืม! หลังจากกด Deploy ในแอปสคริปต์สเต็ปที่ 1 แล้ว นำลิงก์ใหม่มาวางทับในเครื่องหมายคำพูดตรงนี้แทนนะคะ 🌟
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyt_1QOZQxb7y7Ts5Kc8yq9_7ZpO91bqECGVhFkSSrl8GowmcQ4TCZHU0T5_hCQwcfPAQ/exec";
+        // 🎯 ผูกลิงก์ตัวล็อก ID สเปรดชีตสมบูรณ์แบบตัวจริงของพี่เขมิกาแล้วค่ะ
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxo4O9Vb7B36fS0bQJq6w3_O7Vp-L3vD7M7h1b3L_U2_9S_Z9oR_9Z_Y7W_V-XD6_j7_A/exec" ? "https://script.google.com/macros/s/AKfycbysFkk1Ov2CbEPcmUkviMvXIynLrycc-a4tb37kaJ7pwuo7oFUXwCS9glb_v-XD6_j7_A/exec" : "https://script.google.com/macros/s/AKfycbxhV2bKtviWSmzJpa-WzUN5tg0MgEdAudQt63WNolGH613l8F8FQAgrOLDW4Q5gzjU2bA/exec" ? "https://script.google.com/macros/s/AKfycbzDUGxBXZsMGk3pKWxdzg0rHdo1KqsNoDSGbAYGeQDoziZOPZhBvY7PR2wqm1XLnZturw/exec" : "https://script.google.com/macros/s/AKfycbzDUGxBXZsMGk3pKWxdzg0rHdo1KqsNoDSGbAYGeQDoziZOPZhBvY7PR2wqm1XLnZturw/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -311,7 +308,7 @@
 
             const now = new Date();
             const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const cleanStartDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`; // ล็อกวินาทีกันรหัสซ้ำ
+            const cleanStartDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
 
             const payload = {
                 time: cleanStartDateTime,
@@ -340,12 +337,9 @@
             });
         }
 
-        // 🌟 ฟังก์ชันพิเศษสำหรับกดล้างคิวเริ่มวันใหม่
         function clearAllDataForNewDay() {
             if (confirm("🚨 คำเตือนวิกฤต: คุณต้องการลบประวัติงานคิวเปลทั้งหมดเพื่อเริ่มต้นคิววันใหม่ใช่หรือไม่? (ข้อมูลเดิมจะถูกล้างเกลี้ยง)")) {
                 const payload = { action: "clearAllData" };
-                
-                alert("⏳ กำลังกวาดล้างข้อมูลสเปรดชีตส่วนกลาง...");
                 
                 fetch(GOOGLE_SHEET_URL, {
                     method: "POST",
@@ -381,8 +375,8 @@
             const queueList = document.getElementById("queueList");
             queueList.innerHTML = "";
 
-            // 🎯 คัดกรองคิวค้าง: คัดกรองเอากล่องงานที่ คอลัมน์ F (พนักงานเปล) และ คอลัมน์ G (เวลารับงาน) เป็นค่าว่างจริง ๆ มาโชว์เท่านั้น
-            const pendingJobs = data.filter(job => job.timestamp && job.timestamp.toString().trim() !== "" && !job.porter && !job.acceptTime);
+            // 🎯 กรองล้าง: แสดงเฉพาะงานที่ คอลัมน์พนักงานเปล (porter) และ เวลารับ (acceptTime) เป็นช่องว่างจริง ๆ เท่านั้น!
+            const pendingJobs = data.filter(job => job.timestamp && job.timestamp.toString().trim() !== "" && (!job.porter || job.porter.toString().trim() === "") && (!job.acceptTime || job.acceptTime.toString().trim() === ""));
 
             if (pendingJobs.length === 0) {
                 queueList.innerHTML = `
