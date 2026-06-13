@@ -299,12 +299,11 @@
         
     </div>
 
-    <!-- ระบบเสียงสัญญาณคัดสรรความสะอาด -->
     <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🎯 สับเปลี่ยนมาผูกลิงก์ตัวล็อก ID สเปรตชีตสมบูรณ์แบบตัวจริงของคุณเขมิกาแล้วค่ะ
+        // 🎯 ผูกลิงก์กับ Web App URL ตัวล่าสุดของพี่เรียบร้อยแล้วค่ะ
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzR3xdHUd9s182eMzCMbt_9M-Bb6tOrbxP_aDyY68vvzRTrMIVL-igZ7AgluqP1iO5e_Q/exec";
 
         let currentStaff = "";
@@ -348,7 +347,6 @@
                 return;
             }
 
-            // บันทึกเวลามาตรฐาน ISO ส่งตรงไปหลังบ้าน
             const cleanStartDateTime = new Date().toISOString();
 
             const payload = {
@@ -361,10 +359,9 @@
                 status: "" 
             };
 
-            // เล่นเสียงสัญญาณสั่งงานทันทีที่กดส่ง
             try {
                 document.getElementById("successSound").play();
-            } catch(e) { console.log("Audio deferred"); }
+            } catch(e) { console.log("Audio play deferred"); }
 
             fetch(GOOGLE_SHEET_URL, {
                 method: "POST",
@@ -419,7 +416,7 @@
             if (!data || !Array.isArray(data)) return;
 
             const queueList = document.getElementById("queueList");
-            queueList.innerHTML = ""; // ล้างคิวการ์ดเก่าออกก่อนวาดใหม่เสมอตราบเท่าที่มีการตรวจสอบคิวรีเฟรช
+            queueList.innerHTML = ""; 
 
             const pendingJobs = data.filter(job => {
                 const timestamp = job.เวลาสั่งงาน || job.timestamp || job.time;
