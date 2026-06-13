@@ -299,14 +299,11 @@
         
     </div>
 
-    <!-- 🔊 ระบบฝังไฟล์เสียงสัญญาณสำหรับการกดสั่งงาน และสัญญาณเตือนภัยพนักงานเปล -->
     <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
-    <audio id="normalSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🎯 ดักจับลิงก์สคริปต์ตัวจริงของคุณเขมิกาเพื่อส่งข้อมูลไปสเปรตชีตเรียลไทม์
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwB4F75Q_OdbDIm_VogYu7j75ME75Z7coZXYAaq3h-afJ-qg0YL6R28yof_efgCzSFhKw/exec";
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyqyd6BvRyMql4rkclwzVea3X5Cp5YFKvASFAjA84lI3Js7_n0pmyjFXwKJpaLFlhUW0A/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -320,7 +317,7 @@
                 document.getElementById("profileSection").style.display = "flex";
             }
             fetchDataFromSheet();
-            setInterval(fetchDataFromSheet, 4000); // ปรับเวลาดึงคิวให้เร็วขึ้นพยาบาลสั่งปุ๊บเปลเห็นปั๊บ
+            setInterval(fetchDataFromSheet, 4000); 
         };
 
         function switchMode(role) {
@@ -349,11 +346,9 @@
                 return;
             }
 
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const cleanStartDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+            // ใช้การบันทึกเวลามาตรฐาน ISO เพื่อให้ระบุค่าได้ตรงกันทั่วโลกไม่ว่าจะเรียกผ่านเครื่องไหน
+            const cleanStartDateTime = new Date().toISOString();
 
-            // จัดโครงสร้างส่งคีย์คอลัมน์ให้ตรงเป๊ะกับฟังก์ชันหลังบ้านในชีต
             const payload = {
                 time: cleanStartDateTime,
                 type: type,
@@ -371,10 +366,9 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                // 🔊 เล่นเสียงสัญญาณฝั่งพยาบาลเมื่อกดส่งคิวงานสำเร็จ
                 try {
                     document.getElementById("successSound").play();
-                } catch(e) { console.log("Audio play deferred"); }
+                } catch(e) { console.log("Audio deferred"); }
                 
                 alert("📝 สั่งงานคิวเปลเข้าชีตสำเร็จ! ระบบจะดีดคิวแสดงผลอัตโนมัติภายใน 4 วินาทีค่ะ");
                 document.getElementById("jobFrom").value = "";
@@ -422,9 +416,8 @@
             if (!data || !Array.isArray(data)) return;
 
             const queueList = document.getElementById("queueList");
-            queueList.innerHTML = "";
+            queueList.innerHTML = ""; // 🎯 ซ่อมแซมจุดนี้: ล้างกระดานเก่าทิ้งก่อนเสมอ เพื่อไม่ให้เกิดคิวซ้ำเต็มหน้าจอ
 
-            // กรองดึงเฉพาะงานที่หัวตารางระบุเวลาสั่งงาน และยังไม่มีพนักงานเปลกดรับไปทำ
             const pendingJobs = data.filter(job => {
                 const timestamp = job.เวลาสั่งงาน || job.timestamp || job.time;
                 const porter = job.พนักงานเปล || job.porter || job.staff;
@@ -451,7 +444,17 @@
                 const newCard = document.createElement("div");
                 let cardClass = "queue-item normal-pending";
                 
-                const currentTimestamp = job.เวลาสั่งงาน || job.timestamp || job.time || "";
+                const currentRawTimestamp = job.เวลาสั่งงาน || job.timestamp || job.time || "";
+                let displayTime = currentRawTimestamp;
+                
+                // ตกแต่งรูปแบบเวลาสำหรับแสดงผลบนหน้าจอการ์ดพนักงานเปลให้มองเห็นง่ายและคุ้นเคย
+                try {
+                    if (currentRawTimestamp.includes("T")) {
+                        const d = new Date(currentRawTimestamp);
+                        displayTime = d.toLocaleDateString('th-TH') + " " + d.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
+                    }
+                } catch(e) {}
+
                 const currentEquipment = job.ประเภทอุปกรณ์ที่ต้องใช้ || job.equipment || job.type || "รถเข็นนั่ง";
                 const currentPriority = job.ระดับความเร่งด่วน || job.priority || "ปกติ";
                 const currentOrigin = job.จุดต้นทาง || job.origin || "";
@@ -469,13 +472,13 @@
                 newCard.innerHTML = `
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         ${tagHTML}
-                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${currentTimestamp}</small>
+                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${displayTime}</small>
                     </div>
                     <strong>🚨 อุปกรณ์:</strong> ${currentEquipment}<br>
                     <strong>📍 ต้นทาง:</strong> ${currentOrigin}<br>
                     <strong>➡️ ปลายทาง:</strong> ${currentDestination}
                     <div style="margin-top: 12px;">
-                        <button class="btn btn-success" onclick="acceptJobFromStaff('${currentTimestamp}', '${currentPriority}', '${currentEquipment}', '${currentOrigin}', '${currentDestination}', this)">
+                        <button class="btn btn-success" onclick="acceptJobFromStaff('${currentRawTimestamp}', '${currentPriority}', '${currentEquipment}', '${currentOrigin}', '${currentDestination}', this)">
                             <i class="fa-solid fa-person-running"></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)
                         </button>
                     </div>
@@ -484,7 +487,9 @@
             });
 
             if (hasUrgent && !urgentPlaying) {
-                document.getElementById("urgentSound").play().catch(e => {});
+                try {
+                    document.getElementById("urgentSound").play();
+                } catch(e) {}
                 urgentPlaying = true;
             } else if (!hasUrgent) {
                 stopUrgentSound();
@@ -500,7 +505,7 @@
             urgentPlaying = false;
         }
 
-        function acceptJobFromStaff(timestamp, priority, equipment, origin, destination, btnElement) {
+        function acceptJobFromStaff(rawTimestamp, priority, equipment, origin, destination, btnElement) {
             if (!currentStaff) {
                 alert("⚠️ พนักงานเปลกรุณาเลือกชื่อยืนยันตัวตนด้านบนก่อนกดรับงานค่ะ!");
                 return;
@@ -510,11 +515,10 @@
             btnElement.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> กำลังบันทึกสถิติลง Google Sheets...";
 
             const now = new Date();
-            const dateStr = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const cleanEndDateTime = `${dateStr} ${now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+            const cleanEndDateTime = now.toLocaleDateString('th-TH') + " " + now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
 
             const payload = {
-                time: timestamp,
+                time: rawTimestamp, // ส่งเวลาแบบสากลกลับไปหลังบ้านเพื่อจับคู่แถวให้แม่นยำล้านเปอร์เซ็นต์
                 type: equipment,
                 priority: priority,
                 origin: origin,
