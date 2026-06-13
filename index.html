@@ -299,12 +299,12 @@
         
     </div>
 
+    <!-- ไฟล์เสียงเอฟเฟกต์ส่งคิวสำเร็จ -->
     <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
-        // 🎯 ยิงตรงเข้าสู่ระบบล็อกลิ้งค์ตัวอัปเกรดล่าสุดของพี่เขมิกาเรียบร้อยค่ะ
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzR3xdHUd9s182eMzCMbt_9M-Bb6tOrbxP_aDyY68vvzRTrMIVL-igZ7AgluqP1iO5e_Q/exec";
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwB4F75Q_OdbDIm_VogYu7j75ME75Z7coZXYAaq3h-afJ-qg0YL6R28yof_efgCzSFhKw/exec";
 
         let currentStaff = "";
         let urgentPlaying = false;
@@ -347,9 +347,8 @@
                 return;
             }
 
-            // บันทึกเวลาด้วยรูปแบบข้อความอ่านง่าย เพื่อเป็นรหัส String ID คุยหลังบ้านตรงตัว ไม่สับสนวินาที
-            const now = new Date();
-            const cleanStartDateTime = now.getFullYear() + "/" + (now.getMonth()+1) + "/" + now.getDate() + " " + now.getHours() + ":" + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ":" + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();
+            // 🎯 เปลี่ยนส่งเวลาเป็น ISO String ดิบๆ จากหน้าเว็บตรงๆ เพื่อให้หลังบ้านบันทึกเป็นฐานเวลาสากลเดียวกัน
+            const cleanStartDateTime = new Date().toISOString();
 
             const payload = {
                 time: cleanStartDateTime,
@@ -413,6 +412,19 @@
             document.body.appendChild(script);
         }
 
+        // ฟังก์ชันแปลงเวลาสากลมาแสดงผลภาษาไทยให้คนอ่านง่าย แต่ยังคงเก็บค่าดิบไว้ข้างหลังเป็น ID
+        function formatThaiDisplayTime(rawTime) {
+            if (!rawTime) return "";
+            try {
+                // รองรับทั้งฟอร์แมตที่มีตัว T และแบบสตริงธรรมดา
+                const d = new Date(rawTime);
+                if (!isNaN(d.getTime())) {
+                    return d.toLocaleDateString('th-TH') + " " + d.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
+                }
+            } catch(e) {}
+            return rawTime;
+        }
+
         function handleSheetData(data) {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-circle-check'></i> เชื่อมต่อเรียลไทม์";
             if (!data || !Array.isArray(data)) return;
@@ -446,15 +458,9 @@
                 const newCard = document.createElement("div");
                 let cardClass = "queue-item normal-pending";
                 
+                // 🎯 จุดสำคัญ: ดึงคีย์ข้อความดั้งเดิมมาเก็บไว้เลย ไม่ต้องมานั่งเสกใหม่ตอนกดส่งรับงาน
                 const currentRawTimestamp = job.เวลาสั่งงาน || job.timestamp || job.time || "";
-                let displayTime = currentRawTimestamp;
-                
-                if (currentRawTimestamp.includes("T")) {
-                    try {
-                        const d = new Date(currentRawTimestamp);
-                        displayTime = d.toLocaleDateString('th-TH') + " " + d.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
-                    } catch(e) {}
-                }
+                let displayTime = formatThaiDisplayTime(currentRawTimestamp);
 
                 const currentEquipment = job.ประเภทอุปกรณ์ที่ต้องใช้ || job.equipment || job.type || "รถเข็นนั่ง";
                 const currentPriority = job.ระดับความเร่งด่วน || job.priority || "ปกติ";
@@ -479,7 +485,8 @@
                     <strong>📍 ต้นทาง:</strong> ${currentOrigin}<br>
                     <strong>➡️ ปลายทาง:</strong> ${currentDestination}
                     <div style="margin-top: 12px;">
-                        <button class="btn btn-success" onclick="acceptJobFromStaff('${currentRawTimestamp}', '${currentPriority}', '${currentEquipment}', '${currentOrigin}', '${currentDestination}', this)">
+                        <!-- 🎯 ปุ่มรับงานจะส่งตัวแปรข้อความดิบดั้งเดิมที่อ่านได้จากชีตกลับไปล้างแถวขจัดปัญหาไม่แมตช์สตริง -->
+                        <button class="btn btn-success" onclick="acceptJobFromStaff('${escapeHtml(currentRawTimestamp.toString())}', '${currentPriority}', '${currentEquipment}', '${currentOrigin}', '${currentDestination}', this)">
                             <i class="fa-solid fa-person-running"></i> 🏃‍♂️ รับคิวงานนี้ทันที (คลิกเดียวจบ)
                         </button>
                     </div>
@@ -495,6 +502,11 @@
             } else if (!hasUrgent) {
                 stopUrgentSound();
             }
+        }
+
+        // ฟังก์ชันตัวช่วยป้องกันรหัส HTML พังกรณีจุดส่งมีเครื่องหมายพิเศษ
+        function escapeHtml(string) {
+            return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
         function stopUrgentSound() {
