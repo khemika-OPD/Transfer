@@ -303,6 +303,7 @@
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
 
     <script>
+        // 🎯 ผูกลิงก์ระบบความปลอดภัยตัวล่าสุดของพี่เขมิกาเรียบร้อยแล้วค่ะ
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyqyd6BvRyMql4rkclwzVea3X5Cp5YFKvASFAjA84lI3Js7_n0pmyjFXwKJpaLFlhUW0A/exec";
 
         let currentStaff = "";
@@ -346,7 +347,7 @@
                 return;
             }
 
-            // ใช้การบันทึกเวลามาตรฐาน ISO เพื่อให้ระบุค่าได้ตรงกันทั่วโลกไม่ว่าจะเรียกผ่านเครื่องไหน
+            // บันทึกเวลามาตรฐานสากล ISO เพื่อส่งไปเปรียบเทียบใน Apps Script หลังบ้านได้แมตช์แถวกันตรงเป๊ะๆ
             const cleanStartDateTime = new Date().toISOString();
 
             const payload = {
@@ -368,7 +369,7 @@
             }).then(() => {
                 try {
                     document.getElementById("successSound").play();
-                } catch(e) { console.log("Audio deferred"); }
+                } catch(e) { console.log("Audio play deferred"); }
                 
                 alert("📝 สั่งงานคิวเปลเข้าชีตสำเร็จ! ระบบจะดีดคิวแสดงผลอัตโนมัติภายใน 4 วินาทีค่ะ");
                 document.getElementById("jobFrom").value = "";
@@ -416,7 +417,7 @@
             if (!data || !Array.isArray(data)) return;
 
             const queueList = document.getElementById("queueList");
-            queueList.innerHTML = ""; // 🎯 ซ่อมแซมจุดนี้: ล้างกระดานเก่าทิ้งก่อนเสมอ เพื่อไม่ให้เกิดคิวซ้ำเต็มหน้าจอ
+            queueList.innerHTML = ""; // ล้างคิวการ์ดเก่าออกก่อนวาดใหม่ เพื่อตัดปัญหาคิวซ้ำซ้อนซ้อนกันเต็มหน้าจอ
 
             const pendingJobs = data.filter(job => {
                 const timestamp = job.เวลาสั่งงาน || job.timestamp || job.time;
@@ -447,7 +448,6 @@
                 const currentRawTimestamp = job.เวลาสั่งงาน || job.timestamp || job.time || "";
                 let displayTime = currentRawTimestamp;
                 
-                // ตกแต่งรูปแบบเวลาสำหรับแสดงผลบนหน้าจอการ์ดพนักงานเปลให้มองเห็นง่ายและคุ้นเคย
                 try {
                     if (currentRawTimestamp.includes("T")) {
                         const d = new Date(currentRawTimestamp);
@@ -518,7 +518,7 @@
             const cleanEndDateTime = now.toLocaleDateString('th-TH') + " " + now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
 
             const payload = {
-                time: rawTimestamp, // ส่งเวลาแบบสากลกลับไปหลังบ้านเพื่อจับคู่แถวให้แม่นยำล้านเปอร์เซ็นต์
+                time: rawTimestamp, 
                 type: equipment,
                 priority: priority,
                 origin: origin,
