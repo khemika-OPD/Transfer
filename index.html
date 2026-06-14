@@ -115,8 +115,7 @@
         .btn-success { background-color: var(--success-color); color: white; }
         .btn-success:hover { background-color: #1b5e20; }
         .btn-warning { background-color: #e65100; color: white; }
-        .btn-warning:hover { background-color: #b33c00; }
-        
+        .btn-warning:hover { background-color: #b33c00; }     
         .profile-zone {
             display: flex;
             justify-content: space-between;
@@ -160,7 +159,6 @@
         .tag-success { background-color: var(--success-color); }
         .app-mode { display: none; }
         .app-mode.active { display: block; }
-
         .footer-credit {
             text-align: center;
             padding: 15px;
@@ -173,8 +171,7 @@
     </style>
 </head>
 <body>
-
-    <div class="header">
+  <div class="header">
         <h2>🏥 นวัตกรรมระบบคิวเปลอัจฉริยะ (Smart Queue)</h2>
         <p>กลุ่มงานผู้ป่วยนอก (OPD) โรงพยาบาลตาคลี</p>
     </div>
@@ -187,8 +184,7 @@
                 <i class="fa-solid fa-wheelchair"></i> 2. ฝั่งพนักงานเปลรับงาน
             </button>
         </div>
-
-        <div id="nurseModeSection" class="app-mode active">
+  <div id="nurseModeSection" class="app-mode active">
             <div class="card">
                 <h3 style="margin-top:0; color: var(--primary-color);"><i class="fa-solid fa-paper-plane"></i> คีย์ส่งงานคิวเปลด่วน</h3>
                 
@@ -199,8 +195,7 @@
                         <option value="เร่งด่วน">🔴 ระดับเร่งด่วน</option>
                     </select>
                 </div>
-
-                <div class="form-group">
+ <div class="form-group">
                     <label>🦽 ประเภทอุปกรณ์ที่ต้องใช้:</label>
                     <select id="jobType" class="select-input">
                         <option value="รถเข็นนั่ง (Wheelchair) 🦽">รถเข็นนั่ง (Wheelchair) 🦽</option>
@@ -208,8 +203,7 @@
                         <option value="เดินประคอง 🚶‍♂️">เดินประคอง 🚶‍♂️</option>
                     </select>
                 </div>
-
-                <div class="form-group">
+ <div class="form-group">
                     <label>📍 จุดต้นทาง:</label>
                     <input list="fromLocations" id="jobFrom" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดต้นทาง..." autocomplete="off">
                     <datalist id="fromLocations">
@@ -228,8 +222,7 @@
                         <option value="ห้องน้ำ">
                     </datalist>
                 </div>
-
-                <div class="form-group">
+ <div class="form-group">
                     <label>➡️ จุดปลายทาง:</label>
                     <input list="toLocations" id="jobTo" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดปลายทาง..." autocomplete="off">
                     <datalist id="toLocations">
@@ -265,11 +258,9 @@
                         <option value="ตึกพิเศษ">
                     </datalist>
                 </div>
-
-                <button class="btn btn-primary" onclick="sendJobFromNurse()">
+  <button class="btn btn-primary" onclick="sendJobFromNurse()">
                     <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
-                </button>
-                
+                </button> 
                 <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
                     <i class="fa-solid fa-trash-can"></i> 🌅 กดล้างกระดานเริ่มต้นคิวใหม่ (สำหรับขึ้นวันใหม่)
                 </button>
@@ -283,8 +274,7 @@
                     <i class="fa-solid fa-volume-high"></i> คลิกเปิดระบบเสียงเตือนอัจฉริยะครั้งแรก
                 </button>
             </div>
-
-            <div id="loginSection" class="card" style="margin-top: 15px;">
+   <div id="loginSection" class="card" style="margin-top: 15px;">
                 <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
                 <label for="staffName">เลือกชื่อของท่านเพื่อผูกกับมือถือเครื่องนี้:</label>
                 <select id="staffName" class="select-input">
@@ -295,21 +285,18 @@
                 </select>
                 <button class="btn btn-primary" style="margin-top:10px;" onclick="saveProfile()">บันทึกเข้าใช้งานเครื่องนี้</button>
             </div>
-
-            <div id="profileSection" class="profile-zone" style="display: none; margin-top: 15px;">
+ <div id="profileSection" class="profile-zone" style="display: none; margin-top: 15px;">
                 <div>
                     <i class="fa-solid fa-id-card" style="color: #0288d1;"></i> 
                     ผู้ใช้งานเครื่องนี้: <strong id="currentStaffLabel"></strong>
                 </div>
                 <button style="background: none; border: none; color: #d32f2f; cursor: pointer; text-decoration: underline;" onclick="clearProfile()">เปลี่ยนชื่อ</button>
             </div>
-
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <h3 style="margin: 0; color: #333;">📋 บอร์ดคิวงานรับส่งผู้ป่วยด่วน</h3>
                     <span id="syncStatus" style="font-size: 12px; color: #2e7d32; font-weight: bold;"><i class="fa-solid fa-rotate fa-spin"></i> กำลังอัปเดตอัตโนมัติ...</span>
-                </div>
-                
+                </div>   
                 <div id="queueList">
                     <div id="emptyMessage" style="text-align: center; color: #999; padding: 20px;">
                         <i class="fa-solid fa-circle-info" style="font-size: 24px; color: #ccc;"></i><br>
@@ -324,10 +311,8 @@
     <div class="footer-credit">
         <i class="fa-solid fa-code"></i> พัฒนาโดย Khemika-OPD Takhli 06/2026
     </div>
-
     <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
     <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
-
     <script>
         // 🎯 ผูกลิงก์ระบบใหม่ล่าสุดมิลลิวินาทีคงที่ตัวจริงของพี่เรียบร้อยสมบูรณ์ค่ะ
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby9z6S7ok-7oHFZUz0JBtVpkX7qOiWyg2LJwOvHvYqzAEd8bpXza2pXb1mxnhRwu1TvUg/exec";
@@ -335,7 +320,6 @@
         let currentStaff = "";
         let urgentPlaying = false;
         let isAudioUnlocked = false;
-
         window.onload = function() {
             const savedName = localStorage.getItem("OPD_Staff_Name");
             if (savedName) {
@@ -347,7 +331,6 @@
             fetchDataFromSheet();
             setInterval(fetchDataFromSheet, 4000); 
         };
-
         function saveProfile() {
             const name = document.getElementById("staffName").value;
             if (!name) {
@@ -361,8 +344,7 @@
             document.getElementById("profileSection").style.display = "flex";
             fetchDataFromSheet();
         }
-
-        function clearProfile() {
+   function clearProfile() {
             if (confirm("ต้องการเปลี่ยนชื่อผู้ใช้งานหรือไม่?")) {
                 localStorage.removeItem("OPD_Staff_Name");
                 currentStaff = "";
@@ -370,7 +352,6 @@
                 document.getElementById("profileSection").style.display = "none";
             }
         }
-
         function unlockAudioElements() {
             const sSound = document.getElementById("successSound");
             const uSound = document.getElementById("urgentSound");
@@ -382,7 +363,6 @@
                 alert("🔊 เปิดระบบเสียงแจ้งเตือนเรียลไทม์สำเร็จ!");
             }
         }
-
         function switchMode(role) {
             document.getElementById("btnNurseMode").classList.remove("active");
             document.getElementById("btnStaffMode").classList.remove("active");
