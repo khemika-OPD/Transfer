@@ -7,13 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #0288d1;
-            --success-color: #2e7d32;
-            --normal-queue-color: #ffb74d;
-            --urgent-queue-color: #d32f2f;
-            --bg-color: #f4f6f9;
-        }
+        :root { --primary-color: #0288d1; --success-color: #2e7d32; --normal-queue-color: #ffb74d; --urgent-queue-color: #d32f2f; --bg-color: #f4f6f9; }
         body { font-family: 'Sarabun', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
         .header { background: linear-gradient(135deg, #01579b, #0288d1); color: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .container { max-width: 600px; margin: 20px auto; padding: 0 15px; flex: 1; }
@@ -22,17 +16,17 @@
         .role-btn.active { background: white; color: var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
         .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; }
-        .select-input, .search-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; background-color: #fff; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .select-input, .search-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-primary { background-color: var(--primary-color); color: white; }
         .btn-success { background-color: var(--success-color); color: white; }
         .btn-warning { background-color: #e65100; color: white; }
-        .profile-zone { display: flex; justify-content: space-between; align-items: center; background: #e1f5fe; border-left: 5px solid var(--primary-color); padding: 12px 15px; border-radius: 6px; margin-bottom: 15px; }
-        .queue-item { border: 2px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .app-mode { display: none; }
         .app-mode.active { display: block; }
         .footer-credit { text-align: center; padding: 20px; font-size: 13px; color: #555; background-color: #eaedf1; font-weight: 600; }
+        .queue-item { border: 2px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #fff; }
+        .urgent-pending { border-color: var(--urgent-queue-color); }
+        .profile-zone { display: flex; justify-content: space-between; align-items: center; background: #e1f5fe; padding: 12px 15px; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -48,11 +42,9 @@
                 <i class="fa-solid fa-qrcode"></i> QR Code เข้าใช้งาน
             </button>
         </div>
-        <div id="qrZone" style="display: none; text-align: center; margin-bottom: 20px;">
-            <div class="card" style="display: inline-block;">
-                <p>สแกนเพื่อเปิดระบบคิวเปล</p>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://YOUR_GITHUB_PAGES_URL" alt="QR Code">
-            </div>
+        <div id="qrZone" class="card" style="display: none; text-align: center;">
+            <p>สแกน QR Code นี้เพื่อเข้าสู่หน้าจอคิวงาน</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://YOUR_GITHUB_PAGES_URL" alt="QR Code">
         </div>
 
         <div class="role-switcher">
@@ -62,8 +54,13 @@
 
         <div id="nurseModeSection" class="app-mode active">
             <div class="card">
-                <h3 style="margin-top:0; color: var(--primary-color);"><i class="fa-solid fa-paper-plane"></i> คีย์ส่งงานคิวเปลด่วน</h3>
-                <button class="btn btn-primary" onclick="sendJobFromNurse()">➕ กดส่งงานไปที่จุดเปลทันที</button>
+                <h3><i class="fa-solid fa-paper-plane"></i> คีย์ส่งงานคิวเปลด่วน</h3>
+                <div class="form-group"><label>ระดับความเร่งด่วน:</label><select id="jobPriority" class="select-input"><option value="ปกติ">🟡 ปกติ</option><option value="เร่งด่วน">🔴 เร่งด่วน</option></select></div>
+                <div class="form-group"><label>ประเภทอุปกรณ์:</label><select id="jobType" class="select-input"><option value="รถเข็นนั่ง (Wheelchair) 🦽">รถเข็นนั่ง 🦽</option><option value="รถนอน (Stretcher) 🚑">รถนอน 🚑</option></select></div>
+                <div class="form-group"><label>จุดต้นทาง:</label><input list="fromLocations" id="jobFrom" class="search-input" placeholder="พิมพ์จุดต้นทาง..."></div>
+                <div class="form-group"><label>จุดปลายทาง:</label><input list="toLocations" id="jobTo" class="search-input" placeholder="พิมพ์จุดปลายทาง..."></div>
+                <button class="btn btn-primary" onclick="sendJobFromNurse()">➕ กดส่งงาน</button>
+                <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">🌅 ล้างคิววันใหม่</button>
             </div>
         </div>
 
@@ -78,15 +75,17 @@
     </div>
 
     <script>
-        // ฟังก์ชัน Toggle QR Code
         function toggleQR() {
-            const qrZone = document.getElementById("qrZone");
-            qrZone.style.display = (qrZone.style.display === "none") ? "block" : "none";
+            const z = document.getElementById("qrZone");
+            z.style.display = (z.style.display === "none") ? "block" : "none";
         }
-        
-        // (ฟังก์ชันเดิมทั้งหมดของพี่ วางต่อจากตรงนี้ได้เลยค่ะ)
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby9z6S7ok-7oHFZUz0JBtVpkX7qOiWyg2LJwOvHvYqzAEd8bpXza2pXb1mxnhRwu1TvUg/exec";
-        // ... โค้ดเดิม ...
+        function switchMode(role) {
+            document.getElementById("btnNurseMode").classList.toggle("active", role === 'nurse');
+            document.getElementById("btnStaffMode").classList.toggle("active", role === 'staff');
+            document.getElementById("nurseModeSection").classList.toggle("active", role === 'nurse');
+            document.getElementById("staffModeSection").classList.toggle("active", role === 'staff');
+        }
+        // ... (โค้ด JS เดิมของพี่ที่เหลือทั้งหมด ใส่ต่อจากตรงนี้ได้เลยค่ะ) ...
     </script>
 </body>
 </html>
