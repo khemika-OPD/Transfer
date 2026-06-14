@@ -7,77 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary-color: #0288d1; --normal-queue-color: #ffb74d; --bg-color: #f4f6f9; }
-        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        .header { background: linear-gradient(135deg, #01579b, #0288d1); color: white; padding: 20px; text-align: center; }
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; flex: 1; }
-        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .role-switcher { display: flex; background: #e0e0e0; border-radius: 30px; padding: 5px; margin-bottom: 20px; }
-        .role-btn { flex: 1; border: none; background: none; padding: 12px; font-weight: bold; border-radius: 25px; cursor: pointer; color: #555; }
-        .role-btn.active { background: white; color: var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
-        .app-mode { display: none; }
-        .app-mode.active { display: block; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .select-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px; }
-        .footer-credit { text-align: center; padding: 10px; font-size: 11px; color: #888; background-color: #eaedf1; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h2>🏥 นวัตกรรมระบบคิวเปลอัจฉริยะ (Smart Queue)</h2>
-        <p>กลุ่มงานผู้ป่วยนอก (OPD) โรงพยาบาลตาคลี</p>
-    </div>
-
-    <div class="container">
-        <div class="role-switcher">
-            <button id="btnNurseMode" class="role-btn active" onclick="switchMode('nurse')">1. พยาบาล</button>
-            <button id="btnStaffMode" class="role-btn" onclick="switchMode('staff')">2. พนักงานเปล</button>
-        </div>
-
-        <div id="nurseModeSection" class="app-mode active">
-            <div class="card">
-                <h3>คีย์ส่งงานคิวเปลด่วน</h3>
-                <select id="jobPriority" class="select-input"><option value="ปกติ">🟡 ปกติ</option><option value="เร่งด่วน">🔴 เร่งด่วน</option></select>
-                <select id="jobType" class="select-input"><option value="รถเข็นนั่ง">รถเข็นนั่ง 🦽</option><option value="รถนอน">รถนอน 🚑</option></select>
-                <input id="jobFrom" class="select-input" placeholder="จุดต้นทาง...">
-                <input id="jobTo" class="select-input" placeholder="จุดปลายทาง...">
-                <button class="btn btn-primary" onclick="sendJobFromNurse()">➕ กดส่งงาน</button>
-                <button class="btn btn-warning" onclick="clearAllDataForNewDay()">🌅 ล้างคิววันใหม่</button>
-                
-                <button class="btn" style="background-color: var(--normal-queue-color); color: #333;" onclick="toggleQR()">
-                    <i class="fa-solid fa-qrcode"></i> QR Code เข้าใช้งาน
-                </button>
-                <div id="qrZone" style="display: none; text-align: center; margin-top: 15px;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://khemika-opd.github.io/Transfer/" alt="QR">
-                </div>
-            </div>
-        </div>
-
-        <div id="staffModeSection" class="app-mode">
-            <div id="queueList"></div>
-        </div>
-    </div>
-
-    <div class="footer-credit">Innovation by Khemika-OPD-Takhli 06/2026</div>
-
-    <script>
-        function toggleQR() { const z = document.getElementById("qrZone"); z.style.display = (z.style.display === "none") ? "block" : "none"; }
-        function switchMode(role) {
-            document.querySelectorAll('.app-mode').forEach(m => m.classList.remove('active'));
-            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(role + "ModeSection").classList.add("active");
-            document.getElementById("btn" + role.charAt(0).toUpperCase() + role.slice(1) + "Mode").classList.add("active");
-        }
-        // (ฟังก์ชัน sendJob, acceptJob, fetchData และฟังก์ชันเดิมของพี่ทั้งหมด วางต่อจากตรงนี้ได้เลยค่ะ)
-        <!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Takhli OPD Smart Queue - นวัตกรรมระบบคิวเปลอัจฉริยะ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
         :root {
             --primary-color: #0288d1;
             --success-color: #2e7d32;
@@ -344,8 +273,12 @@
                     <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
                 </button>
                 
-                <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
-                    <i class="fa-solid fa-trash-can"></i> 🌅 กดล้างกระดานเริ่มต้นคิวใหม่ (สำหรับขึ้นวันใหม่)
+                <button class="btn" style="background-color: var(--normal-queue-color); color: #333; margin-top: 20px;" onclick="toggleQR()">
+                    <i class="fa-solid fa-qrcode"></i> แสดง/ซ่อน QR Code
+                </button>
+                <div id="qrZone" style="display: none; text-align: center; margin-top: 15px;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://khemika-opd.github.io/Transfer/" alt="QR">
+                </div>
                 </button>
             </div>
         </div>
@@ -546,24 +479,7 @@
             });
         }
 
-        function clearAllDataForNewDay() {
-            if (confirm("🚨 คำเตือนวิกฤต: คุณต้องการลบประวัติงานคิวเปลทั้งหมดเพื่อเริ่มต้นคิววันใหม่ใช่หรือไม่? (ข้อมูลเดิมจะถูกล้างเกลี้ยง)")) {
-                const payload = { action: "clearAllData" };
-                
-                fetch(GOOGLE_SHEET_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    cache: "no-cache",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                }).then(() => {
-                    alert("🌅 ล้างข้อมูลกระดานรับงานขึ้นวันใหม่เรียบร้อยค่ะ! เริ่มรันคิวที่ 1 ของวันนี้ได้เลย");
-                    fetchDataFromSheet();
-                }).catch(err => {
-                    alert("ไม่สามารถล้างข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ");
-                });
-            }
-        }
+        
 
         function fetchDataFromSheet() {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-rotate fa-spin'></i> กำลังตรวจเช็กคิวงานด่วน...";
@@ -696,7 +612,3 @@
 </body>
 </html>
 
-
-    </script>
-</body>
-</html>
