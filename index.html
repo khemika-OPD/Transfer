@@ -273,8 +273,8 @@
                     <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
                 </button>
                 
-                <button class="btn btn-warning" style="margin-top: 15px;" onclick="toggleQR()">
-                    <i class="fa-solid fa-hand-peace"></i> 🌅 Innovation By Khemika 06/2026
+                <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
+                    <i class="fa-solid fa-hand-peace"></i> 👩‍⚕️Innovation By Khemika 06/2026
                 </button>
             </div>
         </div>
@@ -475,23 +475,7 @@
             });
         }
 
-        <button class="btn btn-primary" onclick="sendJobFromNurse()">
-    <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
-</button>
-
-<button class="btn" style="background-color: var(--normal-queue-color); color: #333; margin-top: 15px;" onclick="toggleQR()">
-    <i class="fa-solid fa-qrcode"></i> QR Code เข้าใช้งานระบบ
-</button>
-
-<div id="qrZone" style="display: none; text-align: center; margin-top: 15px; padding: 10px; background: white; border-radius: 8px;">
-    <p style="font-size: 11px; margin-bottom: 8px; color: #666;">
-        <i class="fa-solid fa-hand-peace" style="color: #0288d1;"></i> Innovation by Khemika-OPD-Takhli 06/2026
-    </p>
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://khemika-opd.github.io/Transfer/" alt="QR">
-</div>
-<script>
-  
-</script>
+        
 
         function fetchDataFromSheet() {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-rotate fa-spin'></i> กำลังตรวจเช็กคิวงานด่วน...";
