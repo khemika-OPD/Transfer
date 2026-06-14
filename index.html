@@ -80,6 +80,232 @@
             document.getElementById("btn" + role.charAt(0).toUpperCase() + role.slice(1) + "Mode").classList.add("active");
         }
         // (ฟังก์ชัน sendJob, acceptJob, fetchData ฯลฯ เดิมของพี่ วางต่อจากตรงนี้ได้เลยค่ะ)
+        function sendJobFromNurse() {
+            const priority = document.getElementById("jobPriority").value;
+            const type = document.getElementById("jobType").value;
+            const from = document.getElementById("jobFrom").value.trim();
+            const to = document.getElementById("jobTo").value.trim();
+
+            if (!from || !to) {
+                alert("⚠️ ข้อผิดพลาด: กรุณาระบุจุดต้นทางและจุดปลายทางก่อนกดส่งงานด้วยค่ะ");
+                return;
+            }
+
+            const cleanStartDateTime = new Date().toISOString();
+            const payload = {
+                action: "insert",
+                time: cleanStartDateTime,
+                type: type,
+                priority: priority,
+                origin: from, 
+                to: to,
+                staff: "", 
+                status: "" 
+            };
+
+            try {
+                document.getElementById("successSound").play();
+            } catch(e) {}
+
+            fetch(GOOGLE_SHEET_URL, {
+                method: "POST",
+                mode: "no-cors",
+                cache: "no-cache",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert("📝 สั่งงานคิวเปลเข้าชีตสำเร็จ! ระบบจะดีดคิวแสดงผลอัตโนมัติภายใน 4 วินาทีค่ะ");
+                document.getElementById("jobFrom").value = "";
+                document.getElementById("jobTo").value = "";
+                switchMode('staff');
+                fetchDataFromSheet();
+            }).catch(err => {
+                alert("การเชื่อมต่อขัดข้อง กรุณาลองส่งใหม่อีกครั้งค่ะ");
+            });
+        }
+
+        function acceptJob(timestamp) {
+            if (!currentStaff) {
+                alert("⚠️ กรุณาเลือกชื่อพนักงานเปลและบันทึกข้อมูลก่อนรับงานค่ะ");
+                switchMode('staff');
+                document.getElementById("staffName").focus();
+                return;
+            }
+
+            const cleanEndDateTime = new Date().toISOString();
+
+            const payload = {
+                action: "update",
+                time: timestamp,
+                staff: currentStaff,
+                status: cleanEndDateTime
+            };
+
+            fetch(GOOGLE_SHEET_URL, {
+                method: "POST",
+                mode: "no-cors",
+                cache: "no-cache",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert("✅ คุณ " + currentStaff + " รับงานเรียบร้อยแล้ว เดินทางปลอดภัยค่ะ");
+                fetchDataFromSheet();
+            }).catch(err => {
+                alert("ไม่สามารถบันทึกการรับงานได้ กรุณาลองใหม่อีกครั้ง");
+            });
+        }
+
+        function clearAllDataForNewDay() {
+            if (confirm("🚨 คำเตือนวิกฤต: คุณต้องการลบประวัติงานคิวเปลทั้งหมดเพื่อเริ่มต้นคิววันใหม่ใช่หรือไม่? (ข้อมูลเดิมจะถูกล้างเกลี้ยง)")) {
+                const payload = { action: "clearAllData" };
+                
+                fetch(GOOGLE_SHEET_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    cache: "no-cache",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                }).then(() => {
+                    alert("🌅 ล้างข้อมูลกระดานรับงานขึ้นวันใหม่เรียบร้อยค่ะ! เริ่มรันคิวที่ 1 ของวันนี้ได้เลย");
+                    fetchDataFromSheet();
+                }).catch(err => {
+                    alert("ไม่สามารถล้างข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ");
+                });
+            }
+        }
+
+        function fetchDataFromSheet() {
+            document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-rotate fa-spin'></i> กำลังตรวจเช็กคิวงานด่วน...";
+            
+            const oldScript = document.getElementById("jsonpScript");
+            if (oldScript) oldScript.remove();
+
+            const script = document.createElement("script");
+            script.id = "jsonpScript";
+            script.src = GOOGLE_SHEET_URL + "?callback=handleSheetData&nocache=" + new Date().getTime();
+            document.body.appendChild(script);
+        }
+
+        function formatThaiDisplayTime(rawTime) {
+            if (!rawTime) return "";
+            try {
+                const d = new Date(rawTime);
+                if (!isNaN(d.getTime())) {
+                    return d.toLocaleDateString('th-TH') + " " + d.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
+                }
+            } catch(e) {}
+            return rawTime;
+        }
+
+        function handleSheetData(data) {
+            document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-circle-check'></i> เชื่อมต่อเรียลไทม์";
+            if (!data || !Array.isArray(data)) return;
+
+            const queueList = document.getElementById("queueList");
+            queueList.innerHTML = ""; 
+
+            const pendingJobs = data.filter(job => {
+                const timestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
+                const porter = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
+                const acceptTime = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
+                
+                return timestamp.toString().trim() !== "" && 
+                       porter.toString().trim() === "" && 
+                       acceptTime.toString().trim() === "";
+            });
+
+            if (pendingJobs.length === 0) {
+                queueList.innerHTML = `
+                    <div id="emptyMessage" style="text-align: center; color: #999; padding: 20px;">
+                        <i class="fa-solid fa-circle-info" style="font-size: 24px; color: #ccc;"></i><br>
+                        ขณะนี้ยังไม่มีคิวค้างในระบบ สบายใจได้ค่ะ
+                    </div>`;
+                stopUrgentSound();
+                return;
+            }
+
+            let hasUrgent = false;
+
+            pendingJobs.forEach((job) => {
+                const newCard = document.createElement("div");
+                let cardClass = "queue-item normal-pending";
+                
+                const currentRawTimestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
+                let displayTime = formatThaiDisplayTime(currentRawTimestamp);
+
+                const currentEquipment = job["ประเภทอุปกรณ์ที่ต้องใช้"] || job.ประเภทอุปกรณ์ที่ต้องใช้ || "รถเข็นนั่ง";
+                const currentPriority = job["ระดับความเร่งด่วน"] || job.ระดับความเร่งด่วน || "ปกติ";
+                const currentOrigin = job["จุดต้นทาง"] || job.จุดต้นทาง || "";
+                const currentDestination = job["จุดปลายทาง"] || job.จุดปลายทาง || "";
+
+                let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${escapeHtml(currentPriority)}</span>`;
+
+                if (currentPriority === "เร่งด่วน" || currentPriority.includes("เร่งด่วน")) {
+                    cardClass = "queue-item urgent-pending";
+                    tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${escapeHtml(currentPriority)}</span>`;
+                    hasUrgent = true;
+                }
+
+                const safeTime = escapeHtml(currentRawTimestamp.toString());
+
+                newCard.className = cardClass;
+                newCard.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        ${tagHTML}
+                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${displayTime}</small>
+                    </div>
+                    <div style="margin-bottom: 12px; font-size: 16px; line-height: 1.5;">
+                        <strong>🚨 อุปกรณ์:</strong> ${escapeHtml(currentEquipment)}<br>
+                        <strong>📍 ต้นทาง:</strong> <span style="color:#01579b; font-weight:bold;">${escapeHtml(currentOrigin)}</span><br>
+                        <strong>➡️ ปลายทาง:</strong> <span style="color:#b71c1c; font-weight:bold;">${escapeHtml(currentDestination)}</span>
+                    </div>
+                    <button class="btn btn-success" onclick="acceptJob('${safeTime}')">
+                        <i class="fa-solid fa-check"></i> 👍 กดรับเคสนี้ทันที
+                    </button>
+                `;
+                queueList.appendChild(newCard);
+            });
+
+            if (hasUrgent && isAudioUnlocked) {
+                playUrgentSound();
+            } else {
+                stopUrgentSound();
+            }
+        }
+
+        function playUrgentSound() {
+            const uSound = document.getElementById("urgentSound");
+            if (uSound && !urgentPlaying) {
+                uSound.play().then(() => {
+                    urgentPlaying = true;
+                }).catch(e => {});
+            }
+        }
+
+        function stopUrgentSound() {
+            const uSound = document.getElementById("urgentSound");
+            if (uSound && urgentPlaying) {
+                uSound.pause();
+                uSound.currentTime = 0;
+                urgentPlaying = false;
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text
+                .toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
+
+
     </script>
 </body>
 </html>
