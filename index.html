@@ -14,6 +14,16 @@
             --urgent-queue-color: #d32f2f;
             --bg-color: #f4f6f9;
         }
+        <div class="footer-credit">พัฒนาโดย Khemika-OPD Takhli</div>
+
+    <script>
+        function toggleQR() { const z = document.getElementById("qrZone"); z.style.display = (z.style.display === "none") ? "block" : "none"; }
+        function switchMode(role) {
+            document.querySelectorAll('.app-mode').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(role + "ModeSection").classList.add("active");
+            document.getElementById("btn" + role.charAt(0).toUpperCase() + role.slice(1) + "Mode").classList.add("active");
+        }
         body {
             font-family: 'Sarabun', sans-serif;
             background-color: var(--bg-color);
@@ -274,7 +284,13 @@
                 </button>
                 
                 <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
-                    <i class="fa-solid fa-trash-can"></i> 🌅 กดล้างกระดานเริ่มต้นคิวใหม่ (สำหรับขึ้นวันใหม่)
+                    <i class="fa-solid fa-trash-can"></i> 🌅 เปิด/ปิด QR code
+                    <button class="btn" style="background-color: var(--normal-queue-color); color: #333; margin-top: 15px;" onclick="toggleQR()">
+                    <i class="fa-solid fa-qrcode"></i> QR Code เข้าใช้งาน
+                </button>
+                <div id="qrZone" style="display: none; text-align: center; margin-top: 15px;">
+                    <p style="font-size: 11px; color: #666;">Innovation By Khemika 06/2026</p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://khemika-opd.github.io/Transfer/" alt="QR">
                 </button>
             </div>
         </div>
@@ -475,24 +491,7 @@
             });
         }
 
-        function clearAllDataForNewDay() {
-            if (confirm("🚨 คำเตือนวิกฤต: คุณต้องการลบประวัติงานคิวเปลทั้งหมดเพื่อเริ่มต้นคิววันใหม่ใช่หรือไม่? (ข้อมูลเดิมจะถูกล้างเกลี้ยง)")) {
-                const payload = { action: "clearAllData" };
-                
-                fetch(GOOGLE_SHEET_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    cache: "no-cache",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                }).then(() => {
-                    alert("🌅 ล้างข้อมูลกระดานรับงานขึ้นวันใหม่เรียบร้อยค่ะ! เริ่มรันคิวที่ 1 ของวันนี้ได้เลย");
-                    fetchDataFromSheet();
-                }).catch(err => {
-                    alert("ไม่สามารถล้างข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ");
-                });
-            }
-        }
+        
 
         function fetchDataFromSheet() {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-rotate fa-spin'></i> กำลังตรวจเช็กคิวงานด่วน...";
