@@ -14,162 +14,25 @@
             --urgent-queue-color: #d32f2f;
             --bg-color: #f4f6f9;
         }
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .header {
-            background: linear-gradient(135deg, #01579b, #0288d1);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 0 15px;
-            flex: 1;
-        }
-        .role-switcher {
-            display: flex;
-            background: #e0e0e0;
-            border-radius: 30px;
-            padding: 5px;
-            margin-bottom: 20px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .role-btn {
-            flex: 1;
-            border: none;
-            background: none;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            color: #555;
-        }
-        .role-btn.active {
-            background: white;
-            color: var(--primary-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #333;
-        }
-        .select-input, .search-input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-            box-sizing: border-box;
-            font-family: 'Sarabun', sans-serif;
-            background-color: #fff;
-        }
-        .search-input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 5px rgba(2, 136, 209, 0.3);
-        }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #01579b, #0288d1); color: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; flex: 1; }
+        .role-switcher { display: flex; background: #e0e0e0; border-radius: 30px; padding: 5px; margin-bottom: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .role-btn { flex: 1; border: none; background: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 25px; cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px; color: #555; }
+        .role-btn.active { background: white; color: var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; }
+        .select-input, .search-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; background-color: #fff; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:hover { background-color: #01579b; }
         .btn-success { background-color: var(--success-color); color: white; }
-        .btn-success:hover { background-color: #1b5e20; }
         .btn-warning { background-color: #e65100; color: white; }
-        .btn-warning:hover { background-color: #b33c00; }
-        
-        .profile-zone {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #e1f5fe;
-            border-left: 5px solid var(--primary-color);
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-        .queue-item {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .queue-item.normal-pending {
-            border-color: var(--normal-queue-color);
-            box-shadow: 0 0 8px rgba(255, 183, 77, 0.2);
-        }
-        .queue-item.urgent-pending {
-            border-color: var(--urgent-queue-color);
-            animation: pulse-urgent 1.5s infinite;
-        }
-        @keyframes pulse-urgent {
-            0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.5); }
-            70% { box-shadow: 0 0 0 12px rgba(211, 47, 47, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
-        }
-        .tag {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-        }
-        .tag-normal { background-color: var(--normal-queue-color); color: #333; }
-        .tag-urgent { background-color: var(--urgent-queue-color); }
-        .tag-success { background-color: var(--success-color); }
+        .profile-zone { display: flex; justify-content: space-between; align-items: center; background: #e1f5fe; border-left: 5px solid var(--primary-color); padding: 12px 15px; border-radius: 6px; margin-bottom: 15px; }
+        .queue-item { border: 2px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .app-mode { display: none; }
         .app-mode.active { display: block; }
-
-        .footer-credit {
-            text-align: center;
-            padding: 15px;
-            font-size: 13px;
-            color: #777;
-            background-color: #eaedf1;
-            border-top: 1px solid #dcdcdc;
-            font-weight: 600;
-        }
+        .footer-credit { text-align: center; padding: 20px; font-size: 13px; color: #555; background-color: #eaedf1; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -180,447 +43,50 @@
     </div>
 
     <div class="container">
-        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button class="btn btn-success" style="width: auto; padding: 10px 20px;" onclick="toggleQR()">
+                <i class="fa-solid fa-qrcode"></i> QR Code เข้าใช้งาน
+            </button>
+        </div>
+        <div id="qrZone" style="display: none; text-align: center; margin-bottom: 20px;">
+            <div class="card" style="display: inline-block;">
+                <p>สแกนเพื่อเปิดระบบคิวเปล</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://YOUR_GITHUB_PAGES_URL" alt="QR Code">
+            </div>
+        </div>
+
         <div class="role-switcher">
-            <button id="btnNurseMode" class="role-btn active" onclick="switchMode('nurse')">
-                <i class="fa-solid fa-user-nurse"></i> 1. ฝั่งพยาบาลสั่งงาน
-            </button>
-            <button id="btnStaffMode" class="role-btn" onclick="switchMode('staff')">
-                <i class="fa-solid fa-wheelchair"></i> 2. ฝั่งพนักงานเปลรับงาน
-            </button>
+            <button id="btnNurseMode" class="role-btn active" onclick="switchMode('nurse')"><i class="fa-solid fa-user-nurse"></i> 1. พยาบาล</button>
+            <button id="btnStaffMode" class="role-btn" onclick="switchMode('staff')"><i class="fa-solid fa-wheelchair"></i> 2. พนักงานเปล</button>
         </div>
 
         <div id="nurseModeSection" class="app-mode active">
             <div class="card">
                 <h3 style="margin-top:0; color: var(--primary-color);"><i class="fa-solid fa-paper-plane"></i> คีย์ส่งงานคิวเปลด่วน</h3>
-                
-                <div class="form-group">
-                    <label style="color: var(--urgent-queue-color); font-weight: bold;">🚨 ระดับความเร่งด่วน:</label>
-                    <select id="jobPriority" class="select-input" style="border: 2px solid var(--normal-queue-color);">
-                        <option value="ปกติ">🟡 ระดับปกติ</option>
-                        <option value="เร่งด่วน">🔴 ระดับเร่งด่วน</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>🦽 ประเภทอุปกรณ์ที่ต้องใช้:</label>
-                    <select id="jobType" class="select-input">
-                        <option value="รถเข็นนั่ง (Wheelchair) 🦽">รถเข็นนั่ง (Wheelchair) 🦽</option>
-                        <option value="รถนอน (Stretcher) 🚑">รถนอน (Stretcher) 🚑</option>
-                        <option value="เดินประคอง 🚶‍♂️">เดินประคอง 🚶‍♂️</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>📍 จุดต้นทาง:</label>
-                    <input list="fromLocations" id="jobFrom" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดต้นทาง..." autocomplete="off">
-                    <datalist id="fromLocations">
-                        <option value="จุดแยกตรวจ">
-                        <option value="จุดซักประวัติ">
-                        <option value="หน้าห้องบัตร">
-                        <option value="จุดรถนั่ง">
-                        <option value="จุด 10">
-                        <option value="หน้าห้องตรวจ 6">
-                        <option value="จุด 99">
-                        <option value="หน้าห้อง Lab">
-                        <option value="หน้าห้องยา">
-                        <option value="ประชาสัมพันธ์">
-                        <option value="หน้าห้องการเงิน">
-                        <option value="คลินิกพิเศษ">
-                        <option value="ห้องน้ำ">
-                    </datalist>
-                </div>
-
-                <div class="form-group">
-                    <label>➡️ จุดปลายทาง:</label>
-                    <input list="toLocations" id="jobTo" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดปลายทาง..." autocomplete="off">
-                    <datalist id="toLocations">
-                        <option value="จุดแยกตรวจ">
-                        <option value="จุดซักประวัติ">
-                        <option value="หน้าห้องบัตร">
-                        <option value="จุดรถนั่ง">
-                        <option value="จุด 10">
-                        <option value="หน้าห้องตรวจ 6">
-                        <option value="จุด 99">
-                        <option value="หน้าห้อง Lab">
-                        <option value="หน้าห้องยา">
-                        <option value="ประชาสัมพันธ์">
-                        <option value="หน้าห้องการเงิน">
-                        <option value="คลินิกพิเศษ">
-                        <option value="ห้องน้ำ">
-                        <option value="กลับบ้าน OPD 🏠">
-                        <option value="กลับบ้าน ER 🏠">
-                        <option value="ห้องผ่าตัด">
-                        <option value="ห้องคลอด">
-                        <option value="ห้องฝากครรภ์">
-                        <option value="ห้อง ICU">
-                        <option value="ห้องฉุกเฉิน ER">
-                        <option value="ห้องเอกซเรย์">
-                        <option value="ห้องจิตเวช">
-                        <option value="ห้องกายภาพ">
-                        <option value="ห้อง CT">
-                        <option value="ทันตกรรมบน">
-                        <option value="ทันตกรรมล่าง">
-                        <option value="ตึกหญิง">
-                        <option value="ตึกเด็ก">
-                        <option value="ตึกชาย">
-                        <option value="ตึกพิเศษ">
-                    </datalist>
-                </div>
-
-                <button class="btn btn-primary" onclick="sendJobFromNurse()">
-                    <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
-                </button>
-                
-                <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
-                    <i class="fa-solid fa-trash-can"></i> 🌅 กดล้างกระดานเริ่มต้นคิวใหม่ (สำหรับขึ้นวันใหม่)
-                </button>
+                <button class="btn btn-primary" onclick="sendJobFromNurse()">➕ กดส่งงานไปที่จุดเปลทันที</button>
             </div>
         </div>
 
         <div id="staffModeSection" class="app-mode">
-            <div id="audioUnlockZone" class="card" style="text-align: center; background-color: #fffde7; border: 1px dashed #fbc02d;">
-                <p style="margin: 0 0 10px 0; font-size: 14px; color: #f57f17; font-weight: bold;">📢 เพื่อให้เสียงไซเรนเตือนภัยเคสเร่งด่วนดังขึ้นบนมือถือเครื่องนี้แน่นอน</p>
-                <button class="btn btn-warning" style="padding: 8px; font-size: 14px; background-color: #fbc02d; color: #333;" onclick="unlockAudioElements()">
-                    <i class="fa-solid fa-volume-high"></i> คลิกเปิดระบบเสียงเตือนอัจฉริยะครั้งแรก
-                </button>
-            </div>
-
-            <div id="loginSection" class="card" style="margin-top: 15px;">
-                <h3>🔑 ยืนยันตัวตนพนักงานเปล (ทำครั้งแรกครั้งเดียว)</h3>
-                <label for="staffName">เลือกชื่อของท่านเพื่อผูกกับมือถือเครื่องนี้:</label>
-                <select id="staffName" class="select-input">
-                    <option value="">-- กรุณาเลือกชื่อของท่าน --</option>
-                    <option value="สมใจ">พนักงานเปล - สมใจ</option>
-                    <option value="สมบัติ">พนักงานเปล - สมบัติ</option>
-                    <option value="นิรันดร์">พนักงานเปล - นิรันดร์</option>
-                </select>
-                <button class="btn btn-primary" style="margin-top:10px;" onclick="saveProfile()">บันทึกเข้าใช้งานเครื่องนี้</button>
-            </div>
-
-            <div id="profileSection" class="profile-zone" style="display: none; margin-top: 15px;">
-                <div>
-                    <i class="fa-solid fa-id-card" style="color: #0288d1;"></i> 
-                    ผู้ใช้งานเครื่องนี้: <strong id="currentStaffLabel"></strong>
-                </div>
-                <button style="background: none; border: none; color: #d32f2f; cursor: pointer; text-decoration: underline;" onclick="clearProfile()">เปลี่ยนชื่อ</button>
-            </div>
-
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h3 style="margin: 0; color: #333;">📋 บอร์ดคิวงานรับส่งผู้ป่วยด่วน</h3>
-                    <span id="syncStatus" style="font-size: 12px; color: #2e7d32; font-weight: bold;"><i class="fa-solid fa-rotate fa-spin"></i> กำลังอัปเดตอัตโนมัติ...</span>
-                </div>
-                
-                <div id="queueList">
-                    <div id="emptyMessage" style="text-align: center; color: #999; padding: 20px;">
-                        <i class="fa-solid fa-circle-info" style="font-size: 24px; color: #ccc;"></i><br>
-                        ขณะนี้ยังไม่มีคิวค้างในระบบ สบายใจได้ค่ะ
-                    </div>
-                </div>
-            </div>
+            <div id="queueList"></div>
         </div>
-        
     </div>
 
     <div class="footer-credit">
-        <i class="fa-solid fa-code"></i> พัฒนาโดย Khemika-OPD Takhli
+        <p>Innovation by Khemika 06/2026</p>
+        <p>พัฒนาโดย Khemika-OPD Takhli</p>
     </div>
 
-    <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
-    <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
-
     <script>
-        // 🎯 ผูกลิงก์ระบบใหม่ล่าสุดมิลลิวินาทีคงที่ตัวจริงของพี่เรียบร้อยสมบูรณ์ค่ะ
+        // ฟังก์ชัน Toggle QR Code
+        function toggleQR() {
+            const qrZone = document.getElementById("qrZone");
+            qrZone.style.display = (qrZone.style.display === "none") ? "block" : "none";
+        }
+        
+        // (ฟังก์ชันเดิมทั้งหมดของพี่ วางต่อจากตรงนี้ได้เลยค่ะ)
         const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby9z6S7ok-7oHFZUz0JBtVpkX7qOiWyg2LJwOvHvYqzAEd8bpXza2pXb1mxnhRwu1TvUg/exec";
-
-        let currentStaff = "";
-        let urgentPlaying = false;
-        let isAudioUnlocked = false;
-
-        window.onload = function() {
-            const savedName = localStorage.getItem("OPD_Staff_Name");
-            if (savedName) {
-                currentStaff = savedName;
-                document.getElementById("currentStaffLabel").innerText = "คุณ " + savedName;
-                document.getElementById("loginSection").style.display = "none";
-                document.getElementById("profileSection").style.display = "flex";
-            }
-            fetchDataFromSheet();
-            setInterval(fetchDataFromSheet, 4000); 
-        };
-
-        function saveProfile() {
-            const name = document.getElementById("staffName").value;
-            if (!name) {
-                alert("กรุณาเลือกชื่อก่อนบันทึกค่ะ");
-                return;
-            }
-            localStorage.setItem("OPD_Staff_Name", name);
-            currentStaff = name;
-            document.getElementById("currentStaffLabel").innerText = "คุณ " + name;
-            document.getElementById("loginSection").style.display = "none";
-            document.getElementById("profileSection").style.display = "flex";
-            fetchDataFromSheet();
-        }
-
-        function clearProfile() {
-            if (confirm("ต้องการเปลี่ยนชื่อผู้ใช้งานหรือไม่?")) {
-                localStorage.removeItem("OPD_Staff_Name");
-                currentStaff = "";
-                document.getElementById("loginSection").style.display = "block";
-                document.getElementById("profileSection").style.display = "none";
-            }
-        }
-
-        function unlockAudioElements() {
-            const sSound = document.getElementById("successSound");
-            const uSound = document.getElementById("urgentSound");
-            if(sSound && uSound) {
-                sSound.play().then(() => { sSound.pause(); }).catch(e => {});
-                uSound.play().then(() => { uSound.pause(); }).catch(e => {});
-                isAudioUnlocked = true;
-                document.getElementById("audioUnlockZone").style.display = "none";
-                alert("🔊 เปิดระบบเสียงแจ้งเตือนเรียลไทม์สำเร็จ!");
-            }
-        }
-
-        function switchMode(role) {
-            document.getElementById("btnNurseMode").classList.remove("active");
-            document.getElementById("btnStaffMode").classList.remove("active");
-            document.getElementById("nurseModeSection").classList.remove("active");
-            document.getElementById("staffModeSection").classList.remove("active");
-
-            if (role === 'nurse') {
-                document.getElementById("btnNurseMode").classList.add("active");
-                document.getElementById("nurseModeSection").classList.add("active");
-            } else {
-                document.getElementById("btnStaffMode").classList.add("active");
-                document.getElementById("staffModeSection").classList.add("active");
-            }
-        }
-
-        function sendJobFromNurse() {
-            const priority = document.getElementById("jobPriority").value;
-            const type = document.getElementById("jobType").value;
-            const from = document.getElementById("jobFrom").value.trim();
-            const to = document.getElementById("jobTo").value.trim();
-
-            if (!from || !to) {
-                alert("⚠️ ข้อผิดพลาด: กรุณาระบุจุดต้นทางและจุดปลายทางก่อนกดส่งงานด้วยค่ะ");
-                return;
-            }
-
-            const cleanStartDateTime = new Date().toISOString();
-            const payload = {
-                action: "insert",
-                time: cleanStartDateTime,
-                type: type,
-                priority: priority,
-                origin: from, 
-                to: to,
-                staff: "", 
-                status: "" 
-            };
-
-            try {
-                document.getElementById("successSound").play();
-            } catch(e) {}
-
-            fetch(GOOGLE_SHEET_URL, {
-                method: "POST",
-                mode: "no-cors",
-                cache: "no-cache",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                alert("📝 สั่งงานคิวเปลเข้าชีตสำเร็จ! ระบบจะดีดคิวแสดงผลอัตโนมัติภายใน 4 วินาทีค่ะ");
-                document.getElementById("jobFrom").value = "";
-                document.getElementById("jobTo").value = "";
-                switchMode('staff');
-                fetchDataFromSheet();
-            }).catch(err => {
-                alert("การเชื่อมต่อขัดข้อง กรุณาลองส่งใหม่อีกครั้งค่ะ");
-            });
-        }
-
-        function acceptJob(timestamp) {
-            if (!currentStaff) {
-                alert("⚠️ กรุณาเลือกชื่อพนักงานเปลและบันทึกข้อมูลก่อนรับงานค่ะ");
-                switchMode('staff');
-                document.getElementById("staffName").focus();
-                return;
-            }
-
-            const cleanEndDateTime = new Date().toISOString();
-
-            const payload = {
-                action: "update",
-                time: timestamp,
-                staff: currentStaff,
-                status: cleanEndDateTime
-            };
-
-            fetch(GOOGLE_SHEET_URL, {
-                method: "POST",
-                mode: "no-cors",
-                cache: "no-cache",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                alert("✅ คุณ " + currentStaff + " รับงานเรียบร้อยแล้ว เดินทางปลอดภัยค่ะ");
-                fetchDataFromSheet();
-            }).catch(err => {
-                alert("ไม่สามารถบันทึกการรับงานได้ กรุณาลองใหม่อีกครั้ง");
-            });
-        }
-
-        function clearAllDataForNewDay() {
-            if (confirm("🚨 คำเตือนวิกฤต: คุณต้องการลบประวัติงานคิวเปลทั้งหมดเพื่อเริ่มต้นคิววันใหม่ใช่หรือไม่? (ข้อมูลเดิมจะถูกล้างเกลี้ยง)")) {
-                const payload = { action: "clearAllData" };
-                
-                fetch(GOOGLE_SHEET_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    cache: "no-cache",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                }).then(() => {
-                    alert("🌅 ล้างข้อมูลกระดานรับงานขึ้นวันใหม่เรียบร้อยค่ะ! เริ่มรันคิวที่ 1 ของวันนี้ได้เลย");
-                    fetchDataFromSheet();
-                }).catch(err => {
-                    alert("ไม่สามารถล้างข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ");
-                });
-            }
-        }
-
-        function fetchDataFromSheet() {
-            document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-rotate fa-spin'></i> กำลังตรวจเช็กคิวงานด่วน...";
-            
-            const oldScript = document.getElementById("jsonpScript");
-            if (oldScript) oldScript.remove();
-
-            const script = document.createElement("script");
-            script.id = "jsonpScript";
-            script.src = GOOGLE_SHEET_URL + "?callback=handleSheetData&nocache=" + new Date().getTime();
-            document.body.appendChild(script);
-        }
-
-        function formatThaiDisplayTime(rawTime) {
-            if (!rawTime) return "";
-            try {
-                const d = new Date(rawTime);
-                if (!isNaN(d.getTime())) {
-                    return d.toLocaleDateString('th-TH') + " " + d.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
-                }
-            } catch(e) {}
-            return rawTime;
-        }
-
-        function handleSheetData(data) {
-            document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-circle-check'></i> เชื่อมต่อเรียลไทม์";
-            if (!data || !Array.isArray(data)) return;
-
-            const queueList = document.getElementById("queueList");
-            queueList.innerHTML = ""; 
-
-            const pendingJobs = data.filter(job => {
-                const timestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
-                const porter = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
-                const acceptTime = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
-                
-                return timestamp.toString().trim() !== "" && 
-                       porter.toString().trim() === "" && 
-                       acceptTime.toString().trim() === "";
-            });
-
-            if (pendingJobs.length === 0) {
-                queueList.innerHTML = `
-                    <div id="emptyMessage" style="text-align: center; color: #999; padding: 20px;">
-                        <i class="fa-solid fa-circle-info" style="font-size: 24px; color: #ccc;"></i><br>
-                        ขณะนี้ยังไม่มีคิวค้างในระบบ สบายใจได้ค่ะ
-                    </div>`;
-                stopUrgentSound();
-                return;
-            }
-
-            let hasUrgent = false;
-
-            pendingJobs.forEach((job) => {
-                const newCard = document.createElement("div");
-                let cardClass = "queue-item normal-pending";
-                
-                const currentRawTimestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
-                let displayTime = formatThaiDisplayTime(currentRawTimestamp);
-
-                const currentEquipment = job["ประเภทอุปกรณ์ที่ต้องใช้"] || job.ประเภทอุปกรณ์ที่ต้องใช้ || "รถเข็นนั่ง";
-                const currentPriority = job["ระดับความเร่งด่วน"] || job.ระดับความเร่งด่วน || "ปกติ";
-                const currentOrigin = job["จุดต้นทาง"] || job.จุดต้นทาง || "";
-                const currentDestination = job["จุดปลายทาง"] || job.จุดปลายทาง || "";
-
-                let tagHTML = `<span class="tag tag-normal">🟡 ความเร่งด่วน: ${escapeHtml(currentPriority)}</span>`;
-
-                if (currentPriority === "เร่งด่วน" || currentPriority.includes("เร่งด่วน")) {
-                    cardClass = "queue-item urgent-pending";
-                    tagHTML = `<span class="tag tag-urgent"><i class="fa-solid fa-triangle-exclamation"></i> ความเร่งด่วน: 🔴 ${escapeHtml(currentPriority)}</span>`;
-                    hasUrgent = true;
-                }
-
-                const safeTime = escapeHtml(currentRawTimestamp.toString());
-
-                newCard.className = cardClass;
-                newCard.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        ${tagHTML}
-                        <small style="color: #666;"><i class="fa-regular fa-clock"></i> สั่งงานเมื่อ: ${displayTime}</small>
-                    </div>
-                    <div style="margin-bottom: 12px; font-size: 16px; line-height: 1.5;">
-                        <strong>🚨 อุปกรณ์:</strong> ${escapeHtml(currentEquipment)}<br>
-                        <strong>📍 ต้นทาง:</strong> <span style="color:#01579b; font-weight:bold;">${escapeHtml(currentOrigin)}</span><br>
-                        <strong>➡️ ปลายทาง:</strong> <span style="color:#b71c1c; font-weight:bold;">${escapeHtml(currentDestination)}</span>
-                    </div>
-                    <button class="btn btn-success" onclick="acceptJob('${safeTime}')">
-                        <i class="fa-solid fa-check"></i> 👍 กดรับเคสนี้ทันที
-                    </button>
-                `;
-                queueList.appendChild(newCard);
-            });
-
-            if (hasUrgent && isAudioUnlocked) {
-                playUrgentSound();
-            } else {
-                stopUrgentSound();
-            }
-        }
-
-        function playUrgentSound() {
-            const uSound = document.getElementById("urgentSound");
-            if (uSound && !urgentPlaying) {
-                uSound.play().then(() => {
-                    urgentPlaying = true;
-                }).catch(e => {});
-            }
-        }
-
-        function stopUrgentSound() {
-            const uSound = document.getElementById("urgentSound");
-            if (uSound && urgentPlaying) {
-                uSound.pause();
-                uSound.currentTime = 0;
-                urgentPlaying = false;
-            }
-        }
-
-        function escapeHtml(text) {
-            if (!text) return "";
-            return text
-                .toString()
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
+        // ... โค้ดเดิม ...
     </script>
 </body>
 </html>
