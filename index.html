@@ -278,7 +278,9 @@
                 <button class="btn btn-primary" onclick="sendJobFromNurse()">
                     <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
                 </button>
-                
+                <button type="button" id="cancelBtn" onclick="cancelOrder()" style="background-color: #d32f2f; color: white; padding: 14px; border: none; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer;">
+  <i class="fa-solid fa-ban"></i> ยกเลิกงานล่าสุด
+</button>
                 <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
                     <i class="fa-solid fa-hand-peace"></i> 👩‍⚕️Innovation By Khemika 06/2026
                 </button>
@@ -450,20 +452,26 @@
             });
         }
 
-        <button type="button" id="cancelBtn" onclick="cancelOrder()" style="background-color: #ff4d4d; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-  ยกเลิกงานล่าสุด
-</button>
-
-<script>
+// --- วางปุ่มยกเลิกไว้ตรงนี้ในส่วนของ script ---
 function cancelOrder() {
   if (confirm("คุณต้องการยกเลิกคำสั่งงานล่าสุดนี้ใช่หรือไม่?")) {
-    // ตรงนี้คือฟังก์ชันที่จะส่งค่ากลับไปที่ Google Apps Script ของพี่
-    // พี่ต้องส่งค่าสถานะเป็น "ยกเลิก" ไปแทนที่งานล่าสุด
-    alert("ระบบทำการยกเลิกงานเรียบร้อยแล้วค่ะ");
-    // เพิ่มคำสั่ง fetch ไปยัง Google Apps Script ของพี่ที่นี่
+    // ส่งข้อมูลไปที่ Google Sheet ของพี่
+    const payload = {
+      action: "cancel" // พี่ต้องไปแก้ใน Google Apps Script ให้รองรับคำสั่ง "cancel" ด้วยนะคะ
+    };
+    
+    fetch(GOOGLE_SHEET_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(() => {
+      alert("ระบบทำการยกเลิกงานล่าสุดเรียบร้อยแล้วค่ะ");
+      fetchDataFromSheet(); // อัปเดตข้อมูลใหม่
+    });
   }
 }
-</script>
+        
         function acceptJob(timestamp) {
             if (!currentStaff) {
                 alert("⚠️ กรุณาเลือกชื่อพนักงานเปลและบันทึกข้อมูลก่อนรับงานค่ะ");
