@@ -26,12 +26,12 @@
         .header {
             background: linear-gradient(135deg, #01579b, #0288d1);
             color: white;
-            padding: 10px;
+            padding: 20px;
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .container {
-            max-width: 500px;
+            max-width: 600px;
             margin: 20px auto;
             padding: 0 15px;
             flex: 1;
@@ -176,13 +176,9 @@
 
     <div class="header">
         <h2>🏥 นวัตกรรมระบบคิวเปลอัจฉริยะ (Smart Queue)</h2>
-        <p>งานผู้ป่วยนอก (OPD) โรงพยาบาลตาคลี</p>
-        
+        <p>กลุ่มงานผู้ป่วยนอก (OPD) โรงพยาบาลตาคลี</p>
     </div>
-<!-- ปุ่มลิงก์ไป Dashboard -->
-<button class="btn btn-primary" style="background-color: #2e7d32; margin-top: 15px;" onclick="window.open('https://datastudio.google.com/reporting/31712615-904d-4634-bdb4-a36e6b6a91d1')">
-    <i class="fa-solid fa-chart-line"></i> 📊 ดู Dashboard สรุปผลงาน
-</button>
+
     <div class="container">
         
         <div class="role-switcher">
@@ -222,6 +218,7 @@
                     <label>📍 จุดต้นทาง:</label>
                     <input list="fromLocations" id="jobFrom" class="search-input" placeholder="👉 พิมพ์พยัญชนะเพื่อค้นหาจุดต้นทาง..." autocomplete="off">
                     <datalist id="fromLocations">
+                         <option value="จุดลงจากรถ">
                         <option value="จุดแยกตรวจ">
                         <option value="จุดซักประวัติ">
                         <option value="หน้าห้องบัตร">
@@ -278,9 +275,9 @@
                 <button class="btn btn-primary" onclick="sendJobFromNurse()">
                     <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
                 </button>
-              
+                
                 <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
-                    <i class="fa-solid fa-hand-peace"></i> 👩‍⚕️Innovation By Khemika 06/2026
+                   <i class="fa-solid fa-hand-scissors"></i> 👩‍⚕️Innovation By Khemika 06/2026
                 </button>
             </div>
         </div>
@@ -330,7 +327,8 @@
         
     </div>
 
-  
+    <div class="footer-credit">
+        <i class="fa-solid fa-code"></i> พัฒนาโดย Khemika-OPD Takhli
     </div>
 
     <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
@@ -450,27 +448,6 @@
             });
         }
 
-function requestCancel(timestamp) {
-    if (confirm("ต้องการขอยกเลิกงานนี้ใช่หรือไม่?")) {
-        const payload = {
-            action: "cancel", // ฝั่ง Google Apps Script ต้องเช็กเงื่อนไขนี้ค่ะ
-            time: timestamp
-        };
-        
-        fetch(GOOGLE_SHEET_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        }).then(() => {
-            alert("✅ ระบบได้รับคำขอยกเลิกงานนี้เรียบร้อยแล้วค่ะ");
-            fetchDataFromSheet();
-        }).catch(err => {
-            alert("เกิดข้อผิดพลาดในการยกเลิก กรุณาลองใหม่อีกครั้งค่ะ");
-        });
-    }
-}
-        
         function acceptJob(timestamp) {
             if (!currentStaff) {
                 alert("⚠️ กรุณาเลือกชื่อพนักงานเปลและบันทึกข้อมูลก่อนรับงานค่ะ");
@@ -502,7 +479,24 @@ function requestCancel(timestamp) {
             });
         }
 
-        
+        function clearAllDataForNewDay() {
+            if (confirm("🚨 คำเตือนวิกฤต: คุณต้องการลบประวัติงานคิวเปลทั้งหมดเพื่อเริ่มต้นคิววันใหม่ใช่หรือไม่? (ข้อมูลเดิมจะถูกล้างเกลี้ยง)")) {
+                const payload = { action: "clearAllData" };
+                
+                fetch(GOOGLE_SHEET_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    cache: "no-cache",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                }).then(() => {
+                    alert("🌅 ล้างข้อมูลกระดานรับงานขึ้นวันใหม่เรียบร้อยค่ะ! เริ่มรันคิวที่ 1 ของวันนี้ได้เลย");
+                    fetchDataFromSheet();
+                }).catch(err => {
+                    alert("ไม่สามารถล้างข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ");
+                });
+            }
+        }
 
         function fetchDataFromSheet() {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-rotate fa-spin'></i> กำลังตรวจเช็กคิวงานด่วน...";
@@ -578,7 +572,6 @@ function requestCancel(timestamp) {
 
                 const safeTime = escapeHtml(currentRawTimestamp.toString());
 
-              // --- แก้ไขตรงนี้ค่ะ ---
                 newCard.className = cardClass;
                 newCard.innerHTML = `
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
@@ -590,16 +583,12 @@ function requestCancel(timestamp) {
                         <strong>📍 ต้นทาง:</strong> <span style="color:#01579b; font-weight:bold;">${escapeHtml(currentOrigin)}</span><br>
                         <strong>➡️ ปลายทาง:</strong> <span style="color:#b71c1c; font-weight:bold;">${escapeHtml(currentDestination)}</span>
                     </div>
-                    <button class="btn btn-success" style="width: 100%; margin-bottom: 8px;" onclick="acceptJob('${safeTime}')">
+                    <button class="btn btn-success" onclick="acceptJob('${safeTime}')">
                         <i class="fa-solid fa-check"></i> 👍 กดรับเคสนี้ทันที
-                    </button>
-                    <button class="btn" style="width: 100%; background-color: #f44336; color: white;" onclick="requestCancel('${safeTime}')">
-                        <i class="fa-solid fa-ban"></i> ขอยกเลิกงานนี้
                     </button>
                 `;
                 queueList.appendChild(newCard);
-                // --- จบส่วนที่แก้ไข ---
-               });
+            });
 
             if (hasUrgent && isAudioUnlocked) {
                 playUrgentSound();
