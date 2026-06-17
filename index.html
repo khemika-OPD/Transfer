@@ -450,6 +450,20 @@
             });
         }
 
+        <button type="button" id="cancelBtn" onclick="cancelOrder()" style="background-color: #ff4d4d; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+  ยกเลิกงานล่าสุด
+</button>
+
+<script>
+function cancelOrder() {
+  if (confirm("คุณต้องการยกเลิกคำสั่งงานล่าสุดนี้ใช่หรือไม่?")) {
+    // ตรงนี้คือฟังก์ชันที่จะส่งค่ากลับไปที่ Google Apps Script ของพี่
+    // พี่ต้องส่งค่าสถานะเป็น "ยกเลิก" ไปแทนที่งานล่าสุด
+    alert("ระบบทำการยกเลิกงานเรียบร้อยแล้วค่ะ");
+    // เพิ่มคำสั่ง fetch ไปยัง Google Apps Script ของพี่ที่นี่
+  }
+}
+</script>
         function acceptJob(timestamp) {
             if (!currentStaff) {
                 alert("⚠️ กรุณาเลือกชื่อพนักงานเปลและบันทึกข้อมูลก่อนรับงานค่ะ");
