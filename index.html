@@ -578,6 +578,7 @@ function requestCancel(timestamp) {
 
                 const safeTime = escapeHtml(currentRawTimestamp.toString());
 
+              // --- แก้ไขตรงนี้ค่ะ ---
                 newCard.className = cardClass;
                 newCard.innerHTML = `
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
@@ -589,14 +590,15 @@ function requestCancel(timestamp) {
                         <strong>📍 ต้นทาง:</strong> <span style="color:#01579b; font-weight:bold;">${escapeHtml(currentOrigin)}</span><br>
                         <strong>➡️ ปลายทาง:</strong> <span style="color:#b71c1c; font-weight:bold;">${escapeHtml(currentDestination)}</span>
                     </div>
-                    <button class="btn btn-success" onclick="acceptJob('${safeTime}')">
+                    <button class="btn btn-success" style="width: 100%; margin-bottom: 8px;" onclick="acceptJob('${safeTime}')">
                         <i class="fa-solid fa-check"></i> 👍 กดรับเคสนี้ทันที
                     </button>
+                    <button class="btn" style="width: 100%; background-color: #f44336; color: white;" onclick="requestCancel('${safeTime}')">
+                        <i class="fa-solid fa-ban"></i> ขอยกเลิกงานนี้
+                    </button>
                 `;
-<button class="btn" style="width: 100%; background-color: #f44336; color: white;" onclick="requestCancel('${safeTime}')">
-        <i class="fa-solid fa-ban"></i> ขอยกเลิกงานนี้
-    </button>
-   `;
+                queueList.appendChild(newCard);
+                // --- จบส่วนที่แก้ไข ---
                 queueList.appendChild(newCard);
             });
 
