@@ -479,24 +479,7 @@
             });
         }
 
-        function clearAllDataForNewDay() {
-            if (confirm("🚨 คำเตือนวิกฤต: คุณต้องการลบประวัติงานคิวเปลทั้งหมดเพื่อเริ่มต้นคิววันใหม่ใช่หรือไม่? (ข้อมูลเดิมจะถูกล้างเกลี้ยง)")) {
-                const payload = { action: "clearAllData" };
-                
-                fetch(GOOGLE_SHEET_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    cache: "no-cache",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                }).then(() => {
-                    alert("🌅 ล้างข้อมูลกระดานรับงานขึ้นวันใหม่เรียบร้อยค่ะ! เริ่มรันคิวที่ 1 ของวันนี้ได้เลย");
-                    fetchDataFromSheet();
-                }).catch(err => {
-                    alert("ไม่สามารถล้างข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ");
-                });
-            }
-        }
+        
 
         function fetchDataFromSheet() {
             document.getElementById("syncStatus").innerHTML = "<i class='fa-solid fa-rotate fa-spin'></i> กำลังตรวจเช็กคิวงานด่วน...";
