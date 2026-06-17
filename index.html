@@ -278,9 +278,7 @@
                 <button class="btn btn-primary" onclick="sendJobFromNurse()">
                     <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
                 </button>
-                <button type="button" id="cancelBtn" onclick="cancelOrder()" style="background-color: #d32f2f; color: white; padding: 14px; border: none; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer;">
-  <i class="fa-solid fa-ban"></i> ยกเลิกงานล่าสุด
-</button>
+              
                 <button class="btn btn-warning" style="margin-top: 15px;" onclick="clearAllDataForNewDay()">
                     <i class="fa-solid fa-hand-peace"></i> 👩‍⚕️Innovation By Khemika 06/2026
                 </button>
@@ -452,24 +450,25 @@
             });
         }
 
-// --- วางปุ่มยกเลิกไว้ตรงนี้ในส่วนของ script ---
-function cancelOrder() {
-  if (confirm("คุณต้องการยกเลิกคำสั่งงานล่าสุดนี้ใช่หรือไม่?")) {
-    // ส่งข้อมูลไปที่ Google Sheet ของพี่
-    const payload = {
-      action: "cancel" // พี่ต้องไปแก้ใน Google Apps Script ให้รองรับคำสั่ง "cancel" ด้วยนะคะ
-    };
-    
-    fetch(GOOGLE_SHEET_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }).then(() => {
-      alert("ระบบทำการยกเลิกงานล่าสุดเรียบร้อยแล้วค่ะ");
-      fetchDataFromSheet(); // อัปเดตข้อมูลใหม่
-    });
-  }
+function requestCancel(timestamp) {
+    if (confirm("ต้องการขอยกเลิกงานนี้ใช่หรือไม่?")) {
+        const payload = {
+            action: "cancel", // ฝั่ง Google Apps Script ต้องเช็กเงื่อนไขนี้ค่ะ
+            time: timestamp
+        };
+        
+        fetch(GOOGLE_SHEET_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            alert("✅ ระบบได้รับคำขอยกเลิกงานนี้เรียบร้อยแล้วค่ะ");
+            fetchDataFromSheet();
+        }).catch(err => {
+            alert("เกิดข้อผิดพลาดในการยกเลิก กรุณาลองใหม่อีกครั้งค่ะ");
+        });
+    }
 }
         
         function acceptJob(timestamp) {
@@ -594,6 +593,10 @@ function cancelOrder() {
                         <i class="fa-solid fa-check"></i> 👍 กดรับเคสนี้ทันที
                     </button>
                 `;
+<button class="btn" style="width: 100%; background-color: #f44336; color: white;" onclick="requestCancel('${safeTime}')">
+        <i class="fa-solid fa-ban"></i> ขอยกเลิกงานนี้
+    </button>
+   
                 queueList.appendChild(newCard);
             });
 
