@@ -547,7 +547,7 @@
                 const currentRawTimestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
                 let displayTime = formatThaiDisplayTime(currentRawTimestamp);
 
-                const currentEquipment = job["ประเภทอุปกรณ์ที่ต้องใช้"] || job.ประเภทอุปกรณ์ที่ต้องใช้ || "รถเข็นนั่ง";
+                const currentEquipment = job["ประเภทอุปกรณ์ที่ต้องใช้"] || job.ประเภทอุปกรณ์ || "รถเข็นนั่ง";
                 const currentPriority = job["ระดับความเร่งด่วน"] || job.ระดับความเร่งด่วน || "ปกติ";
                 const currentOrigin = job["จุดต้นทาง"] || job.จุดต้นทาง || "";
                 const currentDestination = job["จุดปลายทาง"] || job.จุดปลายทาง || "";
