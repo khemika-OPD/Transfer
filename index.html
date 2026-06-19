@@ -283,7 +283,7 @@
                     <i class="fa-solid fa-plus"></i> ➕ กดส่งงานไปที่จุดเปลทันที
                 </button>
                 
-                <button class="btn btn-warning" style="margin-top: -10px;
+                <button class="btn btn-warning" style="margin-top: 5px;
                    <i class="fa-solid fa-hand-scissors"></i> 👩‍⚕️Innovation By Khemika 06/2026
                 </button>
             </div>
@@ -358,7 +358,7 @@
                 document.getElementById("profileSection").style.display = "flex";
             }
             fetchDataFromSheet();
-            setInterval(fetchDataFromSheet, 4000); 
+            setInterval(fetchDataFromSheet, 2000); 
         };
 
         function saveProfile() {
@@ -445,7 +445,7 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert("📝 สั่งงานคิวเปลเข้าชีตสำเร็จ! ระบบจะดีดคิวแสดงผลอัตโนมัติภายใน 4 วินาทีค่ะ");
+                alert("📝 สั่งงานคิวเปลเข้าชีตสำเร็จ! ระบบจะดีดคิวแสดงผลอัตโนมัติภายใน 2 วินาทีค่ะ");
                 document.getElementById("jobFrom").value = "";
                 document.getElementById("jobTo").value = "";
                 switchMode('staff');
