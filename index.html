@@ -1102,7 +1102,7 @@
                 isFirstSync = false;
             }
 
-            // Render Group 2: Active accepted queues (REMOVED complete case button layout)
+            // Render Group 2: Active accepted queues (UPDATED: Limited to show only the 5 latest updates)
             if (activeJobs.length === 0) {
                 queueListActive.innerHTML = `
                     <div class="text-center py-3 px-2 text-slate-400 border border-dashed border-slate-200 rounded-lg bg-slate-50/50">
@@ -1110,7 +1110,8 @@
                     </div>`;
             } else {
                 queueListActive.innerHTML = "";
-                activeJobs.forEach((job) => {
+                // Slice data here to display only top 5 records safely
+                activeJobs.slice(0, 5).forEach((job) => {
                     const currentRawTimestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
                     const currentRawAcceptTime = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
                     const currentStaffAssigned = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "กำลังดำเนินการ";
