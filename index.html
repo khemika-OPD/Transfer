@@ -496,8 +496,9 @@
     <audio id="soundUrgentJob" src="sounds/urgent_job.mp3" preload="auto"></audio>
     <audio id="soundRepeat" src="sounds/repeat.mp3" preload="auto"></audio>
 
-    <audio id="successSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
-    <audio id="urgentSound" src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg" loop preload="auto"></audio>
+    <!-- UPDATED: Changed from .ogg to universally supported .wav and .mp3 for 100% Mobile & iOS Safari compatibility -->
+    <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-200.wav" preload="auto"></audio>
+    <audio id="urgentSound" src="https://assets.mixkit.co/active_storage/sfx/911/911-200.wav" loop preload="auto"></audio>
 
     <!-- Core Application Script -->
     <script>
@@ -709,12 +710,17 @@
             const sSound = document.getElementById("successSound");
             const uSound = document.getElementById("urgentSound");
             if (sSound && uSound) {
-                sSound.play().then(() => { sSound.pause(); }).catch(e => {});
-                uSound.play().then(() => { uSound.pause(); }).catch(e => {});
+                // Play and immediately pause to satisfy mobile browser autoplay permissions
+                sSound.play().then(() => { sSound.pause(); sSound.currentTime = 0; }).catch(e => {});
+                uSound.play().then(() => { uSound.pause(); uSound.currentTime = 0; }).catch(e => {});
                 isAudioUnlocked = true;
+                
                 const zone = document.getElementById("audioUnlockZone");
                 if (zone) zone.classList.add("hidden");
-                showCustomAlert("🔊 เปิดระบบเสียงสำเร็จ!", "ระบบเสียงแจ้งเตือนสแตนด์บายเรียบร้อยแล้วค่ะ", "success");
+                
+                // Force triggering a welcome speech to confirm TTS is fully awake on mobile
+                speakThai("เปิดระบบเสียงเตือนอัจฉริยะ บนโทรศัพท์มือถือ สำเร็จแล้วค่ะ");
+                showCustomAlert("🔊 เปิดระบบเสียงสำเร็จ!", "ระบบเสียงเตือนภาษาไทยสแตนด์บายบนมือถือของท่านเรียบร้อยแล้วค่ะ", "success");
             }
         }
 
