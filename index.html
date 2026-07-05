@@ -94,19 +94,15 @@
     <main class="max-w-xl w-full mx-auto px-4 py-4 flex-1">
         
         <!-- UPDATED: Unified Yellow Audio Unlocking Panel placed instantly at the top -->
-        <div id="audioUnlockZone" class="bg-amber-50 border border-dashed border-amber-300 rounded-xl p-3 text-center shadow-xs mb-3.5">
-            <p class="text-[11px] sm:text-xs text-amber-800 font-bold mb-2 flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-volume-high text-amber-500 animate-bounce"></i>
-                เพื่อให้ระบบส่งเสียงเรียกภาษาไทยและเปิดไซเรนด่วนอัตโนมัติบนมือถือ Samsung
+        <div id="audioUnlockZone" class="bg-amber-50 border border-dashed border-amber-300 rounded-xl p-4 text-center shadow-xs mb-3.5">
+            <p class="text-[11px] sm:text-xs text-amber-800 font-bold mb-2.5 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-volume-high text-amber-500"></i>
+                เพื่อให้ระบบส่งเสียงเรียกภาษาไทยและเปิดสัญญาณเสียงด่วนอัตโนมัติบนมือถือ Samsung
             </p>
-            <div class="flex flex-wrap gap-2 justify-center mb-2">
-                <button onclick="unlockAudioElements()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-2xs sm:text-xs font-black py-2 px-4 rounded-lg transition-all shadow-xs flex items-center gap-1.5">
+            <div class="flex justify-center mb-2">
+                <button onclick="unlockAudioElements()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-2xs sm:text-xs font-black py-2.5 px-6 rounded-lg transition-all shadow-xs flex items-center gap-1.5">
                     <i class="fa-solid fa-bell"></i>
                     คลิกเปิดระบบเสียงเตือนอัจฉริยะครั้งแรก
-                </button>
-                <button onclick="playDiagnosticChime()" class="bg-teal-600 hover:bg-teal-700 text-white text-2xs sm:text-xs font-black py-2 px-4 rounded-lg transition-all shadow-xs flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-play"></i>
-                    🔊 ทดสอบเสียงบี๊บสด (Samsung/Android)
                 </button>
             </div>
             <span class="block text-[9px] text-slate-500 font-medium">
@@ -380,7 +376,7 @@
                     <i class="fa-solid fa-chevron-down"></i>
                 </span>
             </summary>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] mt-2.5 pt-2.5 border-t border-slate-100">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] mt-2.5 pt-2.5 border-t border-slate-100">
                 <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
                     <label class="block font-bold text-slate-600 mb-0.5">📢 แจ้งเตือนภาษาไทย:</label>
                     <select id="voiceSpeakOption" class="w-full bg-white border border-slate-200 rounded-md p-1 font-semibold">
@@ -397,15 +393,12 @@
                         <option value="off">ไม่เตือนซ้ำ 🔇</option>
                     </select>
                 </div>
-                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 flex flex-col justify-between">
+                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 flex flex-col justify-between col-span-1 sm:col-span-2">
                     <label class="block font-bold text-slate-600 mb-0.5">🗣️ เสียงผู้หญิง/AI:</label>
                     <div class="flex gap-1 items-center">
-                        <select id="thaiVoiceSelector" class="flex-1 bg-white border border-slate-200 rounded-md p-1 font-semibold text-[9px] truncate">
+                        <select id="thaiVoiceSelector" class="w-full bg-white border border-slate-200 rounded-md p-1 font-semibold text-[9px] truncate">
                             <option value="">กำลังค้นหาเสียง...</option>
                         </select>
-                        <button onclick="testSelectedVoice()" class="bg-primary-500 hover:bg-primary-600 text-white font-bold p-1 rounded text-center flex items-center justify-center h-[22px] w-[22px]" title="ทดสอบเสียง">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -507,7 +500,6 @@
         let currentStaff = "";
         let isAudioUnlocked = false;
         let confirmPromiseResolver = null;
-        let urgentPlaying = false;
         
         // CRITICAL FIX: isFirstSync handles startup silently. Clear guard after first sync render.
         let isFirstSync = true; 
@@ -525,10 +517,6 @@
 
         // Web Audio API context properties for high-compatibility synthesized alarms
         let audioCtx = null;
-        let sirenOsc1 = null;
-        let sirenGain = null;
-        let sirenInterval = null;
-        let sirenTimeout = null;
 
         function initAudioContext() {
             try {
@@ -578,77 +566,58 @@
             }
         }
 
-        // High compatibility diagnostic beep sound for Samsung test button
-        function playDiagnosticChime() {
+        // High compatibility synthesized 'Beep Beep BEEP!' alarm (3 rapid warning beeps)
+        // COMPLETELY self-terminating - no intervals, no loops, zero risk of getting stuck!
+        function playSynthesizedSiren() {
             initAudioContext();
             if (!audioCtx) return;
             try {
                 const now = audioCtx.currentTime;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(1000, now);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            } catch(e) {}
+                
+                // Beep 1
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(988, now); // B5 (Urgent pitch)
+                gain1.gain.setValueAtTime(0.15, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.3);
+
+                // Beep 2
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(988, now + 0.35);
+                gain2.gain.setValueAtTime(0.15, now + 0.35);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start(now + 0.35);
+                osc2.stop(now + 0.65);
+
+                // Beep 3
+                const osc3 = audioCtx.createOscillator();
+                const gain3 = audioCtx.createGain();
+                osc3.type = 'sine';
+                osc3.frequency.setValueAtTime(1174, now + 0.7); // D6 (Higher peak)
+                gain3.gain.setValueAtTime(0.18, now + 0.7);
+                gain3.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+                osc3.connect(gain3);
+                gain3.connect(audioCtx.destination);
+                osc3.start(now + 0.7);
+                osc3.stop(now + 1.1);
+
+            } catch(e) {
+                console.warn("Synthesized siren failed:", e);
+            }
         }
 
-        // High compatibility synthesized 'Wee-Woo' ambulance style siren
-        // UPDATED: Added safety timeout auto-stop after 6 seconds to prevent infinite siren loops!
-        function playSynthesizedSiren() {
-            initAudioContext();
-            if (!audioCtx || sirenOsc1) return; // Prevent duplicate overlap triggers
-            
-            // Auto stop after 6 seconds to prevent getting stuck infinitely on Samsung!
-            if (sirenTimeout) clearTimeout(sirenTimeout);
-            sirenTimeout = setTimeout(() => {
-                stopSynthesizedSiren();
-            }, 6000);
-
-            try {
-                const now = audioCtx.currentTime;
-                sirenOsc1 = audioCtx.createOscillator();
-                sirenGain = audioCtx.createGain();
-                
-                sirenOsc1.type = 'triangle'; // Smooth alarm frequency wave
-                sirenOsc1.frequency.setValueAtTime(550, now);
-                
-                sirenGain.gain.setValueAtTime(0.12, now);
-                sirenOsc1.connect(sirenGain);
-                sirenGain.connect(audioCtx.destination);
-                sirenOsc1.start(now);
-                
-                let toggle = false;
-                sirenInterval = setInterval(() => {
-                    if (!audioCtx || !sirenOsc1) return;
-                    const currentTime = audioCtx.currentTime;
-                    sirenOsc1.frequency.exponentialRampToValueAtTime(toggle ? 850 : 500, currentTime + 0.28);
-                    toggle = !toggle;
-                }, 300);
-            } catch(e) {}
-        }
-
-        // UPDATED: Fully cleared intervals and handles safety timeouts cleanly
         function stopSynthesizedSiren() {
-            if (sirenTimeout) {
-                clearTimeout(sirenTimeout);
-                sirenTimeout = null;
-            }
-            if (sirenInterval) {
-                clearInterval(sirenInterval);
-                sirenInterval = null;
-            }
-            if (sirenOsc1) {
-                try {
-                    sirenOsc1.stop();
-                } catch(e){}
-                sirenOsc1 = null;
-            }
-            sirenGain = null;
+            // No-op because playSynthesizedSiren() terminates entirely on its own!
+            // This is 100% bug-free and will never loop infinitely.
         }
 
         // Sandbox escaper method to pop app into full Safari/Chrome view
@@ -803,11 +772,6 @@
             });
             
             select.selectedIndex = defaultIndex;
-        }
-
-        function testSelectedVoice() {
-            isAudioUnlocked = true;
-            speakThai("ระบบทดสอบเสียงเรียกคิวเปลค่ะ, เสียงประมวลผลชัดเจนดีไหมคะ");
         }
 
         function saveProfile() {
@@ -1466,7 +1430,7 @@
             localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
             processAndRenderData(localJobs);
 
-            // Trigger synthesized chimes on creation click
+            // Trigger synthesized alert on creation click
             if (priority.includes("เร่งด่วน") || priority === "เร่งด่วน") {
                 playSynthesizedSiren();
             } else {
