@@ -73,6 +73,14 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
+    <!-- แถบแจ้งเตือนพิเศษสีแดงสำหรับการใช้งานมือถือผ่านระบบกรอบจำลอง (Iframe Sandbox) -->
+    <div id="iframeWarningBanner" class="hidden bg-rose-600 text-white text-xs py-2.5 px-4 text-center font-bold relative z-50 flex flex-col sm:flex-row items-center justify-center gap-2 shadow-md">
+        <span>⚠️ โทรศัพท์มือถือของท่านอาจบล็อกเสียงเตือนเนื่องจากใช้งานในช่องจำลอง (Iframe Sandbox)</span>
+        <button onclick="openInNewTab()" class="bg-white text-rose-700 hover:bg-rose-50 px-3 py-1 rounded-lg text-[10px] font-extrabold shadow-sm flex items-center gap-1 mx-auto sm:mx-0 transition-all active:scale-95">
+            <i class="fa-solid fa-up-right-from-square"></i> กดเปิดระบบเต็มจอเพื่อเปิดเสียง 100%
+        </button>
+    </div>
+
     <!-- Header Section with Live Digital Clock for Precision Medicine -->
     <header class="bg-gradient-to-r from-primary-700 to-sky-600 text-white shadow-md relative overflow-hidden">
         <div class="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]"></div>
@@ -94,6 +102,27 @@
     <!-- Main Content Container -->
     <main class="max-w-xl w-full mx-auto px-4 py-4 flex-1">
         
+        <!-- UPDATED: Moved Audio Unlocking Panel to the top so it is instantly visible to both Nurses and Porters on load -->
+        <div id="audioUnlockZone" class="bg-amber-50 border border-dashed border-amber-300 rounded-xl p-3 text-center shadow-xs mb-3.5">
+            <p class="text-[11px] sm:text-xs text-amber-800 font-bold mb-2 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-volume-high text-amber-500 animate-bounce"></i>
+                เพื่อให้ระบบส่งเสียงเรียกภาษาไทยและเปิดไซเรนด่วนอัตโนมัติบนมือถือ
+            </p>
+            <div class="flex flex-wrap gap-2 justify-center mb-2">
+                <button onclick="unlockAudioElements()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-2xs sm:text-xs font-black py-2 px-4 rounded-lg transition-all shadow-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-bell"></i>
+                    คลิกเปิดระบบเสียงเตือนอัจฉริยะครั้งแรก
+                </button>
+                <button onclick="playSynthesizedChime()" class="bg-teal-600 hover:bg-teal-700 text-white text-2xs sm:text-xs font-black py-2 px-4 rounded-lg transition-all shadow-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-play"></i>
+                    🔊 ทดสอบเสียงบี๊บสด (Samsung/Android)
+                </button>
+            </div>
+            <span class="block text-[9px] text-slate-500 font-medium">
+                💡 คำแนะนำสำหรับ Samsung/Android: หากกดแล้วไม่มีเสียง ให้กดเพิ่มเสียงข้างเครื่อง แตะที่จุดสามจุด <i class="fa-solid fa-ellipsis"></i> และเลื่อนเพิ่มระดับ <strong>"เสียงสื่อ" (Media Volume)</strong> ให้สุดด้วยนะคะ
+            </span>
+        </div>
+
         <!-- Link Button to Google Looker Studio Dashboard -->
         <div class="mb-3.5">
             <button onclick="window.open('https://datastudio.google.com/reporting/31712615-904d-4634-bdb4-a36e6b6a91d1')" 
@@ -253,17 +282,7 @@
         <!-- STAFF MODE SECTION -->
         <div id="staffModeSection" class="hidden space-y-3.5">
             
-            <!-- Audio Unlocking Panel to circumvent browser constraints -->
-            <div id="audioUnlockZone" class="bg-amber-50 border border-dashed border-amber-300 rounded-xl p-3 text-center shadow-xs">
-                <p class="text-[11px] sm:text-xs text-amber-800 font-bold mb-2 flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-volume-high text-amber-500 animate-bounce"></i>
-                    เพื่อให้ระบบส่งเสียงเรียกภาษาไทยและเปิดไซเรนด่วนอัตโนมัติ
-                </p>
-                <button onclick="unlockAudioElements()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-2xs sm:text-xs font-black py-2 px-4 rounded-lg transition-all shadow-xs flex items-center gap-1.5 mx-auto">
-                    <i class="fa-solid fa-bell"></i>
-                    คลิกเปิดระบบเสียงเตือนอัจฉริยะครั้งแรก
-                </button>
-            </div>
+            <!-- UPDATED: Removed Audio Unlocking Panel from here to prevent duplicate code and ensure global visibility -->
 
             <!-- Stretcher Staff Identify (Login Panel) -->
             <div id="loginSection" class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/60">
@@ -496,7 +515,6 @@
     <audio id="soundUrgentJob" src="sounds/urgent_job.mp3" preload="auto"></audio>
     <audio id="soundRepeat" src="sounds/repeat.mp3" preload="auto"></audio>
 
-    <!-- UPDATED: Changed from .ogg to universally supported .wav and .mp3 for 100% Mobile & iOS Safari compatibility -->
     <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-200.wav" preload="auto"></audio>
     <audio id="urgentSound" src="https://assets.mixkit.co/active_storage/sfx/911/911-200.wav" loop preload="auto"></audio>
 
@@ -521,6 +539,111 @@
         let activeSpeechUtterances = [];
         let thaiVoicesList = [];
         let currentlyVisiblePendingJobs = [];
+
+        // ระบบสร้างคลื่นสัญญาณเสียงสดผ่านชิปประมวลผลลำโพงมือถือโดยตรง (ไม่พึ่งพาเน็ตดาวน์โหลดไฟล์)
+        let audioCtx = null;
+        let sirenOsc1 = null;
+        let sirenOsc2 = null;
+        let sirenGain = null;
+        let sirenInterval = null;
+
+        function initAudioContext() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch(e) {
+                console.error("Web Audio API not supported on this device:", e);
+            }
+        }
+
+        // ฟังก์ชันสร้างเสียงกระดิ่ง "ติ๊งหน่อง" แจ้งเตือนคิวปกติความเที่ยงตรงสูง
+        function playSynthesizedChime() {
+            initAudioContext();
+            if (!audioCtx) return;
+            try {
+                const now = audioCtx.currentTime;
+                
+                // เสียงโน้ตตัวที่ 1 (โทนสูงปานกลาง)
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(880, now); // โน้ต A5
+                gain1.gain.setValueAtTime(0.25, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.4);
+
+                // เสียงโน้ตตัวที่ 2 (เสียงใสสูงพาสเทล)
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(1320, now + 0.12); // โน้ต E6
+                gain2.gain.setValueAtTime(0.25, now + 0.12);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start(now + 0.12);
+                osc2.stop(now + 0.6);
+            } catch(e) {
+                console.warn("Synthesizer fail fallback to tag:", e);
+            }
+        }
+
+        // ฟังก์ชันบีบสร้างเสียงไซเรนฉุกเฉิน "วี้หว่อ" แบบเรียลไทม์บนมือถือ
+        function playSynthesizedSiren() {
+            initAudioContext();
+            if (!audioCtx || sirenOsc1) return; // หากกำลังดังอยู่แล้วให้ข้าม
+            try {
+                const now = audioCtx.currentTime;
+                sirenOsc1 = audioCtx.createOscillator();
+                sirenGain = audioCtx.createGain();
+                
+                sirenOsc1.type = 'triangle'; // เสียงแบบหวอพยาบาลนุ่มนวล
+                sirenOsc1.frequency.setValueAtTime(550, now);
+                
+                sirenGain.gain.setValueAtTime(0.12, now);
+                sirenOsc1.connect(sirenGain);
+                sirenGain.connect(audioCtx.destination);
+                sirenOsc1.start(now);
+                
+                let toggle = false;
+                sirenInterval = setInterval(() => {
+                    if (!audioCtx || !sirenOsc1) return;
+                    const currentTime = audioCtx.currentTime;
+                    // สลับระดับความถี่ความถี่ของไซเรน
+                    sirenOsc1.frequency.exponentialRampToValueAtTime(toggle ? 850 : 500, currentTime + 0.28);
+                    toggle = !toggle;
+                }, 300);
+            } catch(e) {}
+        }
+
+        function stopSynthesizedSiren() {
+            if (sirenInterval) {
+                clearInterval(sirenInterval);
+                sirenInterval = null;
+            }
+            if (sirenOsc1) {
+                try {
+                    sirenOsc1.stop();
+                } catch(e){}
+                sirenOsc1 = null;
+            }
+            sirenGain = null;
+        }
+
+        // ฟังก์ชันสร้างหน้าต่างเดี่ยวอิสระ (Blob URL) ปลดล็อก Sandbox Iframe สำหรับมือถือ
+        function openInNewTab() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        }
 
         function sanitizePronunciation(text) {
             if (!text) return "";
@@ -549,6 +672,11 @@
 
         // Clock & Initial setups
         window.onload = function() {
+            // ตรวจสอบว่าแอปทำงานอยู่ภายใต้กรอบจำลอง Iframe ของเว็บหรือไม่
+            if (window.self !== window.top) {
+                document.getElementById("iframeWarningBanner").classList.remove("hidden");
+            }
+
             // Start Clock
             updateClock();
             setInterval(updateClock, 1000);
@@ -557,8 +685,6 @@
             const today = new Date();
             const dateStr = today.toLocaleDateString('en-CA'); // 'YYYY-MM-DD' formats reliably
             document.getElementById("dashboardDate").value = dateStr;
-
-            // UPDATED: Completely removed the block of code that automatically generated fake mock jobs in localStorage on start.
 
             const savedName = localStorage.getItem("OPD_Staff_Name");
             if (savedName) {
@@ -584,6 +710,7 @@
 
             // Global click/touch event listener to seamlessly bypass browser auto-play restrictions
             document.body.addEventListener('click', function automaticAudioUnlock() {
+                initAudioContext(); // ปลดล็อก Web Audio API สด
                 if (!isAudioUnlocked) {
                     const sSound = document.getElementById("successSound");
                     const uSound = document.getElementById("urgentSound");
@@ -597,7 +724,8 @@
                     const zone = document.getElementById("audioUnlockZone");
                     if (zone) zone.classList.add("hidden");
                     
-                    // Fire a test welcome speech (Muted to prevent automatic voice noise on startup)
+                    // ปล่อยกระดิ่งทักทายสด
+                    playSynthesizedChime();
                     speakThai("ยินดีต้อนรับสู่ระบบคิวเปลอัจฉริยะ โรงพยาบาลตาคลีค่ะ");
                     
                     // Clean up listener to run only once
@@ -707,6 +835,7 @@
         }
 
         function unlockAudioElements() {
+            initAudioContext(); // สั่งลำโพงหลังบ้านเบราว์เซอร์ตื่นตัว
             const sSound = document.getElementById("successSound");
             const uSound = document.getElementById("urgentSound");
             if (sSound && uSound) {
@@ -718,22 +847,40 @@
                 const zone = document.getElementById("audioUnlockZone");
                 if (zone) zone.classList.add("hidden");
                 
-                // Force triggering a welcome speech to confirm TTS is fully awake on mobile
+                // ปล่อยกระดิ่งทักทายสด
+                playSynthesizedChime();
                 speakThai("เปิดระบบเสียงเตือนอัจฉริยะ บนโทรศัพท์มือถือ สำเร็จแล้วค่ะ");
-                showCustomAlert("🔊 เปิดระบบเสียงสำเร็จ!", "ระบบเสียงเตือนภาษาไทยสแตนด์บายบนมือถือของท่านเรียบร้อยแล้วค่ะ", "success");
+                showCustomAlert("🔊 เปิดระบบเสียงสำเร็จ!", "ระบบเสียงเตือนภาษาไทยและกระดิ่งสังเคราะห์สแตนด์บายเรียบร้อยแล้วค่ะ", "success");
             }
         }
 
-        // Speak dynamic text via Text-To-Speech
+        // Speak dynamic text via Text-To-Speech (Optimized specifically for Android/Samsung TTS Engines)
         function speakThai(phrase) {
             const isVoiceEnabled = document.getElementById("voiceSpeakOption").value === "true";
             if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
             
             try {
-                window.speechSynthesis.cancel(); 
+                // STEP 1: Wake up Samsung Android Media channel with sub-audible chime
+                initAudioContext();
+                if (audioCtx) {
+                    const now = audioCtx.currentTime;
+                    const silentOsc = audioCtx.createOscillator();
+                    const silentGain = audioCtx.createGain();
+                    silentOsc.frequency.setValueAtTime(1, now); // 1Hz sub-audible
+                    silentGain.gain.setValueAtTime(0.001, now);
+                    silentOsc.connect(silentGain);
+                    silentGain.connect(audioCtx.destination);
+                    silentOsc.start(now);
+                    silentOsc.stop(now + 0.1);
+                }
+
+                // WARNING: Never call speechSynthesis.cancel() aggressively right before speak() on Android
+                // as it halts the TTS system queue and silences all future calls!
                 
                 const cleanPhrase = sanitizePronunciation(phrase);
                 const utterance = new SpeechSynthesisUtterance(cleanPhrase);
+                
+                // Keep references to prevent JavaScript Garbage Collection on mobile Chrome
                 activeSpeechUtterances.push(utterance);
                 
                 utterance.onend = function() {
@@ -744,25 +891,19 @@
                 };
 
                 const selector = document.getElementById("thaiVoiceSelector");
+                // ONLY explicitly bind the voice object if the user selected a custom voice from the list
                 if (selector && selector.value !== "" && thaiVoicesList.length > 0) {
                     const selectedIdx = parseInt(selector.value);
                     if (thaiVoicesList[selectedIdx]) {
                         utterance.voice = thaiVoicesList[selectedIdx];
                     }
-                } else {
-                    const voices = window.speechSynthesis.getVoices();
-                    const thVoice = voices.find(v => {
-                        const nameLower = v.name.toLowerCase();
-                        return (v.lang.startsWith("th") || v.lang === "th-TH") &&
-                               (nameLower.includes("kanya") || nameLower.includes("pattara") || nameLower.includes("achara") || nameLower.includes("google") || nameLower.includes("female"));
-                    }) || voices.find(v => v.lang === "th-TH" || v.lang.startsWith("th"));
-                    if (thVoice) {
-                        utterance.voice = thVoice;
-                    }
                 }
+                // NOTE: If no voice is chosen, do NOT bind a custom voice manually. 
+                // This lets Samsung/Android natively resolve the "th-TH" locale using its default downloaded local voice package, 
+                // preventing silent crashes from offline cloud voices.
 
                 utterance.lang = "th-TH";
-                utterance.rate = 0.90; 
+                utterance.rate = 0.95; 
                 utterance.pitch = 1.0;
                 utterance.volume = 1.0;
                 
@@ -999,9 +1140,11 @@
                     const equipment = newlyArrivedJob["ประเภทอุปกรณ์ที่ต้องใช้"] || newlyArrivedJob.ประเภทอุปกรณ์ || "รถเข็นนั่ง";
                     
                     if (priority.includes("เร่งด่วน") || priority === "เร่งด่วน") {
+                        playSynthesizedSiren(); // ยิงเสียงไซเรนฉุกเฉินสดขึ้นมือถือทันที
                         const fallbackText = `เรียกคิวเปลด่วนค่ะ,, มีเคสเร่งด่วน,, จากจุด ${origin},, ไปยัง ${to},, อุปกรณ์ คือ ${equipment},, ด่วนค่ะ`;
                         playVoiceNotification("urgent", fallbackText);
                     } else {
+                        playSynthesizedChime(); // ยิงเสียงกระดิ่ง "ติ๊งหน่อง" แจ้งเตือนเคสปกติ
                         const fallbackText = `เรียกคิวเปลค่ะ,, มีเคสใหม่,, จากจุด ${origin},, ไปยัง ${to},, อุปกรณ์คือ ${equipment} ค่ะ`;
                         playVoiceNotification("normal", fallbackText);
                     }
@@ -1009,9 +1152,9 @@
                 }
 
                 if (hasUrgent && isAudioUnlocked && !isFirstSync) {
-                    playUrgentSound();
+                    playSynthesizedSiren();
                 } else {
-                    stopUrgentSound();
+                    stopSynthesizedSiren();
                 }
 
                 // Finalize first load sync silently
@@ -1354,10 +1497,12 @@
             localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
             processAndRenderData(localJobs);
 
-            // Sound trigger
-            try {
-                document.getElementById("successSound").play();
-            } catch(e) {}
+            // สั่นและยิงสัญญาณเสียงเตือนสดด่วน
+            if (priority.includes("เร่งด่วน") || priority === "เร่งด่วน") {
+                playSynthesizedSiren();
+            } else {
+                playSynthesizedChime();
+            }
 
             const payload = {
                 action: "insert",
@@ -1410,6 +1555,9 @@
             localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
             processAndRenderData(localJobs);
 
+            // ปล่อยกระดิ่ง chimes รับงานสำเร็จบนมือถือพนักงานเปล
+            playSynthesizedChime();
+
             const payload = {
                 action: "update",
                 time: timestamp,
@@ -1449,10 +1597,8 @@
                     localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
                     processAndRenderData(localJobs);
 
-                    // Web haptic audio feedback
-                    try {
-                        document.getElementById("successSound").play();
-                    } catch(e) {}
+                    // ยิงเสียงกระดิ่งติ๊งหน่องสดปิดงานสำเร็จ
+                    playSynthesizedChime();
 
                     // Post to Google Apps Script API
                     const payload = {
@@ -1516,6 +1662,7 @@
         }
 
         function playUrgentSound() {
+            playSynthesizedSiren(); // ยิงกระดิ่งอิเล็กทรอนิกส์สดแทน
             const uSound = document.getElementById("urgentSound");
             if (uSound && !urgentPlaying) {
                 uSound.play().then(() => {
@@ -1525,6 +1672,7 @@
         }
 
         function stopUrgentSound() {
+            stopSynthesizedSiren(); // ปิดเสียงกระดิ่งไซเรนสังเคราะห์สด
             const uSound = document.getElementById("urgentSound");
             if (uSound && urgentPlaying) {
                 uSound.pause();
