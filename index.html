@@ -508,6 +508,7 @@
         let isAudioUnlocked = false;
         let confirmPromiseResolver = null;
         let urgentPlaying = false;
+        let isFirstSync = true; // NEW: Flag to register existing board jobs silently on initial load
         
         // Track already-notified/spoken queues to prevent repeating voice alerts on every sync interval
         let announcedJobs = new Set(JSON.parse(localStorage.getItem("Takhli_Announced_Jobs") || "[]"));
@@ -556,35 +557,7 @@
             const dateStr = today.toLocaleDateString('en-CA'); // 'YYYY-MM-DD' formats reliably
             document.getElementById("dashboardDate").value = dateStr;
 
-            // Setup initial backup mock data in localStorage to ensure the simulation is immediately playable
-            let localJobs = JSON.parse(localStorage.getItem("Takhli_Smart_Queue_Jobs"));
-            if (!localJobs || localJobs.length === 0) {
-                const dummyTime1 = new Date(Date.now() - 120000).toISOString(); // 2 mins ago
-                const dummyTime2 = new Date(Date.now() - 300000).toISOString(); // 5 mins ago
-                localJobs = [
-                    {
-                        "เวลาสั่งงาน": dummyTime1,
-                        "ประเภทอุปกรณ์ที่ต้องใช้": "รถเข็นนั่ง",
-                        "ระดับความเร่งด่วน": "ปกติ",
-                        "จุดต้นทาง": "จุดคัดกรอง",
-                        "จุดปลายทาง": "หน้าห้องตรวจ 6",
-                        "พนักงานเปล": "",
-                        "เวลารับงาน": "",
-                        "เวลาเสร็จสิ้น": ""
-                    },
-                    {
-                        "เวลาสั่งงาน": dummyTime2,
-                        "ประเภทอุปกรณ์ที่ต้องใช้": "รถนอน",
-                        "ระดับความเร่งด่วน": "เร่งด่วน",
-                        "จุดต้นทาง": "จุดลงจากรถ",
-                        "จุดปลายทาง": "ห้องฉุกเฉิน ER",
-                        "พนักงานเปล": "",
-                        "เวลารับงาน": "",
-                        "เวลาเสร็จสิ้น": ""
-                    }
-                ];
-                localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
-            }
+            // UPDATED: Completely removed the block of code that automatically generated fake mock jobs in localStorage on start.
 
             const savedName = localStorage.getItem("OPD_Staff_Name");
             if (savedName) {
@@ -623,7 +596,7 @@
                     const zone = document.getElementById("audioUnlockZone");
                     if (zone) zone.classList.add("hidden");
                     
-                    // Fire a test welcome speech
+                    // Fire a test welcome speech (Muted to prevent automatic voice noise on startup)
                     speakThai("ยินดีต้อนรับสู่ระบบคิวเปลอัจฉริยะ โรงพยาบาลตาคลีค่ะ");
                     
                     // Clean up listener to run only once
@@ -868,6 +841,10 @@
                 // Keep local jobs that haven't been synchronized or uploaded yet
                 const pendingUpload = localJobs.filter(lj => !remoteTimes.has(lj["เวลาสั่งงาน"]));
                 mergedData = [...pendingUpload, ...remoteJobs];
+
+                // CRITICAL FIX: Overwrite local storage with the latest remote synced data
+                // This ensures deletions (cancellations) on computer propagate instantly to phones!
+                localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(mergedData));
             } else {
                 mergedData = JSON.parse(localStorage.getItem("Takhli_Smart_Queue_Jobs")) || [];
             }
@@ -943,13 +920,13 @@
                     const timeStr = currentRawTimestamp.toString();
                     
                     if (!announcedJobs.has(timeStr)) {
-                        newlyArrivedJob = job;
-                        announcedJobs.add(timeStr);
-                        if (announcedJobs.size > 200) {
-                            const arr = Array.from(announcedJobs);
-                            announcedJobs = new Set(arr.slice(arr.length - 100));
+                        if (isFirstSync) {
+                            // First sync: register silently so pre-existing board items do not call out
+                            announcedJobs.add(timeStr);
+                        } else {
+                            newlyArrivedJob = job;
+                            announcedJobs.add(timeStr);
                         }
-                        localStorage.setItem("Takhli_Announced_Jobs", JSON.stringify(Array.from(announcedJobs)));
                     }
 
                     const newCard = document.createElement("div");
@@ -1006,7 +983,10 @@
                     queueListPending.appendChild(newCard);
                 });
 
-                if (newlyArrivedJob && isAudioUnlocked) {
+                localStorage.setItem("Takhli_Announced_Jobs", JSON.stringify(Array.from(announcedJobs)));
+
+                // UPDATED: Play notification sounds ONLY if NOT in the first-load sync sequence
+                if (newlyArrivedJob && isAudioUnlocked && !isFirstSync) {
                     const priority = newlyArrivedJob["ระดับความเร่งด่วน"] || newlyArrivedJob.ระดับความเร่งด่วน || "ปกติ";
                     const origin = newlyArrivedJob["จุดต้นทาง"] || newlyArrivedJob.จุดต้นทาง || "";
                     const to = newlyArrivedJob["จุดปลายทาง"] || newlyArrivedJob.จุดปลายทาง || "";
@@ -1022,10 +1002,15 @@
                     lastAnnouncedTime = Date.now();
                 }
 
-                if (hasUrgent && isAudioUnlocked) {
+                if (hasUrgent && isAudioUnlocked && !isFirstSync) {
                     playUrgentSound();
                 } else {
                     stopUrgentSound();
+                }
+
+                // Finalize first load sync silently
+                if (isFirstSync) {
+                    isFirstSync = false;
                 }
             }
 
