@@ -104,7 +104,7 @@
                     <i class="fa-solid fa-bell"></i>
                     คลิกเปิดระบบเสียงเตือนอัจฉริยะครั้งแรก
                 </button>
-                <button onclick="playSynthesizedChime()" class="bg-teal-600 hover:bg-teal-700 text-white text-2xs sm:text-xs font-black py-2 px-4 rounded-lg transition-all shadow-xs flex items-center gap-1.5">
+                <button onclick="playDiagnosticChime()" class="bg-teal-600 hover:bg-teal-700 text-white text-2xs sm:text-xs font-black py-2 px-4 rounded-lg transition-all shadow-xs flex items-center gap-1.5">
                     <i class="fa-solid fa-circle-play"></i>
                     🔊 ทดสอบเสียงบี๊บสด (Samsung/Android)
                 </button>
@@ -509,7 +509,7 @@
         let confirmPromiseResolver = null;
         let urgentPlaying = false;
         
-        // CRITICAL FIX: isFirstSync allows silent initial registrations without noisy sound triggers
+        // CRITICAL FIX: isFirstSync handles startup silently. Clear guard after first sync render.
         let isFirstSync = true; 
         
         // Track already-notified queues to prevent repeats on every API poll cycle
@@ -528,6 +528,7 @@
         let sirenOsc1 = null;
         let sirenGain = null;
         let sirenInterval = null;
+        let sirenTimeout = null;
 
         function initAudioContext() {
             try {
@@ -577,10 +578,37 @@
             }
         }
 
+        // High compatibility diagnostic beep sound for Samsung test button
+        function playDiagnosticChime() {
+            initAudioContext();
+            if (!audioCtx) return;
+            try {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1000, now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } catch(e) {}
+        }
+
         // High compatibility synthesized 'Wee-Woo' ambulance style siren
+        // UPDATED: Added safety timeout auto-stop after 6 seconds to prevent infinite siren loops!
         function playSynthesizedSiren() {
             initAudioContext();
             if (!audioCtx || sirenOsc1) return; // Prevent duplicate overlap triggers
+            
+            // Auto stop after 6 seconds to prevent getting stuck infinitely on Samsung!
+            if (sirenTimeout) clearTimeout(sirenTimeout);
+            sirenTimeout = setTimeout(() => {
+                stopSynthesizedSiren();
+            }, 6000);
+
             try {
                 const now = audioCtx.currentTime;
                 sirenOsc1 = audioCtx.createOscillator();
@@ -604,7 +632,12 @@
             } catch(e) {}
         }
 
+        // UPDATED: Fully cleared intervals and handles safety timeouts cleanly
         function stopSynthesizedSiren() {
+            if (sirenTimeout) {
+                clearTimeout(sirenTimeout);
+                sirenTimeout = null;
+            }
             if (sirenInterval) {
                 clearInterval(sirenInterval);
                 sirenInterval = null;
@@ -1102,11 +1135,12 @@
                 } else {
                     stopSynthesizedSiren();
                 }
+            }
 
-                // Shutdown first load initialization guard
-                if (isFirstSync) {
-                    isFirstSync = false;
-                }
+            // CRITICAL BUG FIX: Ensure isFirstSync is marked complete immediately after rendering, 
+            // even if the board was completely empty, so subsequent polls correctly identify and speak new jobs!
+            if (isFirstSync) {
+                isFirstSync = false;
             }
 
             // Render Group 2: Active accepted queues
