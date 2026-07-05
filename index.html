@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Takhli OPD Smart Queue - นวัตกรรมระบบคิวเปลอัจฉริยะ</title>
     
-    <!-- Tailwind CSS for modern responsive styling -->
+    <!-- Tailwind CSS for modern responsive medical theme styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome for medical and user interface icons -->
+    <!-- FontAwesome for professional medical and user interface icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Google Fonts - Sarabun & Inter for professional Thai and English typography -->
+    <!-- Google Fonts - Sarabun & Inter for cleanest Thai and English digital typography -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script>
@@ -52,16 +52,7 @@
             background: #94a3b8;
         }
         
-        /* Pulse animations for urgent cases on the queue board */
-        @keyframes pulse-urgent-border {
-            0%, 100% { border-color: rgba(211, 47, 47, 0.4); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); }
-            50% { border-color: rgba(211, 47, 47, 1); box-shadow: 0 0 12px 4px rgba(211, 47, 47, 0.2); }
-        }
-        .urgent-card-active {
-            animation: pulse-urgent-border 1.5s infinite;
-        }
-        
-        /* Gently pulsating highlight for the innovation credit */
+        /* Gentle glowing effect for the medical innovation signature tag */
         @keyframes subtle-gold-glow {
             0%, 100% { transform: scale(1); opacity: 0.95; text-shadow: 0 0 2px rgba(2, 136, 209, 0.1); }
             50% { transform: scale(1.02); opacity: 1; text-shadow: 0 0 6px rgba(2, 136, 209, 0.3); }
@@ -91,7 +82,7 @@
             <h1 class="text-lg sm:text-xl font-extrabold tracking-tight">🏥 นวัตกรรมระบบคิวเปลอัจฉริยะ (Smart Queue)</h1>
             <p class="text-[10px] sm:text-xs text-sky-100 font-medium mt-0.5">งานผู้ป่วยนอก (OPD) โรงพยาบาลตาคลี จังหวัดนครสวรรค์</p>
             
-            <!-- Live Digital Clock Display -->
+            <!-- Live Digital Clock Display (Refreshes every second) -->
             <div class="mt-2.5 bg-black/25 px-4 py-1.5 rounded-full text-[11px] font-mono font-semibold text-sky-200 border border-white/10 flex items-center gap-1.5 shadow-inner">
                 <i class="fa-regular fa-clock text-xs animate-spin-slow"></i>
                 <span id="liveClock">กำลังดึงเวลาปัจจุบัน...</span>
@@ -102,11 +93,11 @@
     <!-- Main Content Container -->
     <main class="max-w-xl w-full mx-auto px-4 py-4 flex-1">
         
-        <!-- UPDATED: Moved Audio Unlocking Panel to the top so it is instantly visible to both Nurses and Porters on load -->
+        <!-- UPDATED: Unified Yellow Audio Unlocking Panel placed instantly at the top -->
         <div id="audioUnlockZone" class="bg-amber-50 border border-dashed border-amber-300 rounded-xl p-3 text-center shadow-xs mb-3.5">
             <p class="text-[11px] sm:text-xs text-amber-800 font-bold mb-2 flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-volume-high text-amber-500 animate-bounce"></i>
-                เพื่อให้ระบบส่งเสียงเรียกภาษาไทยและเปิดไซเรนด่วนอัตโนมัติบนมือถือ
+                เพื่อให้ระบบส่งเสียงเรียกภาษาไทยและเปิดไซเรนด่วนอัตโนมัติบนมือถือ Samsung
             </p>
             <div class="flex flex-wrap gap-2 justify-center mb-2">
                 <button onclick="unlockAudioElements()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-2xs sm:text-xs font-black py-2 px-4 rounded-lg transition-all shadow-xs flex items-center gap-1.5">
@@ -190,7 +181,7 @@
                     </select>
                 </div>
 
-                <!-- Origin Point -->
+                <!-- Origin Point with Autocomplete -->
                 <div class="mb-3">
                     <label class="block text-xs font-semibold text-slate-700 mb-1">
                         📍 จุดต้นทาง:
@@ -219,7 +210,7 @@
                     </datalist>
                 </div>
 
-                <!-- Destination Point -->
+                <!-- Destination Point with Autocomplete -->
                 <div class="mb-4">
                     <label class="block text-xs font-semibold text-slate-700 mb-1">
                         ➡️ จุดปลายทาง:
@@ -282,9 +273,7 @@
         <!-- STAFF MODE SECTION -->
         <div id="staffModeSection" class="hidden space-y-3.5">
             
-            <!-- UPDATED: Removed Audio Unlocking Panel from here to prevent duplicate code and ensure global visibility -->
-
-            <!-- Stretcher Staff Identify (Login Panel) -->
+            <!-- Stretcher Staff Identity Login Panel -->
             <div id="loginSection" class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/60">
                 <h3 class="text-xs sm:text-sm font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-id-card-clip text-primary-500"></i>
@@ -375,13 +364,13 @@
                         <i class="fa-solid fa-wheelchair text-primary-500"></i> สัดส่วนอุปกรณ์ที่ใช้ปฏิบัติงาน
                     </h3>
                     <div id="dashEquipmentBars" class="space-y-2.5 text-xs">
-                        <!-- Dynamic bars injected here -->
+                        <!-- Dynamic bar elements injected here -->
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Advanced Settings & Sound Controls (Collapsible) -->
+        <!-- Advanced Settings & Sound Controls (Collapsible to clean clutter) -->
         <details class="bg-white rounded-xl p-3 mt-3 shadow-xs border border-slate-200/60 group">
             <summary class="list-none cursor-pointer flex justify-between items-center text-[10px] font-extrabold text-slate-500 uppercase tracking-wider select-none">
                 <span class="flex items-center gap-1">
@@ -510,14 +499,6 @@
         <span class="text-[8px] text-slate-400 font-medium"><i class="fa-solid fa-code"></i> พัฒนาโดย Khemika-OPD Takhli</span>
     </footer>
 
-    <!-- HTML5 Audio Tags for Pre-recorded MP3 Files (Hosted alongside index.html) -->
-    <audio id="soundNewJob" src="sounds/new_job.mp3" preload="auto"></audio>
-    <audio id="soundUrgentJob" src="sounds/urgent_job.mp3" preload="auto"></audio>
-    <audio id="soundRepeat" src="sounds/repeat.mp3" preload="auto"></audio>
-
-    <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-200.wav" preload="auto"></audio>
-    <audio id="urgentSound" src="https://assets.mixkit.co/active_storage/sfx/911/911-200.wav" loop preload="auto"></audio>
-
     <!-- Core Application Script -->
     <script>
         // Production API endpoint of Takhli Google Apps Script
@@ -527,23 +508,24 @@
         let isAudioUnlocked = false;
         let confirmPromiseResolver = null;
         let urgentPlaying = false;
-        let isFirstSync = true; // NEW: Flag to register existing board jobs silently on initial load
         
-        // Track already-notified/spoken queues to prevent repeating voice alerts on every sync interval
+        // CRITICAL FIX: isFirstSync allows silent initial registrations without noisy sound triggers
+        let isFirstSync = true; 
+        
+        // Track already-notified queues to prevent repeats on every API poll cycle
         let announcedJobs = new Set(JSON.parse(localStorage.getItem("Takhli_Announced_Jobs") || "[]"));
         let lastAnnouncedTime = 0;
         let currentMode = "nurse";
         let syncTimeout = null;
 
-        // Anti-Garbage Collection Store for SpeechSynthesis (To prevent voice stuttering on Chrome/Safari)
+        // Anti-Garbage Collection Store for SpeechSynthesis (to safeguard Web Speech API on Samsung)
         let activeSpeechUtterances = [];
         let thaiVoicesList = [];
         let currentlyVisiblePendingJobs = [];
 
-        // ระบบสร้างคลื่นสัญญาณเสียงสดผ่านชิปประมวลผลลำโพงมือถือโดยตรง (ไม่พึ่งพาเน็ตดาวน์โหลดไฟล์)
+        // Web Audio API context properties for high-compatibility synthesized alarms
         let audioCtx = null;
         let sirenOsc1 = null;
-        let sirenOsc2 = null;
         let sirenGain = null;
         let sirenInterval = null;
 
@@ -560,18 +542,18 @@
             }
         }
 
-        // ฟังก์ชันสร้างเสียงกระดิ่ง "ติ๊งหน่อง" แจ้งเตือนคิวปกติความเที่ยงตรงสูง
+        // High precision synthesized 'Ting Tong' bell chime
         function playSynthesizedChime() {
             initAudioContext();
             if (!audioCtx) return;
             try {
                 const now = audioCtx.currentTime;
                 
-                // เสียงโน้ตตัวที่ 1 (โทนสูงปานกลาง)
+                // Note 1 (A5)
                 const osc1 = audioCtx.createOscillator();
                 const gain1 = audioCtx.createGain();
                 osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(880, now); // โน้ต A5
+                osc1.frequency.setValueAtTime(880, now);
                 gain1.gain.setValueAtTime(0.25, now);
                 gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
                 osc1.connect(gain1);
@@ -579,11 +561,11 @@
                 osc1.start(now);
                 osc1.stop(now + 0.4);
 
-                // เสียงโน้ตตัวที่ 2 (เสียงใสสูงพาสเทล)
+                // Note 2 (E6)
                 const osc2 = audioCtx.createOscillator();
                 const gain2 = audioCtx.createGain();
                 osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(1320, now + 0.12); // โน้ต E6
+                osc2.frequency.setValueAtTime(1320, now + 0.12);
                 gain2.gain.setValueAtTime(0.25, now + 0.12);
                 gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
                 osc2.connect(gain2);
@@ -591,20 +573,20 @@
                 osc2.start(now + 0.12);
                 osc2.stop(now + 0.6);
             } catch(e) {
-                console.warn("Synthesizer fail fallback to tag:", e);
+                console.warn("Synthesizer failed:", e);
             }
         }
 
-        // ฟังก์ชันบีบสร้างเสียงไซเรนฉุกเฉิน "วี้หว่อ" แบบเรียลไทม์บนมือถือ
+        // High compatibility synthesized 'Wee-Woo' ambulance style siren
         function playSynthesizedSiren() {
             initAudioContext();
-            if (!audioCtx || sirenOsc1) return; // หากกำลังดังอยู่แล้วให้ข้าม
+            if (!audioCtx || sirenOsc1) return; // Prevent duplicate overlap triggers
             try {
                 const now = audioCtx.currentTime;
                 sirenOsc1 = audioCtx.createOscillator();
                 sirenGain = audioCtx.createGain();
                 
-                sirenOsc1.type = 'triangle'; // เสียงแบบหวอพยาบาลนุ่มนวล
+                sirenOsc1.type = 'triangle'; // Smooth alarm frequency wave
                 sirenOsc1.frequency.setValueAtTime(550, now);
                 
                 sirenGain.gain.setValueAtTime(0.12, now);
@@ -616,7 +598,6 @@
                 sirenInterval = setInterval(() => {
                     if (!audioCtx || !sirenOsc1) return;
                     const currentTime = audioCtx.currentTime;
-                    // สลับระดับความถี่ความถี่ของไซเรน
                     sirenOsc1.frequency.exponentialRampToValueAtTime(toggle ? 850 : 500, currentTime + 0.28);
                     toggle = !toggle;
                 }, 300);
@@ -637,7 +618,7 @@
             sirenGain = null;
         }
 
-        // ฟังก์ชันสร้างหน้าต่างเดี่ยวอิสระ (Blob URL) ปลดล็อก Sandbox Iframe สำหรับมือถือ
+        // Sandbox escaper method to pop app into full Safari/Chrome view
         function openInNewTab() {
             const htmlContent = document.documentElement.outerHTML;
             const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -645,6 +626,7 @@
             window.open(url, '_blank');
         }
 
+        // Clean medical acronyms and emojis for accurate Thai Speech pronunciation
         function sanitizePronunciation(text) {
             if (!text) return "";
             return text.toString()
@@ -667,23 +649,22 @@
                 .replace(/จุดลงจากรถ/g, " จุดลงจากรถ ")
                 .replace(/จุดแยกตรวจ/g, " จุดแยกตรวจ ")
                 .replace(/จุดซักประวัติ/g, " จุดซักประวัติ ")
-                .replace(/\s+/g, " "); // collapse extra spacing
+                .replace(/\s+/g, " ");
         }
 
         // Clock & Initial setups
         window.onload = function() {
-            // ตรวจสอบว่าแอปทำงานอยู่ภายใต้กรอบจำลอง Iframe ของเว็บหรือไม่
             if (window.self !== window.top) {
                 document.getElementById("iframeWarningBanner").classList.remove("hidden");
             }
 
-            // Start Clock
+            // Start Live clock loop
             updateClock();
             setInterval(updateClock, 1000);
 
-            // Set default date in Dashboard input to "Today" (yyyy-mm-dd) in Thai timezone context
+            // Set default date picker value to "Today" (yyyy-mm-dd format)
             const today = new Date();
-            const dateStr = today.toLocaleDateString('en-CA'); // 'YYYY-MM-DD' formats reliably
+            const dateStr = today.toLocaleDateString('en-CA');
             document.getElementById("dashboardDate").value = dateStr;
 
             const savedName = localStorage.getItem("OPD_Staff_Name");
@@ -692,49 +673,37 @@
                 const el = document.getElementById("currentStaffLabel");
                 if (el) el.innerText = "คุณ " + savedName;
                 
-                const loginSection = document.getElementById("loginSection");
-                if (loginSection) loginSection.classList.add("hidden");
-                
-                const profileSection = document.getElementById("profileSection");
-                if (profileSection) profileSection.classList.remove("hidden");
+                document.getElementById("loginSection").classList.add("hidden");
+                document.getElementById("profileSection").classList.remove("hidden");
             }
+            
+            // Start API Sync Loop
             fetchDataFromSheet();
             setInterval(fetchDataFromSheet, 3000); 
             setInterval(checkPendingReminders, 5000);
             
-            // Populate Thai voices after speech synthesis system prepares list
+            // Populate Thai speech voice assets on setup
             setTimeout(populateThaiVoices, 1000);
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.onvoiceschanged = populateThaiVoices;
             }
 
-            // Global click/touch event listener to seamlessly bypass browser auto-play restrictions
+            // Universal touch unlock handler to safely bypass auto-play restrictions on iOS & Android
             document.body.addEventListener('click', function automaticAudioUnlock() {
-                initAudioContext(); // ปลดล็อก Web Audio API สด
+                initAudioContext();
                 if (!isAudioUnlocked) {
-                    const sSound = document.getElementById("successSound");
-                    const uSound = document.getElementById("urgentSound");
-                    if (sSound && uSound) {
-                        sSound.play().then(() => { sSound.pause(); }).catch(e => {});
-                        uSound.play().then(() => { uSound.pause(); }).catch(e => {});
-                    }
                     isAudioUnlocked = true;
                     
-                    // Hide the warning zone as audio has been successfully unlocked
                     const zone = document.getElementById("audioUnlockZone");
                     if (zone) zone.classList.add("hidden");
                     
-                    // ปล่อยกระดิ่งทักทายสด
                     playSynthesizedChime();
                     speakThai("ยินดีต้อนรับสู่ระบบคิวเปลอัจฉริยะ โรงพยาบาลตาคลีค่ะ");
-                    
-                    // Clean up listener to run only once
                     document.body.removeEventListener('click', automaticAudioUnlock);
                 }
             }, { once: false });
         };
 
-        // Live Clock generator function
         function updateClock() {
             const now = new Date();
             const days = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
@@ -746,7 +715,7 @@
             const dayName = days[now.getDay()];
             const date = now.getDate();
             const monthName = months[now.getMonth()];
-            const year = now.getFullYear() + 543; // Buddhist Era
+            const year = now.getFullYear() + 543;
             const timeStr = now.toLocaleTimeString('th-TH', { hour12: false });
             
             const clockEl = document.getElementById("liveClock");
@@ -835,23 +804,15 @@
         }
 
         function unlockAudioElements() {
-            initAudioContext(); // สั่งลำโพงหลังบ้านเบราว์เซอร์ตื่นตัว
-            const sSound = document.getElementById("successSound");
-            const uSound = document.getElementById("urgentSound");
-            if (sSound && uSound) {
-                // Play and immediately pause to satisfy mobile browser autoplay permissions
-                sSound.play().then(() => { sSound.pause(); sSound.currentTime = 0; }).catch(e => {});
-                uSound.play().then(() => { uSound.pause(); uSound.currentTime = 0; }).catch(e => {});
-                isAudioUnlocked = true;
-                
-                const zone = document.getElementById("audioUnlockZone");
-                if (zone) zone.classList.add("hidden");
-                
-                // ปล่อยกระดิ่งทักทายสด
-                playSynthesizedChime();
-                speakThai("เปิดระบบเสียงเตือนอัจฉริยะ บนโทรศัพท์มือถือ สำเร็จแล้วค่ะ");
-                showCustomAlert("🔊 เปิดระบบเสียงสำเร็จ!", "ระบบเสียงเตือนภาษาไทยและกระดิ่งสังเคราะห์สแตนด์บายเรียบร้อยแล้วค่ะ", "success");
-            }
+            initAudioContext();
+            isAudioUnlocked = true;
+            
+            const zone = document.getElementById("audioUnlockZone");
+            if (zone) zone.classList.add("hidden");
+            
+            playSynthesizedChime();
+            speakThai("เปิดระบบเสียงเตือนอัจฉริยะ บนโทรศัพท์มือถือ สำเร็จแล้วค่ะ");
+            showCustomAlert("🔊 เปิดระบบเสียงสำเร็จ!", "ระบบเสียงเตือนภาษาไทยและกระดิ่งสังเคราะห์สแตนด์บายเรียบร้อยแล้วค่ะ", "success");
         }
 
         // Speak dynamic text via Text-To-Speech (Optimized specifically for Android/Samsung TTS Engines)
@@ -860,13 +821,13 @@
             if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
             
             try {
-                // STEP 1: Wake up Samsung Android Media channel with sub-audible chime
+                // Wake up Samsung Audio pipeline using sub-audible low frequency wave
                 initAudioContext();
                 if (audioCtx) {
                     const now = audioCtx.currentTime;
                     const silentOsc = audioCtx.createOscillator();
                     const silentGain = audioCtx.createGain();
-                    silentOsc.frequency.setValueAtTime(1, now); // 1Hz sub-audible
+                    silentOsc.frequency.setValueAtTime(1, now); // 1Hz Sub-audible wave
                     silentGain.gain.setValueAtTime(0.001, now);
                     silentOsc.connect(silentGain);
                     silentGain.connect(audioCtx.destination);
@@ -874,13 +835,11 @@
                     silentOsc.stop(now + 0.1);
                 }
 
-                // WARNING: Never call speechSynthesis.cancel() aggressively right before speak() on Android
-                // as it halts the TTS system queue and silences all future calls!
-                
+                // Note: Avoiding speechSynthesis.cancel() as it causes Samsung TTS engines to hang
                 const cleanPhrase = sanitizePronunciation(phrase);
                 const utterance = new SpeechSynthesisUtterance(cleanPhrase);
                 
-                // Keep references to prevent JavaScript Garbage Collection on mobile Chrome
+                // Keep references alive to avoid premature Garbage Collection on mobile Chrome
                 activeSpeechUtterances.push(utterance);
                 
                 utterance.onend = function() {
@@ -891,16 +850,12 @@
                 };
 
                 const selector = document.getElementById("thaiVoiceSelector");
-                // ONLY explicitly bind the voice object if the user selected a custom voice from the list
                 if (selector && selector.value !== "" && thaiVoicesList.length > 0) {
                     const selectedIdx = parseInt(selector.value);
                     if (thaiVoicesList[selectedIdx]) {
                         utterance.voice = thaiVoicesList[selectedIdx];
                     }
                 }
-                // NOTE: If no voice is chosen, do NOT bind a custom voice manually. 
-                // This lets Samsung/Android natively resolve the "th-TH" locale using its default downloaded local voice package, 
-                // preventing silent crashes from offline cloud voices.
 
                 utterance.lang = "th-TH";
                 utterance.rate = 0.95; 
@@ -909,7 +864,7 @@
                 
                 window.speechSynthesis.speak(utterance);
             } catch(e) {
-                console.error("Speech Synthesis failure bypassed: ", e);
+                console.error("Speech Synthesis bypassed safely: ", e);
             }
         }
 
@@ -928,7 +883,6 @@
             const secDashboard = document.getElementById("dashboardModeSection");
             const secSharedBoard = document.getElementById("sharedQueueBoard");
 
-            // Reset tab styles
             btnNurse.className = "flex-1 py-2 font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 text-slate-600 hover:text-slate-800";
             btnStaff.className = "flex-1 py-2 font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 text-slate-600 hover:text-slate-800";
             btnDashboard.className = "flex-1 py-2 font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 text-slate-600 hover:text-slate-800";
@@ -936,7 +890,7 @@
             secNurse.classList.add("hidden");
             secStaff.classList.add("hidden");
             secDashboard.classList.add("hidden");
-            secSharedBoard.classList.remove("hidden"); // Default show board
+            secSharedBoard.classList.remove("hidden");
 
             if (role === 'nurse') {
                 btnNurse.className = "flex-1 py-2 font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 bg-white text-primary-600 shadow-xs";
@@ -947,7 +901,7 @@
             } else {
                 btnDashboard.className = "flex-1 py-2 font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 bg-white text-primary-600 shadow-xs";
                 secDashboard.classList.remove("hidden");
-                secSharedBoard.classList.add("hidden"); // Hide board on dedicated analytical dashboard tab
+                secSharedBoard.classList.add("hidden");
             }
             fetchDataFromSheet();
         }
@@ -963,7 +917,7 @@
             script.src = GOOGLE_SHEET_URL + "?callback=handleSheetData&nocache=" + new Date().getTime();
             document.body.appendChild(script);
 
-            // Safety fallback if the JSONP fails inside sandbox/offline environment
+            // Fallback to local memory if internet sync fails
             if (syncTimeout) clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
                 const statusText = document.getElementById("syncStatus").innerHTML;
@@ -985,12 +939,11 @@
                 const localJobs = JSON.parse(localStorage.getItem("Takhli_Smart_Queue_Jobs")) || [];
                 const remoteTimes = new Set(remoteJobs.map(rj => (rj["เวลาสั่งงาน"] || rj.เวลาสั่งงาน || rj.time || "").toString()));
                 
-                // Keep local jobs that haven't been synchronized or uploaded yet
+                // Retain un-synced local edits
                 const pendingUpload = localJobs.filter(lj => !remoteTimes.has(lj["เวลาสั่งงาน"]));
                 mergedData = [...pendingUpload, ...remoteJobs];
 
-                // CRITICAL FIX: Overwrite local storage with the latest remote synced data
-                // This ensures deletions (cancellations) on computer propagate instantly to phones!
+                // Write synced database onto LocalStorage to clear cancelled items
                 localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(mergedData));
             } else {
                 mergedData = JSON.parse(localStorage.getItem("Takhli_Smart_Queue_Jobs")) || [];
@@ -1000,10 +953,7 @@
         }
 
         function processAndRenderData(allJobs) {
-            // Render standard board lists (Shared Queue view)
             renderQueueFeed(allJobs);
-
-            // Render analytical statistics (Interactive Dashboard view)
             renderDashboardStats(allJobs);
         }
 
@@ -1011,7 +961,6 @@
             const queueListPending = document.getElementById("queueListPending");
             const queueListActive = document.getElementById("queueListActive");
 
-            // Sort: Pending Jobs (Ordered but not accepted yet, and not completed/cancelled)
             const pendingJobs = data.filter(job => {
                 const timestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
                 const porter = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
@@ -1026,7 +975,6 @@
                        acceptTime.toString().trim() !== "CANCELLED";
             });
 
-            // Sort: Active Jobs (Staff accepted and currently transporting patient, not completed yet)
             const activeJobs = data.filter(job => {
                 const timestamp = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
                 const porter = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
@@ -1041,7 +989,6 @@
                        (completion.toString().trim() === "" || completion === undefined);
             });
 
-            // SORT active jobs by acceptance date/time descending (newest accepted on top)
             activeJobs.sort((a, b) => {
                 const timeA = new Date(a["เวลารับงาน"] || a.เวลารับงาน || a.status || 0).getTime();
                 const timeB = new Date(b["เวลารับงาน"] || b.เวลารับงาน || b.status || 0).getTime();
@@ -1050,7 +997,7 @@
 
             currentlyVisiblePendingJobs = pendingJobs;
 
-            // 1. Render Pending Queue Section
+            // Render Group 1: Pending queues
             if (pendingJobs.length === 0) {
                 queueListPending.innerHTML = `
                     <div class="text-center py-3 px-2 text-slate-400 border border-dashed border-slate-200 rounded-lg bg-slate-50/50">
@@ -1068,8 +1015,7 @@
                     
                     if (!announcedJobs.has(timeStr)) {
                         if (isFirstSync) {
-                            // First sync: register silently so pre-existing board items do not call out
-                            announcedJobs.add(timeStr);
+                            announcedJobs.add(timeStr); // Silent register on startup
                         } else {
                             newlyArrivedJob = job;
                             announcedJobs.add(timeStr);
@@ -1132,7 +1078,7 @@
 
                 localStorage.setItem("Takhli_Announced_Jobs", JSON.stringify(Array.from(announcedJobs)));
 
-                // UPDATED: Play notification sounds ONLY if NOT in the first-load sync sequence
+                // Alert triggered ONLY if newly Arrived and NOT on initial sync setup
                 if (newlyArrivedJob && isAudioUnlocked && !isFirstSync) {
                     const priority = newlyArrivedJob["ระดับความเร่งด่วน"] || newlyArrivedJob.ระดับความเร่งด่วน || "ปกติ";
                     const origin = newlyArrivedJob["จุดต้นทาง"] || newlyArrivedJob.จุดต้นทาง || "";
@@ -1140,11 +1086,11 @@
                     const equipment = newlyArrivedJob["ประเภทอุปกรณ์ที่ต้องใช้"] || newlyArrivedJob.ประเภทอุปกรณ์ || "รถเข็นนั่ง";
                     
                     if (priority.includes("เร่งด่วน") || priority === "เร่งด่วน") {
-                        playSynthesizedSiren(); // ยิงเสียงไซเรนฉุกเฉินสดขึ้นมือถือทันที
+                        playSynthesizedSiren();
                         const fallbackText = `เรียกคิวเปลด่วนค่ะ,, มีเคสเร่งด่วน,, จากจุด ${origin},, ไปยัง ${to},, อุปกรณ์ คือ ${equipment},, ด่วนค่ะ`;
                         playVoiceNotification("urgent", fallbackText);
                     } else {
-                        playSynthesizedChime(); // ยิงเสียงกระดิ่ง "ติ๊งหน่อง" แจ้งเตือนเคสปกติ
+                        playSynthesizedChime();
                         const fallbackText = `เรียกคิวเปลค่ะ,, มีเคสใหม่,, จากจุด ${origin},, ไปยัง ${to},, อุปกรณ์คือ ${equipment} ค่ะ`;
                         playVoiceNotification("normal", fallbackText);
                     }
@@ -1157,13 +1103,13 @@
                     stopSynthesizedSiren();
                 }
 
-                // Finalize first load sync silently
+                // Shutdown first load initialization guard
                 if (isFirstSync) {
                     isFirstSync = false;
                 }
             }
 
-            // 2. Render Active/Accepted Queue Section
+            // Render Group 2: Active accepted queues
             if (activeJobs.length === 0) {
                 queueListActive.innerHTML = `
                     <div class="text-center py-3 px-2 text-slate-400 border border-dashed border-slate-200 rounded-lg bg-slate-50/50">
@@ -1194,7 +1140,6 @@
                     
                     const safeTime = escapeHtml(currentRawTimestamp.toString());
                     
-                    // Porter task closure actions
                     activeCard.innerHTML = `
                         <div class="flex items-center justify-between text-[10px]">
                             <div class="flex items-center gap-1">
@@ -1208,7 +1153,6 @@
                         <div class="text-[11px] text-slate-600">
                             <p><span class="font-bold text-slate-700">📍 จาก:</span> ${escapeHtml(currentOrigin)} ➡️ <span class="font-bold text-slate-700">ไป:</span> ${escapeHtml(currentDestination)} | <span class="font-semibold text-slate-500">${escapeHtml(currentEquipment)}</span></p>
                         </div>
-                        <!-- Completed / Arrived Close Button -->
                         <div class="mt-1">
                             <button onclick="completeJob('${safeTime}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 text-2xs shadow-xs transform active:scale-95">
                                 <i class="fa-solid fa-circle-check"></i>
@@ -1222,10 +1166,9 @@
         }
 
         function renderDashboardStats(allJobs) {
-            const filterDateStr = document.getElementById("dashboardDate").value; // YYYY-MM-DD
+            const filterDateStr = document.getElementById("dashboardDate").value;
             if (!filterDateStr) return;
 
-            // Filter jobs by selected date
             const targetDate = new Date(filterDateStr);
             const dayJobs = allJobs.filter(job => {
                 const rawTime = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
@@ -1234,10 +1177,8 @@
                 return jobDate.toDateString() === targetDate.toDateString();
             });
 
-            // Counters logic
             const total = dayJobs.length;
             
-            // "Completed" refers to jobs that are closed (marked Arrived)
             const completed = dayJobs.filter(job => {
                 const staff = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
                 const accept = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
@@ -1250,7 +1191,6 @@
                        complete.toString().trim() !== "";
             }).length;
 
-            // "Active" refers to jobs accepted but not closed/completed yet
             const active = dayJobs.filter(job => {
                 const staff = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
                 const accept = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
@@ -1273,7 +1213,6 @@
             document.getElementById("dashPendingCount").innerText = active;
             document.getElementById("dashUrgentCount").innerText = urgent;
 
-            // Render Leaderboard (Count COMPLETED jobs by staff)
             const staffCounts = {};
             dayJobs.forEach(job => {
                 const staff = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
@@ -1316,7 +1255,6 @@
                 });
             }
 
-            // Render Equipment Usage Percentage Bars
             const eqCounts = { "รถเข็นนั่ง": 0, "รถนอน": 0, "เดินประคอง": 0, "ออกซิเจน": 0 };
             let totalEq = 0;
             dayJobs.forEach(job => {
@@ -1431,7 +1369,6 @@
                 .replace(/'/g, "&#039;");
         }
 
-        /* custom alert controls */
         function showCustomAlert(title, message, type = "success") {
             document.getElementById("alert-title").innerText = title;
             document.getElementById("alert-message").innerText = message;
@@ -1450,7 +1387,6 @@
             document.getElementById("custom-alert").classList.add("hidden");
         }
 
-        /* custom confirm dialog controls */
         function showCustomConfirm(title, message) {
             document.getElementById("confirm-title").innerText = title;
             document.getElementById("confirm-message").innerText = message;
@@ -1491,13 +1427,12 @@
                 "เวลาเสร็จสิ้น": ""
             };
 
-            // Local save first for instantaneous responsive feedback
             let localJobs = JSON.parse(localStorage.getItem("Takhli_Smart_Queue_Jobs")) || [];
             localJobs.unshift(newJob);
             localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
             processAndRenderData(localJobs);
 
-            // สั่นและยิงสัญญาณเสียงเตือนสดด่วน
+            // Trigger synthesized chimes on creation click
             if (priority.includes("เร่งด่วน") || priority === "เร่งด่วน") {
                 playSynthesizedSiren();
             } else {
@@ -1542,7 +1477,6 @@
 
             const cleanEndDateTime = new Date().toISOString();
 
-            // Immediate Local Update for Fluid feel
             let localJobs = JSON.parse(localStorage.getItem("Takhli_Smart_Queue_Jobs")) || [];
             localJobs = localJobs.map(job => {
                 const time = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
@@ -1555,7 +1489,6 @@
             localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
             processAndRenderData(localJobs);
 
-            // ปล่อยกระดิ่ง chimes รับงานสำเร็จบนมือถือพนักงานเปล
             playSynthesizedChime();
 
             const payload = {
@@ -1579,13 +1512,12 @@
             });
         }
 
-        // Complete Job function (Mark Arrived / Closed)
+        // Close Job complete markers
         function completeJob(timestamp) {
             const cleanCompleteTime = new Date().toISOString();
 
             showCustomConfirm("ส่งงานเสร็จสิ้น", "ยืนยันว่าได้ส่งตัวคนไข้ถึงจุดหมายปลายทางเรียบร้อยแล้วใช่หรือไม่?").then((result) => {
                 if (result) {
-                    // Update Local Storage immediately
                     let localJobs = JSON.parse(localStorage.getItem("Takhli_Smart_Queue_Jobs")) || [];
                     localJobs = localJobs.map(job => {
                         const time = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
@@ -1597,15 +1529,13 @@
                     localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
                     processAndRenderData(localJobs);
 
-                    // ยิงเสียงกระดิ่งติ๊งหน่องสดปิดงานสำเร็จ
                     playSynthesizedChime();
 
-                    // Post to Google Apps Script API
                     const payload = {
                         action: "update",
                         time: timestamp,
                         staff: currentStaff,
-                        status: "COMPLETED", // compatibility tag
+                        status: "COMPLETED",
                         complete: cleanCompleteTime
                     };
 
@@ -1628,7 +1558,6 @@
         function cancelJob(timestamp) {
             showCustomConfirm("ยืนยันสิทธิ์ยกเลิก", "ต้องการยกเลิกคำสั่งส่งเปลสำหรับเคสนี้ใช่หรือไม่?").then((result) => {
                 if (result) {
-                    // Perform local cancel immediately to maintain fluid UI responsive feel
                     let localJobs = JSON.parse(localStorage.getItem("Takhli_Smart_Queue_Jobs")) || [];
                     localJobs = localJobs.filter(job => {
                         const time = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
@@ -1637,7 +1566,6 @@
                     localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
                     processAndRenderData(localJobs);
 
-                    // Send POST to Google Sheets to mark cancelled
                     const payload = {
                         action: "update",
                         time: timestamp,
@@ -1662,23 +1590,11 @@
         }
 
         function playUrgentSound() {
-            playSynthesizedSiren(); // ยิงกระดิ่งอิเล็กทรอนิกส์สดแทน
-            const uSound = document.getElementById("urgentSound");
-            if (uSound && !urgentPlaying) {
-                uSound.play().then(() => {
-                    urgentPlaying = true;
-                }).catch(e => {});
-            }
+            playSynthesizedSiren();
         }
 
         function stopUrgentSound() {
-            stopSynthesizedSiren(); // ปิดเสียงกระดิ่งไซเรนสังเคราะห์สด
-            const uSound = document.getElementById("urgentSound");
-            if (uSound && urgentPlaying) {
-                uSound.pause();
-                uSound.currentTime = 0;
-                urgentPlaying = false;
-            }
+            stopSynthesizedSiren();
         }
     </script>
 </body>
