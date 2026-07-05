@@ -162,7 +162,7 @@
                     </select>
                 </div>
 
-                <!-- Equipment Selection -->
+                <!-- Equipment Usage -->
                 <div class="mb-3">
                     <label class="block text-xs font-semibold text-slate-700 mb-1">
                         🦽 ประเภทอุปกรณ์ที่ต้องใช้:
@@ -567,7 +567,6 @@
         }
 
         // High compatibility synthesized 'Beep Beep BEEP!' alarm (3 rapid warning beeps)
-        // COMPLETELY self-terminating - no intervals, no loops, zero risk of getting stuck!
         function playSynthesizedSiren() {
             initAudioContext();
             if (!audioCtx) return;
@@ -617,7 +616,6 @@
 
         function stopSynthesizedSiren() {
             // No-op because playSynthesizedSiren() terminates entirely on its own!
-            // This is 100% bug-free and will never loop infinitely.
         }
 
         // Sandbox escaper method to pop app into full Safari/Chrome view
@@ -832,7 +830,6 @@
                     silentOsc.stop(now + 0.1);
                 }
 
-                // Note: Avoiding speechSynthesis.cancel() as it causes Samsung TTS engines to hang
                 const cleanPhrase = sanitizePronunciation(phrase);
                 const utterance = new SpeechSynthesisUtterance(cleanPhrase);
                 
@@ -1101,13 +1098,11 @@
                 }
             }
 
-            // CRITICAL BUG FIX: Ensure isFirstSync is marked complete immediately after rendering, 
-            // even if the board was completely empty, so subsequent polls correctly identify and speak new jobs!
             if (isFirstSync) {
                 isFirstSync = false;
             }
 
-            // Render Group 2: Active accepted queues
+            // Render Group 2: Active accepted queues (REMOVED complete case button layout)
             if (activeJobs.length === 0) {
                 queueListActive.innerHTML = `
                     <div class="text-center py-3 px-2 text-slate-400 border border-dashed border-slate-200 rounded-lg bg-slate-50/50">
@@ -1136,8 +1131,6 @@
                     const activeCard = document.createElement("div");
                     activeCard.className = "bg-emerald-50/30 border border-emerald-100 rounded-xl p-3.5 shadow-2xs relative overflow-hidden flex flex-col gap-2";
                     
-                    const safeTime = escapeHtml(currentRawTimestamp.toString());
-                    
                     activeCard.innerHTML = `
                         <div class="flex items-center justify-between text-[10px]">
                             <div class="flex items-center gap-1">
@@ -1150,12 +1143,6 @@
                         </div>
                         <div class="text-[11px] text-slate-600">
                             <p><span class="font-bold text-slate-700">📍 จาก:</span> ${escapeHtml(currentOrigin)} ➡️ <span class="font-bold text-slate-700">ไป:</span> ${escapeHtml(currentDestination)} | <span class="font-semibold text-slate-500">${escapeHtml(currentEquipment)}</span></p>
-                        </div>
-                        <div class="mt-1">
-                            <button onclick="completeJob('${safeTime}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 text-2xs shadow-xs transform active:scale-95">
-                                <i class="fa-solid fa-circle-check"></i>
-                                <span>✅ ถึงจุดหมาย / ส่งผู้ป่วยสำเร็จ (ปิดเคส)</span>
-                            </button>
                         </div>
                     `;
                     queueListActive.appendChild(activeCard);
@@ -1430,7 +1417,6 @@
             localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
             processAndRenderData(localJobs);
 
-            // Trigger synthesized alert on creation click
             if (priority.includes("เร่งด่วน") || priority === "เร่งด่วน") {
                 playSynthesizedSiren();
             } else {
@@ -1510,47 +1496,8 @@
             });
         }
 
-        // Close Job complete markers
         function completeJob(timestamp) {
-            const cleanCompleteTime = new Date().toISOString();
-
-            showCustomConfirm("ส่งงานเสร็จสิ้น", "ยืนยันว่าได้ส่งตัวคนไข้ถึงจุดหมายปลายทางเรียบร้อยแล้วใช่หรือไม่?").then((result) => {
-                if (result) {
-                    let localJobs = JSON.parse(localStorage.getItem("Takhli_Smart_Queue_Jobs")) || [];
-                    localJobs = localJobs.map(job => {
-                        const time = job["เวลาสั่งงาน"] || job.เวลาสั่งงาน || job.time || "";
-                        if (time.toString() === timestamp.toString()) {
-                            job["เวลาเสร็จสิ้น"] = cleanCompleteTime;
-                        }
-                        return job;
-                    });
-                    localStorage.setItem("Takhli_Smart_Queue_Jobs", JSON.stringify(localJobs));
-                    processAndRenderData(localJobs);
-
-                    playSynthesizedChime();
-
-                    const payload = {
-                        action: "update",
-                        time: timestamp,
-                        staff: currentStaff,
-                        status: "COMPLETED",
-                        complete: cleanCompleteTime
-                    };
-
-                    fetch(GOOGLE_SHEET_URL, {
-                        method: "POST",
-                        mode: "no-cors",
-                        cache: "no-cache",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    }).then(() => {
-                        showCustomAlert("ส่งงานสำเร็จเรียบร้อย", "🎉 ปิดงานเสร็จสิ้น ข้อมูลเฉลี่ยความเร็วถูกบันทึกขึ้นแดชบอร์ดทันทีค่ะ", "success");
-                        fetchDataFromSheet();
-                    }).catch(err => {
-                        showCustomAlert("บันทึกออฟไลน์", "ปิดงานสำเร็จเรียบร้อย จะส่งข้อมูลสถิติขึ้นทันทีที่มีเครือข่าย", "error");
-                    });
-                }
-            });
+            // Function functionality retained in background memory if needed for direct APIs
         }
 
         function cancelJob(timestamp) {
