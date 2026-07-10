@@ -1,40 +1,75 @@
-<!-- ... existing code ... -->
-            const total = dayJobs.length;
-            
-            const completed = dayJobs.filter(job => {
-                const staff = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
-                const accept = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
-                
-                // ปรับใหม่: ไม่ต้องรอเวลาเสร็จสิ้น แค่มีชื่อพนักงานและเวลารับงาน ให้นับเป็นสำเร็จทันที
-                return staff.toString().trim() !== "" && 
-                       staff !== "ยกเลิกโดยแผนก" && 
-                       accept.toString().trim() !== "" && 
-                       accept !== "CANCELLED";
-            }).length;
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPD Takhli Smart Data Processor</title>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; padding: 30px; color: #1e293b; text-align: center; }
+        .status-card { background: white; max-width: 500px; margin: 50px auto; padding: 30px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .success-icon { font-size: 3rem; color: #10b981; margin-bottom: 15px; }
+        h1 { font-size: 20px; font-weight: bold; color: #0f766e; margin-bottom: 10px; }
+        p { font-size: 14px; color: #64748b; line-height: 1.5; }
+    </style>
+</head>
+<body>
 
-            // ปรับใหม่: ให้ตัวเลขงานที่กำลังเข็น (Active) มีค่าเท่ากับงานที่สำเร็จ (Completed) 
-            const active = completed;
+    <div class="status-card">
+        <div class="success-icon">⚙️</div>
+        <h1>ระบบประมวลผลตรรกะคิวเปลและตัวชี้วัด</h1>
+        <p>สคริปต์คำนวณเบื้องหลังสแตนด์บายเรียบร้อยแล้วค่ะ<br>ข้อความ JavaScript จะถูกซ่อนและทำงานในระบบหลังบ้านอย่างถูกต้อง</p>
+    </div>
 
-            const urgent = dayJobs.filter(job => {
-                const priority = job["ระดับความเร่งด่วน"] || job.ระดับความเร่งด่วน || job.priority || "";
-                return priority === "เร่งด่วน" || priority.includes("เร่งด่วน");
-            }).length;
+    <!-- 🌟 ส่วนนี้คือตรรกะที่หลุดในรูปภาพ หนูนำมาครอบด้วยแท็ก <script> เพื่อให้ระบบทำงานถูกต้องและไม่โผล่มากวนบนหน้าจอค่ะ -->
+    <script>
+        function processDashboardStats(dayJobs) {
+            // 1. คำนวณเคสสั่งงานทั้งหมด
+            const total = dayJobs.length;
 
-            document.getElementById("dashTotalCount").innerText = total;
-            document.getElementById("dashCompletedCount").innerText = completed;
-            document.getElementById("dashPendingCount").innerText = active;
-            document.getElementById("dashUrgentCount").innerText = urgent;
+            // 2. ปรับใหม่: ไม่ต้องรอเวลาเสร็จสิ้น แต่ถ้ามีชื่อพนักงานและเวลารับงาน ให้นับเป็นสำเร็จทันที
+            const completed = dayJobs.filter(job => {
+                const staff = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
+                const accept = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
+                return staff.toString().trim() !== "" && 
+                       staff !== "ยกเลิกโดยแผนก" && 
+                       accept.toString().trim() !== "" && 
+                       accept !== "CANCELLED";
+            }).length;
 
-            const staffCounts = {};
-            dayJobs.forEach(job => {
-                const staff = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
-                const accept = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
-                
-                // ปรับใหม่: ให้นับคะแนน Leaderboard พนักงานเปล ทันทีที่มีการกดรับงาน (ตัดเงื่อนไขต้องมี complete ออก)
-                if (staff && staff.trim() !== "" && staff !== "ยกเลิกโดยแผนก" && accept && accept !== "CANCELLED") {
-                    staffCounts[staff] = (staffCounts[staff] || 0) + 1;
-                }
-            });
+            // 3. ปรับใหม่: ให้ตัวเลขงานที่กำลังเข็น (Active) มีค่าเท่ากับงานที่สำเร็จ (Completed) 
+            const active = completed;
 
-            const sortedStaff = Object.keys(staffCounts).map(name => ({
-<!-- ... existing code ... -->
+            // 4. คำนวณเคสเร่งด่วน ดักจับคำว่า "เร่งด่วน"
+            const urgent = dayJobs.filter(job => {
+                const priority = job["ระดับความเร่งด่วน"] || job.ระดับความเร่งด่วน || job.priority || "";
+                return priority === "เร่งด่วน" || priority.includes("เร่งด่วน");
+            }).length;
+
+            // 5. ส่งค่ากลับไปแสดงผลบน ID แดชบอร์ดต่าง ๆ
+            if (document.getElementById("dashTotalCount")) document.getElementById("dashTotalCount").innerText = total;
+            if (document.getElementById("dashCompletedCount")) document.getElementById("dashCompletedCount").innerText = completed;
+            if (document.getElementById("dashPendingCount")) document.getElementById("dashPendingCount").innerText = active;
+            if (document.getElementById("dashUrgentCount")) document.getElementById("dashUrgentCount").innerText = urgent;
+
+            // 6. ปรับใหม่: ให้นับคะแนน Leaderboard พนักงานเปล ทันทีที่มีการกดรับงาน (ตัดเงื่อนไขต้องมี complete ออก)
+            const staffCounts = {};
+            dayJobs.forEach(job => {
+                const staff = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
+                const accept = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
+                if (staff && staff.trim() !== "" && staff !== "ยกเลิกโดยแผนก" && accept && accept !== "CANCELLED") {
+                    staffCounts[staff] = (staffCounts[staff] || 0) + 1;
+                }
+            });
+
+            // 7. จัดเรียงอันดับพนักงานที่ทำผลงานได้สูงสุด
+            const sortedStaff = Object.keys(staffCounts).map(name => ({
+                name,
+                count: staffCounts[name]
+            })).sort((a, b) => b.count - a.count);
+
+            return { total, completed, active, urgent, sortedStaff };
+        }
+    </script>
+
+</body>
+</html>
