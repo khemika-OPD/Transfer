@@ -52,7 +52,6 @@
             background: #94a3b8;
         }
         
-        /* Gentle glowing effect for the medical innovation signature tag */
         @keyframes subtle-gold-glow {
             0%, 100% { transform: scale(1); opacity: 0.95; text-shadow: 0 0 2px rgba(2, 136, 209, 0.1); }
             50% { transform: scale(1.02); opacity: 1; text-shadow: 0 0 6px rgba(2, 136, 209, 0.3); }
@@ -171,7 +170,7 @@
                         <option value="รถเข็นนั่ง">รถเข็นนั่ง (Wheelchair) 🦽</option>
                         <option value="ช่วยเข็นรถเข็นนั่ง">ช่วยเข็นรถเข็นนั่ง (มีรถแล้ว) 🦽</option>
                         <option value="รถนอน">รถนอน (Stretcher) 🛏️</option>
-                        <option value="ช่วยเข็นรถนอน">ช่วยเข็นรถนอน (มีรถแล้ว) 𛛏️</option>
+                        <option value="ช่วยเข็นรถนอน">ช่วยเข็นรถนอน (มีรถแล้ว) 🛏️</option>
                         <option value="เดินประคอง">เดินประคอง 🚶‍♂️</option>
                         <option value="ออกซิเจน">ขอออกซิเจนให้ผู้ป่วย 🧪</option>
                     </select>
@@ -319,23 +318,23 @@
                     </div>
                 </div>
 
-                <!-- Real-time Counters Grid -->
+                <!-- Real-time Counters Grid (Updated as Requested) -->
                 <div class="grid grid-cols-2 gap-3 mb-5">
                     <div class="bg-sky-50 border border-sky-100 p-3 rounded-xl text-center shadow-2xs">
-                        <p class="text-[10px] text-sky-700 font-bold uppercase tracking-wide">เคสสั่งงานทั้งหมด</p>
+                        <p class="text-[10px] text-sky-700 font-bold uppercase tracking-wide">📊 เคสสั่งงานทั้งหมด</p>
                         <p id="dashTotalCount" class="text-2xl font-black text-primary-700 font-mono">0</p>
                     </div>
-                    <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-center shadow-2xs">
-                        <p class="text-[10px] text-emerald-700 font-bold uppercase tracking-wide">ส่งปลายทางสำเร็จ (Closed)</p>
-                        <p id="dashCompletedCount" class="text-2xl font-black text-emerald-700 font-mono">0</p>
-                    </div>
                     <div class="bg-amber-50 border border-amber-100 p-3 rounded-xl text-center shadow-2xs">
-                        <p class="text-[10px] text-amber-700 font-bold uppercase tracking-wide">อยู่ระหว่างเข็นส่ง (Active)</p>
-                        <p id="dashPendingCount" class="text-2xl font-black text-amber-700 font-mono">0</p>
+                        <p class="text-[10px] text-amber-700 font-bold uppercase tracking-wide">🟡 เคสปกติ (Normal)</p>
+                        <p id="dashNormalCount" class="text-2xl font-black text-amber-700 font-mono">0</p>
                     </div>
                     <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl text-center shadow-2xs">
-                        <p class="text-[10px] text-rose-700 font-bold uppercase tracking-wide">เคสเร่งด่วน</p>
+                        <p class="text-[10px] text-rose-700 font-bold uppercase tracking-wide">🚨 เคสเร่งด่วน (Urgent)</p>
                         <p id="dashUrgentCount" class="text-2xl font-black text-red-600 font-mono">0</p>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-center shadow-2xs">
+                        <p class="text-[10px] text-emerald-700 font-bold uppercase tracking-wide">🏆 งานสำเร็จ (Closed)</p>
+                        <p id="dashCompletedCount" class="text-2xl font-black text-emerald-700 font-mono">0</p>
                     </div>
                 </div>
 
@@ -689,7 +688,7 @@
             const select = document.getElementById("thaiVoiceSelector");
             if (!select) return;
             const allVoices = window.speechSynthesis.getVoices();
-            thaiVoicesList = allVoices.filter(v => v.lang === "th-TH" || v.lang.startsWith("th-") || v.lang.startsWith("th-"));
+            thaiVoicesList = allVoices.filter(v => v.lang === "th-TH" || v.lang.startsWith("th-"));
             select.innerHTML = "";
             if (thaiVoicesList.length === 0) {
                 const opt = document.createElement("option");
@@ -1086,11 +1085,9 @@
                 return staff.toString().trim() !== "" && staff !== "ยกเลิกโดยแผนก" && accept.toString().trim() !== "" && accept !== "CANCELLED" && complete.toString().trim() !== "";
             }).length;
 
-            const active = dayJobs.filter(job => {
-                const staff = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
-                const accept = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
-                const complete = job["เวลาเสร็จสิ้น"] || job.เวลาเสร็จสิ้น || job.complete || "";
-                return staff.toString().trim() !== "" && staff !== "ยกเลิกโดยแผนก" && accept.toString().trim() !== "" && accept !== "CANCELLED" && complete.toString().trim() === "";
+            const normal = dayJobs.filter(job => {
+                const priority = job["ระดับความเร่งด่วน"] || job.ระดับความเร่งด่วน || job.priority || "ปกติ";
+                return priority === "ปกติ" || !priority.includes("เร่งด่วน");
             }).length;
 
             const urgent = dayJobs.filter(job => {
@@ -1099,9 +1096,9 @@
             }).length;
 
             document.getElementById("dashTotalCount").innerText = total;
-            document.getElementById("dashCompletedCount").innerText = completed;
-            document.getElementById("dashPendingCount").innerText = active;
+            document.getElementById("dashNormalCount").innerText = normal;
             document.getElementById("dashUrgentCount").innerText = urgent;
+            document.getElementById("dashCompletedCount").innerText = completed;
 
             const staffCounts = {};
             dayJobs.forEach(job => {
