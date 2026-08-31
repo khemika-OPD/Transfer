@@ -318,23 +318,19 @@
                     </div>
                 </div>
 
-                <!-- Real-time Counters Grid (Updated as Requested) -->
-                <div class="grid grid-cols-2 gap-3 mb-5">
-                    <div class="bg-sky-50 border border-sky-100 p-3 rounded-xl text-center shadow-2xs">
+                <!-- Real-time Counters Grid (Adjusted to 3 Cards) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                    <div class="bg-sky-50 border border-sky-100 p-3.5 rounded-xl text-center shadow-2xs">
                         <p class="text-[10px] text-sky-700 font-bold uppercase tracking-wide">📊 เคสสั่งงานทั้งหมด</p>
-                        <p id="dashTotalCount" class="text-2xl font-black text-primary-700 font-mono">0</p>
+                        <p id="dashTotalCount" class="text-3xl font-black text-primary-700 font-mono mt-1">0</p>
                     </div>
-                    <div class="bg-amber-50 border border-amber-100 p-3 rounded-xl text-center shadow-2xs">
+                    <div class="bg-amber-50 border border-amber-100 p-3.5 rounded-xl text-center shadow-2xs">
                         <p class="text-[10px] text-amber-700 font-bold uppercase tracking-wide">🟡 เคสปกติ (Normal)</p>
-                        <p id="dashNormalCount" class="text-2xl font-black text-amber-700 font-mono">0</p>
+                        <p id="dashNormalCount" class="text-3xl font-black text-amber-700 font-mono mt-1">0</p>
                     </div>
-                    <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl text-center shadow-2xs">
+                    <div class="bg-rose-50 border border-rose-100 p-3.5 rounded-xl text-center shadow-2xs">
                         <p class="text-[10px] text-rose-700 font-bold uppercase tracking-wide">🚨 เคสเร่งด่วน (Urgent)</p>
-                        <p id="dashUrgentCount" class="text-2xl font-black text-red-600 font-mono">0</p>
-                    </div>
-                    <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-center shadow-2xs">
-                        <p class="text-[10px] text-emerald-700 font-bold uppercase tracking-wide">🏆 งานสำเร็จ (Closed)</p>
-                        <p id="dashCompletedCount" class="text-2xl font-black text-emerald-700 font-mono">0</p>
+                        <p id="dashUrgentCount" class="text-3xl font-black text-red-600 font-mono mt-1">0</p>
                     </div>
                 </div>
 
@@ -1078,12 +1074,6 @@
             });
 
             const total = dayJobs.length;
-            const completed = dayJobs.filter(job => {
-                const staff = job["พนักงานเปล"] || job.พนักงานเปล || job.staff || "";
-                const accept = job["เวลารับงาน"] || job.เวลารับงาน || job.status || "";
-                const complete = job["เวลาเสร็จสิ้น"] || job.เวลาเสร็จสิ้น || job.complete || "";
-                return staff.toString().trim() !== "" && staff !== "ยกเลิกโดยแผนก" && accept.toString().trim() !== "" && accept !== "CANCELLED" && complete.toString().trim() !== "";
-            }).length;
 
             const normal = dayJobs.filter(job => {
                 const priority = job["ระดับความเร่งด่วน"] || job.ระดับความเร่งด่วน || job.priority || "ปกติ";
@@ -1098,7 +1088,6 @@
             document.getElementById("dashTotalCount").innerText = total;
             document.getElementById("dashNormalCount").innerText = normal;
             document.getElementById("dashUrgentCount").innerText = urgent;
-            document.getElementById("dashCompletedCount").innerText = completed;
 
             const staffCounts = {};
             dayJobs.forEach(job => {
